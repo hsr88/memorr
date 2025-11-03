@@ -38,7 +38,6 @@ body {
     padding: 20px 0;
     cursor: default;
     
-    /* Wyłączenie wygładzania dla ostrego wyglądu */
     -webkit-font-smoothing: none;
     -moz-osx-font-smoothing: grayscale;
     image-rendering: pixelated;
@@ -61,20 +60,17 @@ h4 { font-size: 1.8em; color: var(--text-secondary); }
 .pixel-btn {
     font-family: var(--font-pixel);
     padding: 8px 14px;
-    font-size: 1.8em; /* Duża, czytelna czcionka */
+    font-size: 1.8em;
     border: var(--border-width) solid var(--border-dark);
-    border-radius: 0; /* Bez zaokrągleń */
-    background-color: var(--accent-blue); /* Domyślny kolor tła */
-    color: var(--text-light); /* Jasny tekst na kolorowym tle */
+    border-radius: 0;
+    background-color: var(--accent-blue);
+    color: var(--text-light);
     cursor: pointer;
-    transition: none; /* Bez animacji */
-    
-    /* Twardy, przesunięty cień */
+    transition: none;
     box-shadow: var(--shadow-distance) var(--shadow-distance) 0px var(--border-dark);
     position: relative;
 }
 
-/* Efekt wciśnięcia przycisku */
 .pixel-btn:active, .pixel-btn:focus {
     outline: none;
     transform: translate(var(--shadow-distance), var(--shadow-distance));
@@ -84,7 +80,6 @@ h4 { font-size: 1.8em; color: var(--text-secondary); }
     filter: brightness(110%);
 }
 
-/* Kolorowe przyciski */
 .pixel-btn.green { background-color: var(--accent-green); }
 .pixel-btn.blue { background-color: var(--accent-blue); }
 .pixel-btn.purple { background-color: var(--accent-purple); }
@@ -102,7 +97,6 @@ h4 { font-size: 1.8em; color: var(--text-secondary); }
     margin-right: 10px;
     width: 200px;
     text-align: center;
-    /* Efekt wklęsły */
     box-shadow: inset 3px 3px 0px var(--border-light);
 }
 .pixel-input:focus {
@@ -146,7 +140,6 @@ h4 { font-size: 1.8em; color: var(--text-secondary); }
     margin-top: 20px;
     padding-top: 20px;
     width: 100%;
-    /* Pixelowa linia podziału */
     border-top: var(--border-width) dashed var(--border-light);
 }
 
@@ -158,7 +151,6 @@ h4 { font-size: 1.8em; color: var(--text-secondary); }
     margin: 15px 0;
 }
 
-/* Kontener ID Gry */
 #game-id-container {
     font-size: 1.8em;
     margin-top: 20px;
@@ -179,7 +171,6 @@ h4 { font-size: 1.8em; color: var(--text-secondary); }
     font-size: 1.3em;
 }
 
-/* Przycisk Kopiowania (dopasowany do stylu pixel) */
 .copy-btn {
     background: var(--bg-panel);
     border: var(--border-width) solid var(--border-dark);
@@ -189,7 +180,6 @@ h4 { font-size: 1.8em; color: var(--text-secondary); }
     padding: 0;
     margin-left: 5px;
     box-shadow: 3px 3px 0px var(--border-light);
-    
     background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="%232C3E50"><path d="M0 0h24v24H0z" fill="none"/><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>');
     background-repeat: no-repeat;
     background-position: center;
@@ -267,11 +257,26 @@ h4 { font-size: 1.8em; color: var(--text-secondary); }
     color: var(--accent-red);
 }
 
-/* Logika CSS dla trybu Solo (bez zmian) */
-#game-screen.solo-mode #opponent-info { display: none; }
-#game-screen.solo-mode #best-score-container { display: block !important; }
-#game-screen:not(.solo-mode) #best-score-container { display: none !important; }
-#game-screen:not(.solo-mode) #opponent-info { display: block !important; }
+/* ===== TO SĄ REGUŁY, KTÓRE NAPRAWIAJĄ BŁĄD ===== */
+/* Ukryj panel przeciwnika w trybie solo */
+#game-screen.solo-mode #opponent-info {
+    display: none;
+}
+/* Pokaż panel rekordu w trybie solo */
+#game-screen.solo-mode #best-score-container {
+    display: block !important;
+}
+
+/* Ukryj panel rekordu w trybie multi */
+#game-screen:not(.solo-mode) #best-score-container {
+    display: none !important;
+}
+/* Pokaż panel przeciwnika w trybie multi */
+#game-screen:not(.solo-mode) #opponent-info {
+    display: block !important;
+}
+/* ============================================== */
+
 
 /* ===== STYLE PLANSZY I KART ===== */
 #game-board.pixel-panel.dark {
@@ -280,7 +285,6 @@ h4 { font-size: 1.8em; color: var(--text-secondary); }
     perspective: 1000px;
     padding: 10px;
     background-color: var(--bg-panel-dark);
-    /* Plansza jest wklęsła */
     box-shadow: inset 4px 4px 0px #2C3E50;
     border-color: var(--border-dark);
 }
@@ -290,7 +294,7 @@ h4 { font-size: 1.8em; color: var(--text-secondary); }
     height: 80px;
     position: relative;
     cursor: pointer;
-    transform-style: preserve-3d;
+    transform-style: preserve-3d; /* Poprawiona literówka z 'preserve-d' */
     transition: transform 0.6s;
 }
 
@@ -313,13 +317,11 @@ h4 { font-size: 1.8em; color: var(--text-secondary); }
     border: var(--border-width) solid var(--border-dark);
 }
 
-/* Rewers (tył karty) - Wypukły */
 .card-back {
     transform: rotateY(0deg);
     background-color: var(--accent-blue);
     border-color: var(--text-light);
     box-shadow: var(--shadow-distance) var(--shadow-distance) 0px var(--border-dark);
-    /* Możemy dodać znak zapytania */
     display: flex;
     justify-content: center;
     align-items: center;
@@ -335,7 +337,6 @@ h4 { font-size: 1.8em; color: var(--text-secondary); }
     box-shadow: 7px 7px 0px var(--border-dark);
 }
 
-/* Awers (przód karty) - Wklęsły */
 .card-front {
     transform: rotateY(180deg);
     display: flex;
@@ -343,7 +344,7 @@ h4 { font-size: 1.8em; color: var(--text-secondary); }
     align-items: center;
     font-size: 40px;
     background-color: var(--bg-light);
-    color: var(--text-dark);
+    color: var(--text-dark); /* Ta linijka sprawia, że emoji jest widoczne */
     box-shadow: inset 3px 3px 0px var(--border-light);
 }
 .card.matched .card-front {

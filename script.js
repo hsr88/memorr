@@ -1,12 +1,13 @@
 // Łączymy się z serwerem Socket.IO
 const socket = io();
 
-// Definicje emoji
+// ===== ZMIANA: NOWA LISTA EMOJI PASUJĄCA DO PIXEL ART =====
 const allEmojis = [
-    '🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼', '🐨', '🐯', 
-    '🦁', '🐮', '🐷', '🐸', '🐵', '🐔', '🐧', '🐦', '🐤', '🦋', 
-    '🐞', '🐢', '🐍', '🐠', '🐙', '🐬', '🐳', '🦀', '🦄', '🦖'
+    '👾', '🤖', '👽', '👻', '💀', '🎃', '💎', '🍄', '🚀', '🛸', 
+    '☄️', '🪐', '🕹️', '💾', '💿', '📼', '📞', '📺', '💰', '💣', 
+    '⚔️', '🛡️', '🔑', '🎁', '🍕', '🍔', '🍟', '🧱', '🧭', '🔋'
 ];
+// ========================================================
 
 // Funkcja tasująca
 function shuffle(array) {
@@ -255,7 +256,7 @@ document.addEventListener('DOMContentLoaded', () => {
         totalPairs = (rows * cols) / 2;
         resetGameState();
         loadBestScore();
-        gameScreen.classList.add('solo-mode');
+        gameScreen.classList.add('solo-mode'); // Ta linia ukrywa panel przeciwnika
         totalPairsSpan.textContent = totalPairs;
         const emojisForGame = allEmojis.slice(0, totalPairs);
         const cardValues = [...emojisForGame, ...emojisForGame];
@@ -269,7 +270,7 @@ document.addEventListener('DOMContentLoaded', () => {
         totalPairs = data.totalPairs;
         opponentPairsFound = 0;
         resetGameState();
-        gameScreen.classList.remove('solo-mode');
+        gameScreen.classList.remove('solo-mode'); // Ta linia pokazuje panel przeciwnika
         totalPairsSpan.textContent = totalPairs;
         opponentTotalPairsSpan.textContent = totalPairs;
         buildBoard(data.board, data.rows, data.cols);
