@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
     <title>Memorr - Gra Pamięciowa Online (Solo & Multiplayer)</title>
     <meta name="description" content="Zagraj w Memorr, darmową grę pamięciową online. Trenuj pamięć w trybie solo lub rywalizuj ze znajomymi w pojedynkach multiplayer!">
     <meta name="keywords" content="gra memory, gra pamięciowa, memory online, multiplayer, gra na dwie osoby, memorr, memorr.top">
@@ -12,109 +11,111 @@
     <meta property="og:description" content="Rzuć wyzwanie znajomym w szybkiej grze memory multiplayer lub trenuj samemu.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://memorr.top">
+
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     <script src="/socket.io/socket.io.js"></script>
 </head>
 <body>
 
-    <h1>Memorr</h1>
+    <main>
+        <h1>Memo<span class="rr">RR</span></h1>
 
-    <div id="lobby-screen" class="panel">
-        <h2>Wybierz Tryb Gry</h2>
+        <div id="lobby-screen" class="panel">
+            <h2>Wybierz Tryb Gry</h2>
 
-        <div id="mode-selection">
-            <button id="btn-select-solo" class="btn green">GRA SOLO</button>
-            <button id="btn-select-multi" class="btn blue">GRA WIELOOSOBOWA</button>
-        </div>
-
-        <p class="game-description">
-            Witaj w Memorr! Sprawdź swoją pamięć grając solo lub zmierz się ze znajomymi w trybie multiplayer. Celem jest znalezienie wszystkich par. Powodzenia!
-        </p>
-        <div id="solo-options" class="hidden">
-            <h3>GRA SOLO - Wybierz Poziom</h3>
-            <div class="difficulty-select">
-                <button id="btn-solo-easy" class="btn green">Łatwy (4x4)</button>
-                <button id="btn-solo-medium" class="btn green">Średni (6x4)</button>
-                <button id="btn-solo-hard" class="btn green">Trudny (6x6)</button>
+            <div id="mode-selection">
+                <button id="btn-select-solo" class="btn green">GRA SOLO</button>
+                <button id="btn-select-multi" class="btn blue">GRA WIELOOSOBOWA</button>
             </div>
-            <button id="btn-back-to-mode" class="btn purple">POWRÓT</button>
-        </div>
 
-        <div id="multi-options" class="hidden">
-            <h3>GRA WIELOOSOBOWA</h3>
-            <div id="multi-create-join">
-                <button id="btn-show-create-game" class="btn blue">STWÓRZ GRĘ</button>
-                <button id="btn-show-join-game" class="btn blue">DOŁĄCZ DO GRY</button>
-                <button id="btn-back-to-mode-multi" class="btn purple">POWRÓT</button>
-            </div>
-            <div id="multi-create-details" class="hidden">
-                <h4>STWÓRZ GRĘ - Wybierz Poziom</h4>
+            <p class="game-description">
+                Witaj w Memorr! Sprawdź swoją pamięć grając solo lub zmierz się ze znajomymi w trybie multiplayer. Celem jest znalezienie wszystkich par. Powodzenia!
+            </p>
+
+            <div id="solo-options" class="hidden">
+                <h3>GRA SOLO - Wybierz Poziom</h3>
                 <div class="difficulty-select">
-                    <button id="btn-multi-easy" class="btn blue">Łatwy (4x4)</button>
-                    <button id="btn-multi-medium" class="btn blue">Średni (6x4)</button>
-                    <button id="btn-multi-hard" class="btn blue">Trudny (6x6)</button>
+                    <button id="btn-solo-easy" class="btn green">Łatwy (4x4)</button>
+                    <button id="btn-solo-medium" class="btn green">Średni (6x4)</button>
+                    <button id="btn-solo-hard" class="btn green">Trudny (6x6)</button>
                 </div>
-                <div id="game-id-container" class="hidden">
-                    <span>ID Gry:</span>
-                    <strong id="game-id-display"></strong>
-                    <button id="copy-game-id-btn" class="copy-btn" title="Kopiuj do schowka"></button>
-                </div>
-                <button id="btn-back-to-multi-options-from-create" class="btn purple">POWRÓT</button>
+                <button id="btn-back-to-mode" class="btn purple">POWRÓT</button>
             </div>
-            <div id="multi-join-details" class="hidden">
-                <h4>DOŁĄCZ DO GRY</h4>
-                <input type="text" id="game-id-input" placeholder="Wpisz ID Gry" class="input-field">
-                <button id="btn-join-game" class="btn blue">DOŁĄCZ</button>
-                <button id="btn-back-to-multi-options-from-join" class="btn purple">POWRÓT</button>
-            </div>
-        </div>
-        
-        <p id="lobby-message" class="error-text"></p>
-    </div>
 
-    <div id="game-screen" class="hidden">
-        <div class="controls">
-            <button id="btn-restart" class="btn purple">POWRÓT DO LOBBY</button> 
-        </div>
-        <div class="all-info-container">
-            <div id="player-info" class="info-container panel">
-                <h3>GRACZ</h3>
-                <div class="info-row">Czas: <span id="timer">0</span>s</div>
-                <div class="info-row">Ruchy: <span id="move-counter">0</span></div>
-                <div class="info-row">Pary: <span id="pairs-found">0</span> / <span id="total-pairs">0</span></div>
-                <div id="best-score-container" class="info-row">
-                    Rekord: <span id="best-score">--</span>s
+            <div id="multi-options" class="hidden">
+                <h3>GRA WIELOOSOBOWA</h3>
+                <div id="multi-create-join">
+                    <button id="btn-show-create-game" class="btn blue">STWÓRZ GRĘ</button>
+                    <button id="btn-show-join-game" class="btn blue">DOŁĄCZ DO GRY</button>
+                    <button id="btn-back-to-mode-multi" class="btn purple">POWRÓT</button>
                 </div>
-                <div id="games-played-container" class="info-row">
-                    Gry: <span id="games-played">0</span>
+                <div id="multi-create-details" class="hidden">
+                    <h4>STWÓRZ GRĘ - Wybierz Poziom</h4>
+                    <div class="difficulty-select">
+                        <button id="btn-multi-easy" class="btn blue">Łatwy (4x4)</button>
+                        <button id="btn-multi-medium" class="btn blue">Średni (6x4)</button>
+                        <button id="btn-multi-hard" class="btn blue">Trudny (6x6)</button>
+                    </div>
+                    <div id="game-id-container" class="hidden">
+                        <span>ID Gry:</span>
+                        <strong id="game-id-display"></strong>
+                        <button id="copy-game-id-btn" class="copy-btn" title="Kopiuj do schowka"></button>
+                    </div>
+                    <button id="btn-back-to-multi-options-from-create" class="btn purple">POWRÓT</button>
+                </div>
+                <div id="multi-join-details" class="hidden">
+                    <h4>DOŁĄCZ DO GRY</h4>
+                    <input type="text" id="game-id-input" placeholder="Wpisz ID Gry" class="input-field">
+                    <button id="btn-join-game" class="btn blue">DOŁĄCZ</button>
+                    <button id="btn-back-to-multi-options-from-join" class="btn purple">POWRÓT</button>
                 </div>
             </div>
-            <div id="opponent-info" class="info-container panel">
-                <h3>PRZECIWNIK</h3>
-                <div class="info-row">Pary: <span id="opponent-pairs-found">0</span> / <span id="opponent-total-pairs">0</span></div>
+            
+            <p id="lobby-message" class="error-text"></p>
+        </div>
+
+        <div id="game-screen" class="hidden">
+            <div class="controls">
+                <button id="btn-restart" class="btn purple">POWRÓT DO LOBBY</button> 
+            </div>
+            <div class="all-info-container">
+                <div id="player-info" class="info-container panel">
+                    <h3>GRACZ</h3>
+                    <div class="info-row">Czas: <span id="timer">0</span>s</div>
+                    <div class="info-row">Ruchy: <span id="move-counter">0</span></div>
+                    <div class="info-row">Pary: <span id="pairs-found">0</span> / <span id="total-pairs">0</span></div>
+                    <div id="best-score-container" class="info-row">
+                        Rekord: <span id="best-score">--</span>s
+                    </div>
+                    <div id="games-played-container" class="info-row">
+                        Gry: <span id="games-played">0</span>
+                    </div>
+                </div>
+                <div id="opponent-info" class="info-container panel">
+                    <h3>PRZECIWNIK</h3>
+                    <div class="info-row">Pary: <span id="opponent-pairs-found">0</span> / <span id="opponent-total-pairs">0</span></div>
+                </div>
+            </div>
+            <div id="game-board"></div>
+        </div>
+
+        <div id="win-modal" class="modal-overlay hidden">
+            <div class="modal-content panel">
+                <h2 id="modal-title">Gratulacje!</h2>
+                <p id="modal-message"></p>
+                <p id="modal-record-message" class="hidden">NOWY REKORD!</p>
+                <p id="modal-rematch-status"></p>
+                <button id="modal-play-again" class="btn green">POWRÓT DO LOBBY</button>
+                <button id="modal-rematch" class="btn blue hidden">REWANŻ</button>
             </div>
         </div>
-        <div id="game-board"></div>
-    </div>
-
-    <div id="win-modal" class="modal-overlay hidden">
-        <div class="modal-content panel">
-            <h2 id="modal-title">Gratulacje!</h2>
-            <p id="modal-message"></p>
-            <p id="modal-record-message" class="hidden">NOWY REKORD!</p>
-            <p id="modal-rematch-status"></p>
-            <button id="modal-play-again" class="btn green">POWRÓT DO LOBBY</button>
-            <button id="modal-rematch" class="btn blue hidden">REWANŻ</button>
-        </div>
-    </div>
-    
-    <script src="script.js"></script>
-
+    </main>
     <footer>
         <div class="footer-content">
             &copy; memorr.top
         </div>
     </footer>
-    </body>
+
+</body>
 </html>
