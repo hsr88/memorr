@@ -1,113 +1,123 @@
-/* Importujemy czcionkę Poppins */
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+/* Importujemy czcionkę pixelową */
+@import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
 
 :root {
-    /* Paleta kolorów - Stonowany Material Design */
-    --bg-light: #F5F5F5;
-    --bg-white: #FFFFFF;
-    --text-primary: #333333;
-    --text-secondary: #757575;
+    /* Paleta kolorów - Clean & Vibrant Pixel Art */
+    --bg-light: #F0F4F8;       /* Jasne, lekko niebieskie tło */
+    --bg-panel: #FFFFFF;       /* Czysta biel paneli */
+    --bg-panel-dark: #34495E; /* Ciemne tło dla planszy (wklęsłe) */
     
-    --accent-green: #66BB6A;
-    --accent-blue: #42A5F5;
-    --accent-red: #EF5350;
-    --accent-purple: #AB47BC;
-    --accent-gold: #FFCA28;
+    --text-dark: #2C3E50;    /* Ciemny tekst */
+    --text-light: #FFFFFF;     /* Jasny tekst (na przyciskach) */
     
-    --font-main: 'Poppins', sans-serif;
+    --border-dark: #2C3E50;
+    --border-light: #7F8C8D;    /* Cień dla białych paneli */
     
-    --shadow-1: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
-    --shadow-2: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
-    --shadow-3: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
+    /* Żywe kolory akcentów */
+    --accent-green: #2ECC71;
+    --accent-blue: #3498DB;
+    --accent-red: #E74C3C;
+    --accent-purple: #9B59B6;
+    --accent-gold: #F1C40F;
+    
+    --border-width: 3px;
+    --shadow-distance: 5px;
+    --font-pixel: 'VT323', monospace;
 }
 
+/* Ustawienia globalne */
 body {
-    font-family: var(--font-main);
+    font-family: var(--font-pixel);
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     background-color: var(--bg-light);
-    color: var(--text-primary);
+    color: var(--text-dark);
     min-height: 100vh;
     padding: 20px 0;
     cursor: default;
+    
+    /* Wyłączenie wygładzania dla ostrego wyglądu */
+    -webkit-font-smoothing: none;
+    -moz-osx-font-smoothing: grayscale;
+    image-rendering: pixelated;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: crisp-edges;
 }
 
 h1, h2, h3, h4 {
-    color: var(--text-primary);
-    font-weight: 600;
+    color: var(--text-dark);
     margin-top: 0;
     margin-bottom: 25px;
+    font-weight: normal;
 }
-h1 { font-size: 3em; color: var(--accent-blue); }
-h2 { font-size: 2em; }
-h3 { font-size: 1.5em; }
-h4 { font-size: 1.2em; color: var(--text-secondary); }
+h1 { font-size: 4em; color: var(--accent-blue); }
+h2 { font-size: 2.8em; }
+h3 { font-size: 2.2em; }
+h4 { font-size: 1.8em; color: var(--text-secondary); }
 
-/* Przyciski w stylu Material Design */
-.md-btn {
-    font-family: var(--font-main);
-    padding: 10px 18px;
-    font-size: 1em;
-    font-weight: 600;
-    text-transform: uppercase;
-    border: none;
-    border-radius: 4px;
-    background-color: var(--accent-blue);
-    color: var(--bg-white);
+/* Przyciski w stylu "Chunky" Pixel Art */
+.pixel-btn {
+    font-family: var(--font-pixel);
+    padding: 8px 14px;
+    font-size: 1.8em; /* Duża, czytelna czcionka */
+    border: var(--border-width) solid var(--border-dark);
+    border-radius: 0; /* Bez zaokrągleń */
+    background-color: var(--accent-blue); /* Domyślny kolor tła */
+    color: var(--text-light); /* Jasny tekst na kolorowym tle */
     cursor: pointer;
-    transition: box-shadow 0.3s cubic-bezier(.25,.8,.25,1), background-color 0.3s;
-    box-shadow: var(--shadow-1);
+    transition: none; /* Bez animacji */
+    
+    /* Twardy, przesunięty cień */
+    box-shadow: var(--shadow-distance) var(--shadow-distance) 0px var(--border-dark);
     position: relative;
-    overflow: hidden;
 }
 
-.md-btn:hover {
-    box-shadow: var(--shadow-2);
-}
-.md-btn:active, .md-btn:focus {
+/* Efekt wciśnięcia przycisku */
+.pixel-btn:active, .pixel-btn:focus {
     outline: none;
-    box-shadow: var(--shadow-1);
+    transform: translate(var(--shadow-distance), var(--shadow-distance));
+    box-shadow: none;
+}
+.pixel-btn:hover {
+    filter: brightness(110%);
 }
 
-.md-btn.green { background-color: var(--accent-green); }
-.md-btn.blue { background-color: var(--accent-blue); }
-.md-btn.purple { background-color: var(--accent-purple); }
+/* Kolorowe przyciski */
+.pixel-btn.green { background-color: var(--accent-green); }
+.pixel-btn.blue { background-color: var(--accent-blue); }
+.pixel-btn.purple { background-color: var(--accent-purple); }
 
-.md-btn.green:hover { background-color: #76C87A; }
-.md-btn.blue:hover { background-color: #52AEF6; }
-.md-btn.purple:hover { background-color: #B557C8; }
-
-/* Pola tekstowe w stylu Material Design (outlined) */
-.md-input {
-    font-family: var(--font-main);
-    font-weight: 400;
-    padding: 10px 12px;
-    font-size: 1em;
-    border: 2px solid #BDBDBD;
-    border-radius: 4px;
-    background-color: var(--bg-white);
-    color: var(--text-primary);
+/* Pola tekstowe (wklęsłe) */
+.pixel-input {
+    font-family: var(--font-pixel);
+    padding: 8px 10px;
+    font-size: 1.8em;
+    border: var(--border-width) solid var(--border-dark);
+    border-radius: 0;
+    background-color: var(--bg-light);
+    color: var(--text-dark);
     outline: none;
     margin-right: 10px;
-    width: 180px;
+    width: 200px;
     text-align: center;
-    transition: border-color 0.3s, box-shadow 0.3s;
+    /* Efekt wklęsły */
+    box-shadow: inset 3px 3px 0px var(--border-light);
 }
-.md-input:focus {
+.pixel-input:focus {
+    background-color: var(--bg-panel);
     border-color: var(--accent-blue);
-    box-shadow: 0 0 5px rgba(66, 165, 245, 0.5);
 }
 
-/* Panele (Lobby, Info, Modal) */
-.md-panel {
+/* Panele (Lobby, Info, Modal) - Wypukłe */
+.pixel-panel {
     width: 100%;
     max-width: 600px;
     padding: 30px;
-    background-color: var(--bg-white);
-    border-radius: 8px;
-    box-shadow: var(--shadow-2);
+    background-color: var(--bg-panel);
+    border: var(--border-width) solid var(--border-dark);
+    box-shadow: var(--shadow-distance) var(--shadow-distance) 0px var(--border-light);
     text-align: center;
     margin-bottom: 40px;
 }
@@ -136,7 +146,8 @@ h4 { font-size: 1.2em; color: var(--text-secondary); }
     margin-top: 20px;
     padding-top: 20px;
     width: 100%;
-    border-top: 1px solid #E0E0E0;
+    /* Pixelowa linia podziału */
+    border-top: var(--border-width) dashed var(--border-light);
 }
 
 .difficulty-select {
@@ -147,8 +158,9 @@ h4 { font-size: 1.2em; color: var(--text-secondary); }
     margin: 15px 0;
 }
 
+/* Kontener ID Gry */
 #game-id-container {
-    font-size: 1.2em;
+    font-size: 1.8em;
     margin-top: 20px;
     margin-bottom: 20px;
     display: flex;
@@ -157,48 +169,43 @@ h4 { font-size: 1.2em; color: var(--text-secondary); }
     gap: 10px;
     padding: 10px;
     background-color: var(--bg-light);
-    border-radius: 4px;
+    border: var(--border-width) solid var(--border-light);
 }
 #game-id-container span {
-    color: var(--text-secondary);
+    color: var(--border-light);
 }
 #game-id-container strong {
     color: var(--accent-blue);
     font-size: 1.3em;
 }
 
-/* NOWA IKONA KOPIOWANIA (SVG) */
+/* Przycisk Kopiowania (dopasowany do stylu pixel) */
 .copy-btn {
-    background: none;
-    border: none;
+    background: var(--bg-panel);
+    border: var(--border-width) solid var(--border-dark);
     cursor: pointer;
-    width: 36px;
-    height: 36px;
+    width: 40px;
+    height: 40px;
     padding: 0;
     margin-left: 5px;
-    border-radius: 50%;
-    transition: background-color 0.2s;
+    box-shadow: 3px 3px 0px var(--border-light);
     
-    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" height="22px" viewBox="0 0 24 24" width="22px" fill="%23757575"><path d="M0 0h24v24H0z" fill="none"/><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>');
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="%232C3E50"><path d="M0 0h24v24H0z" fill="none"/><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>');
     background-repeat: no-repeat;
     background-position: center;
-    background-size: 22px 22px;
-}
-.copy-btn:hover {
-    background-color: #E0E0E0;
+    background-size: 24px 24px;
 }
 .copy-btn:active {
-    background-color: #BDBDBD;
+    transform: translate(3px, 3px);
+    box-shadow: none;
 }
 .copy-btn.copied {
-    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" height="22px" viewBox="0 0 24 24" width="22px" fill="%2366BB6A"><path d="M0 0h24v24H0z" fill="none"/><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>');
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="%232ECC71"><path d="M0 0h24v24H0z" fill="none"/><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>');
 }
-/* ================================== */
 
 .error-text {
     color: var(--accent-red);
-    font-weight: 600;
-    font-size: 1em;
+    font-size: 1.5em;
     min-height: 20px;
     margin-top: 15px;
 }
@@ -223,28 +230,27 @@ h4 { font-size: 1.2em; color: var(--text-secondary); }
     margin-bottom: 30px;
 }
 
-.info-container.md-panel {
-    font-size: 1em;
+.info-container.pixel-panel {
+    font-size: 1.5em;
     padding: 20px;
     min-width: 220px;
     text-align: left;
     max-width: 300px;
+    border-color: var(--accent-purple);
+    box-shadow: var(--shadow-distance) var(--shadow-distance) 0px var(--border-light);
 }
 .info-container h3 {
     text-align: center;
     margin-bottom: 15px;
-    font-size: 1.2em;
+    font-size: 1.5em;
     color: var(--accent-blue);
 }
 .info-row {
     margin-bottom: 8px;
-    color: var(--text-secondary);
-    font-weight: 400;
 }
 .info-row span {
-    color: var(--text-primary);
+    color: var(--text-dark);
     font-size: 1.1em;
-    font-weight: 600;
 }
 
 #best-score-container {
@@ -261,17 +267,22 @@ h4 { font-size: 1.2em; color: var(--text-secondary); }
     color: var(--accent-red);
 }
 
+/* Logika CSS dla trybu Solo (bez zmian) */
 #game-screen.solo-mode #opponent-info { display: none; }
 #game-screen.solo-mode #best-score-container { display: block !important; }
 #game-screen:not(.solo-mode) #best-score-container { display: none !important; }
 #game-screen:not(.solo-mode) #opponent-info { display: block !important; }
 
 /* ===== STYLE PLANSZY I KART ===== */
-#game-board {
+#game-board.pixel-panel.dark {
     display: grid;
-    gap: 12px;
+    gap: 10px;
     perspective: 1000px;
-    padding: 12px;
+    padding: 10px;
+    background-color: var(--bg-panel-dark);
+    /* Plansza jest wklęsła */
+    box-shadow: inset 4px 4px 0px #2C3E50;
+    border-color: var(--border-dark);
 }
 
 .card {
@@ -279,8 +290,8 @@ h4 { font-size: 1.2em; color: var(--text-secondary); }
     height: 80px;
     position: relative;
     cursor: pointer;
-    transform-style: preserve-3d; /* <-- POPRAWIONE */
-    transition: transform 0.6s, box-shadow 0.3s;
+    transform-style: preserve-3d;
+    transition: transform 0.6s;
 }
 
 .card.flipped {
@@ -290,40 +301,53 @@ h4 { font-size: 1.2em; color: var(--text-secondary); }
 .card.matched {
     opacity: 0.5;
     cursor: default;
-    box-shadow: none;
 }
 
 .card-face {
     position: absolute;
     width: 100%;
     height: 100%;
-    border-radius: 8px;
+    border-radius: 0;
     backface-visibility: hidden;
     transition: all 0.3s ease;
-    box-shadow: var(--shadow-1);
+    border: var(--border-width) solid var(--border-dark);
 }
 
+/* Rewers (tył karty) - Wypukły */
 .card-back {
     transform: rotateY(0deg);
     background-color: var(--accent-blue);
+    border-color: var(--text-light);
+    box-shadow: var(--shadow-distance) var(--shadow-distance) 0px var(--border-dark);
+    /* Możemy dodać znak zapytania */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 3em;
+    color: var(--text-light);
 }
-.card:not(.matched):not(.flipped):hover .card-back {
-    transform: translateY(-3px);
-    box-shadow: var(--shadow-2);
+.card-back::after {
+    content: '?';
 }
 
+.card:not(.matched):not(.flipped):hover .card-back {
+    transform: translateY(-2px);
+    box-shadow: 7px 7px 0px var(--border-dark);
+}
+
+/* Awers (przód karty) - Wklęsły */
 .card-front {
     transform: rotateY(180deg);
     display: flex;
     justify-content: center;
     align-items: center;
     font-size: 40px;
-    background-color: var(--bg-white);
-    color: #333333 !important; /* <-- ZASTĄP POPRZEDNIĄ LINIĘ TĄ */
+    background-color: var(--bg-light);
+    color: var(--text-dark);
+    box-shadow: inset 3px 3px 0px var(--border-light);
 }
 .card.matched .card-front {
-    background-color: #E0E0E0;
-    box-shadow: none;
+    background-color: var(--border-light);
 }
 
 /* ===== STYLE OKNA MODALNEGO ===== */
@@ -333,7 +357,7 @@ h4 { font-size: 1.2em; color: var(--text-secondary); }
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
+    background-color: rgba(0, 0, 0, 0.6);
     backdrop-filter: blur(2px);
     display: flex;
     justify-content: center;
@@ -341,34 +365,32 @@ h4 { font-size: 1.2em; color: var(--text-secondary); }
     z-index: 1000;
 }
 
-.modal-content.md-panel {
+.modal-content.pixel-panel {
     max-width: 500px;
-    box-shadow: var(--shadow-3);
     animation: fadeIn 0.3s ease-out;
 }
 
 .modal-content h2 {
-    color: var(--accent-blue);
+    color: var(--accent-green);
     margin-top: 0;
     margin-bottom: 20px;
+    font-size: 2.8em;
 }
 
 .modal-content p {
-    font-size: 1.1em;
+    font-size: 1.8em;
     margin-bottom: 15px;
-    color: var(--text-primary);
+    color: var(--text-dark);
 }
 
 #modal-record-message {
     color: var(--accent-gold);
-    font-weight: 600;
-    font-size: 1.3em;
+    font-size: 2em;
     margin-bottom: 25px;
 }
 
 #modal-play-again {
     padding: 12px 20px;
-    font-size: 1em;
 }
 
 @keyframes fadeIn {

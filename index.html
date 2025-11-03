@@ -3,61 +3,61 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Material Memory</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <title>Pixel Memory</title>
+    <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     <script src="/socket.io/socket.io.js"></script>
 </head>
 <body>
 
-    <h1>Memory</h1>
+    <h1>PIXEL MEMORY</h1>
 
-    <div id="lobby-screen" class="md-panel">
+    <div id="lobby-screen" class="pixel-panel">
         <h2>Wybierz Tryb Gry</h2>
 
         <div id="mode-selection">
-            <button id="btn-select-solo" class="md-btn green">GRA SOLO</button>
-            <button id="btn-select-multi" class="md-btn blue">GRA WIELOOSOBOWA</button>
+            <button id="btn-select-solo" class="pixel-btn green">GRA SOLO</button>
+            <button id="btn-select-multi" class="pixel-btn blue">GRA WIELOOSOBOWA</button>
         </div>
 
         <div id="solo-options" class="hidden">
             <h3>GRA SOLO - Wybierz Poziom</h3>
             <div class="difficulty-select">
-                <button id="btn-solo-easy" class="md-btn green">Łatwy (4x4)</button>
-                <button id="btn-solo-medium" class="md-btn green">Średni (6x4)</button>
-                <button id="btn-solo-hard" class="md-btn green">Trudny (6x6)</button>
+                <button id="btn-solo-easy" class="pixel-btn green">Łatwy (4x4)</button>
+                <button id="btn-solo-medium" class="pixel-btn green">Średni (6x4)</button>
+                <button id="btn-solo-hard" class="pixel-btn green">Trudny (6x6)</button>
             </div>
-            <button id="btn-back-to-mode" class="md-btn purple">POWRÓT</button>
+            <button id="btn-back-to-mode" class="pixel-btn purple">POWRÓT</button>
         </div>
 
         <div id="multi-options" class="hidden">
             <h3>GRA WIELOOSOBOWA</h3>
             <div id="multi-create-join">
-                <button id="btn-show-create-game" class="md-btn blue">STWÓRZ GRĘ</button>
-                <button id="btn-show-join-game" class="md-btn blue">DOŁĄCZ DO GRY</button>
-                <button id="btn-back-to-mode-multi" class="md-btn purple">POWRÓT</button>
+                <button id="btn-show-create-game" class="pixel-btn blue">STWÓRZ GRĘ</button>
+                <button id="btn-show-join-game" class="pixel-btn blue">DOŁĄCZ DO GRY</button>
+                <button id="btn-back-to-mode-multi" class="pixel-btn purple">POWRÓT</button>
             </div>
 
             <div id="multi-create-details" class="hidden">
                 <h4>STWÓRZ GRĘ - Wybierz Poziom</h4>
                 <div class="difficulty-select">
-                    <button id="btn-multi-easy" class="md-btn blue">Łatwy (4x4)</button>
-                    <button id="btn-multi-medium" class="md-btn blue">Średni (6x4)</button>
-                    <button id="btn-multi-hard" class="md-btn blue">Trudny (6x6)</button>
+                    <button id="btn-multi-easy" class="pixel-btn blue">Łatwy (4x4)</button>
+                    <button id="btn-multi-medium" class="pixel-btn blue">Średni (6x4)</button>
+                    <button id="btn-multi-hard" class="pixel-btn blue">Trudny (6x6)</button>
                 </div>
                 <div id="game-id-container" class="hidden">
                     <span>ID Gry:</span>
                     <strong id="game-id-display"></strong>
                     <button id="copy-game-id-btn" class="copy-btn" title="Kopiuj do schowka"></button>
                 </div>
-                <button id="btn-back-to-multi-options-from-create" class="md-btn purple">POWRÓT</button>
+                <button id="btn-back-to-multi-options-from-create" class="pixel-btn purple">POWRÓT</button>
             </div>
 
             <div id="multi-join-details" class="hidden">
                 <h4>DOŁĄCZ DO GRY</h4>
-                <input type="text" id="game-id-input" placeholder="Wpisz ID Gry" class="md-input">
-                <button id="btn-join-game" class="md-btn blue">DOŁĄCZ</button>
-                <button id="btn-back-to-multi-options-from-join" class="md-btn purple">POWRÓT</button>
+                <input type="text" id="game-id-input" placeholder="Wpisz ID Gry" class="pixel-input">
+                <button id="btn-join-game" class="pixel-btn blue">DOŁĄCZ</button>
+                <button id="btn-back-to-multi-options-from-join" class="pixel-btn purple">POWRÓT</button>
             </div>
         </div>
         
@@ -66,36 +66,36 @@
 
     <div id="game-screen" class="hidden">
         <div class="controls">
-            <button id="btn-restart" class="md-btn purple">POWRÓT DO LOBBY</button> 
+            <button id="btn-restart" class="pixel-btn purple">POWRÓT DO LOBBY</button> 
         </div>
 
         <div class="all-info-container">
-            <div id="player-info" class="info-container md-panel">
+            <div id="player-info" class="info-container pixel-panel">
                 <h3>GRACZ</h3>
-               <div class="info-row">Czas: <span id="timer">0</span>s</div>
-    <div class="info-row">Ruchy: <span id="move-counter">0</span></div>
-    <div class="info-row">Pary: <span id="pairs-found">0</span> / <span id="total-pairs">0</span></div>
+                <div class="info-row">Czas: <span>0</span>s</div>
+                <div class="info-row">Ruchy: <span>0</span></div>
+                <div class="info-row">Pary: <span id="pairs-found">0</span> / <span id="total-pairs">0</span></div>
                 <div id="best-score-container" class="info-row">
                     Rekord: <span id="best-score">--</span>s
                 </div>
             </div>
             
-            <div id="opponent-info" class="info-container md-panel">
+            <div id="opponent-info" class="info-container pixel-panel">
                 <h3>PRZECIWNIK</h3>
                 <div class="info-row">Pary: <span id="opponent-pairs-found">0</span> / <span id="opponent-total-pairs">0</span></div>
             </div>
         </div>
 
-        <div id="game-board">
-            </div>
+        <div id="game-board" class="pixel-panel dark">
+        </div>
     </div>
 
     <div id="win-modal" class="modal-overlay hidden">
-        <div class="modal-content md-panel">
+        <div class="modal-content pixel-panel">
             <h2 id="modal-title">Gratulacje!</h2>
             <p id="modal-message"></p>
             <p id="modal-record-message" class="hidden">NOWY REKORD!</p>
-            <button id="modal-play-again" class="md-btn green">POWRÓT DO LOBBY</button>
+            <button id="modal-play-again" class="pixel-btn green">POWRÓT DO LOBBY</button>
         </div>
     </div>
     
