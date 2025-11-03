@@ -11,7 +11,7 @@
     /* Akcenty z palety */
     --accent-green: #D9CAB3;     /* Beżowy (dla Solo) */
     --accent-blue: #6D9886;      /* Morski zielony (dla Multi i tyłu kart) */
-    --accent-purple: #D9CAB3;    /* Beżowy (dla Wstecz) */
+    --accent-purple: #708993;    /* POPRAWIONY: Szaro-niebieski (dla Wstecz) */
     --accent-gold: #D9CAB3;      /* Beżowy (dla Rekordu) */
 
     /* Uzupełniające akcenty */
@@ -30,7 +30,7 @@ body {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    background-color: var(--bg-light); /* NOWE TŁO */
+    background-color: var(--bg-light);
     color: var(--text-primary);
     min-height: 100vh;
     padding: 20px 0;
@@ -59,10 +59,10 @@ h4 { font-size: 1.2em; color: var(--text-secondary); }
     border: none;
     border-radius: 50px;
     background-color: var(--accent-blue);
-    color: var(--bg-white); /* Jasny tekst na ciemnym przycisku */
+    color: var(--bg-white);
     cursor: pointer;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
-    box-shadow: 0 4px 10px rgba(109, 152, 134, 0.3); /* Cień dopasowany do --accent-blue */
+    box-shadow: 0 4px 10px rgba(109, 152, 134, 0.3);
     position: relative;
 }
 
@@ -79,8 +79,8 @@ h4 { font-size: 1.2em; color: var(--text-secondary); }
 /* Kolorowe przyciski */
 .btn.green {
     background-color: var(--accent-green);
-    color: var(--text-primary); /* Ciemny tekst na jasnym przycisku */
-    box-shadow: 0 4px 10px rgba(217, 202, 179, 0.4); /* Cień dopasowany do --accent-green */
+    color: var(--text-primary);
+    box-shadow: 0 4px 10px rgba(217, 202, 179, 0.4);
 }
 .btn.green:hover { box-shadow: 0 6px 12px rgba(217, 202, 179, 0.5); }
 
@@ -91,12 +91,13 @@ h4 { font-size: 1.2em; color: var(--text-secondary); }
 }
 .btn.blue:hover { box-shadow: 0 6px 12px rgba(109, 152, 134, 0.4); }
 
+/* POPRAWIONY STYL PRZYCISKU "POWRÓT" */
 .btn.purple {
     background-color: var(--accent-purple);
-    color: var(--text-primary);
-    box-shadow: 0 4px 10px rgba(217, 202, 179, 0.4);
+    color: var(--bg-white); /* Jasny tekst na ciemniejszym przycisku */
+    box-shadow: 0 4px 10px rgba(112, 137, 147, 0.3); /* Nowy cień */
 }
-.btn.purple:hover { box-shadow: 0 6px 12px rgba(217, 202, 179, 0.5); }
+.btn.purple:hover { box-shadow: 0 6px 12px rgba(112, 137, 147, 0.4); }
 
 /* Pola tekstowe (też zaokrąglone) */
 .input-field {
@@ -200,7 +201,6 @@ h4 { font-size: 1.2em; color: var(--text-secondary); }
     border-radius: 50%;
     transition: background-color 0.2s;
     
-    /* Ikona SVG (clipboard) - zmieniony kolor fill na szaro-niebieski */
     background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 0 24 24" width="20px" fill="%23708993"><path d="M0 0h24v24H0z" fill="none"/><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>');
     background-repeat: no-repeat;
     background-position: center;
@@ -210,7 +210,6 @@ h4 { font-size: 1.2em; color: var(--text-secondary); }
     background-color: #DEE2E6;
 }
 .copy-btn.copied {
-    /* Ikona "check" - w kolorze zielonym */
     background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 0 24 24" width="20px" fill="%232ECC71"><path d="M0 0h24v24H0z" fill="none"/><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>');
 }
 
@@ -254,7 +253,7 @@ h4 { font-size: 1.2em; color: var(--text-secondary); }
     text-align: center;
     margin-bottom: 15px;
     font-size: 1.2em;
-    color: var(--text-secondary); /* Szaro-niebieski tytuł */
+    color: var(--text-secondary);
     font-weight: 800;
 }
 .info-row {
