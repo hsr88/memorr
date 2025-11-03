@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
     <title>Memorr - Gra Pamięciowa Online (Solo & Multiplayer)</title>
     <meta name="description" content="Zagraj w Memorr, darmową grę pamięciową online. Trenuj pamięć w trybie solo lub rywalizuj ze znajomymi w pojedynkach multiplayer!">
     <meta name="keywords" content="gra memory, gra pamięciowa, memory online, multiplayer, gra na dwie osoby, memorr, memorr.top">
@@ -11,7 +12,6 @@
     <meta property="og:description" content="Rzuć wyzwanie znajomym w szybkiej grze memory multiplayer lub trenuj samemu.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://memorr.top">
-
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     <script src="/socket.io/socket.io.js"></script>
@@ -19,7 +19,7 @@
 <body>
 
     <main>
-        <h1>Memo<span class="rr">RR</span></h1>
+        <h1>Memo<span class="rr">rr</span></h1>
 
         <div id="lobby-screen" class="panel">
             <h2>Wybierz Tryb Gry</h2>
@@ -100,22 +100,23 @@
             <div id="game-board"></div>
         </div>
 
-        <div id="win-modal" class="modal-overlay hidden">
-            <div class="modal-content panel">
-                <h2 id="modal-title">Gratulacje!</h2>
-                <p id="modal-message"></p>
-                <p id="modal-record-message" class="hidden">NOWY REKORD!</p>
-                <p id="modal-rematch-status"></p>
-                <button id="modal-play-again" class="btn green">POWRÓT DO LOBBY</button>
-                <button id="modal-rematch" class="btn blue hidden">REWANŻ</button>
-            </div>
+    </main> <div id="win-modal" class="modal-overlay hidden">
+        <div class="modal-content panel">
+            <h2 id="modal-title">Gratulacje!</h2>
+            <p id="modal-message"></p>
+            <p id="modal-record-message" class="hidden">NOWY REKORD!</p>
+            <p id="modal-rematch-status"></p>
+            <button id="modal-play-again" class="btn green">POWRÓT DO LOBBY</button>
+            <button id="modal-rematch" class="btn blue hidden">REWANŻ</button>
         </div>
-    </main>
+    </div>
     <footer>
         <div class="footer-content">
             &copy; memorr.top
         </div>
     </footer>
+    
+    <script src="script.js"></script>
 
 </body>
 </html>
