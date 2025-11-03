@@ -3,24 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Material Memory</title>
+    
+    <title>Memorr - Gra Pamięciowa Online (Solo & Multiplayer)</title>
+    <meta name="description" content="Zagraj w Memorr, darmową grę pamięciową online. Trenuj pamięć w trybie solo lub rywalizuj ze znajomymi w pojedynkach multiplayer!">
+    <meta name="keywords" content="gra memory, gra pamięciowa, memory online, multiplayer, gra na dwie osoby, memorr, memorr.top">
+    
+    <meta property="og:title" content="Memorr - Gra Pamięciowa Online">
+    <meta property="og:description" content="Rzuć wyzwanie znajomym w szybkiej grze memory multiplayer lub trenuj samemu.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://memorr.top">
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     <script src="/socket.io/socket.io.js"></script>
 </head>
 <body>
 
-    <h1>Memory</h1>
+    <h1>Memorr</h1>
 
     <div id="lobby-screen" class="panel">
         <h2>Wybierz Tryb Gry</h2>
-        <p class="game-description">
-            Witaj w Memory! Sprawdź swoją pamięć grając solo lub zmierz się ze znajomymi w trybie multiplayer. Celem jest znalezienie wszystkich par. Powodzenia!
-        </p>
+
         <div id="mode-selection">
             <button id="btn-select-solo" class="btn green">GRA SOLO</button>
             <button id="btn-select-multi" class="btn blue">GRA WIELOOSOBOWA</button>
         </div>
+
+        <p class="game-description">
+            Witaj w Memorr! Sprawdź swoją pamięć grając solo lub zmierz się ze znajomymi w trybie multiplayer. Celem jest znalezienie wszystkich par. Powodzenia!
+        </p>
         <div id="solo-options" class="hidden">
             <h3>GRA SOLO - Wybierz Poziom</h3>
             <div class="difficulty-select">
@@ -30,6 +40,7 @@
             </div>
             <button id="btn-back-to-mode" class="btn purple">POWRÓT</button>
         </div>
+
         <div id="multi-options" class="hidden">
             <h3>GRA WIELOOSOBOWA</h3>
             <div id="multi-create-join">
@@ -58,6 +69,7 @@
                 <button id="btn-back-to-multi-options-from-join" class="btn purple">POWRÓT</button>
             </div>
         </div>
+        
         <p id="lobby-message" class="error-text"></p>
     </div>
 
@@ -65,7 +77,6 @@
         <div class="controls">
             <button id="btn-restart" class="btn purple">POWRÓT DO LOBBY</button> 
         </div>
-
         <div class="all-info-container">
             <div id="player-info" class="info-container panel">
                 <h3>GRACZ</h3>
@@ -78,14 +89,12 @@
                 <div id="games-played-container" class="info-row">
                     Gry: <span id="games-played">0</span>
                 </div>
-                </div>
-            
+            </div>
             <div id="opponent-info" class="info-container panel">
                 <h3>PRZECIWNIK</h3>
                 <div class="info-row">Pary: <span id="opponent-pairs-found">0</span> / <span id="opponent-total-pairs">0</span></div>
             </div>
         </div>
-
         <div id="game-board"></div>
     </div>
 
@@ -94,13 +103,18 @@
             <h2 id="modal-title">Gratulacje!</h2>
             <p id="modal-message"></p>
             <p id="modal-record-message" class="hidden">NOWY REKORD!</p>
-            
             <p id="modal-rematch-status"></p>
             <button id="modal-play-again" class="btn green">POWRÓT DO LOBBY</button>
             <button id="modal-rematch" class="btn blue hidden">REWANŻ</button>
-            </div>
+        </div>
     </div>
     
     <script src="script.js"></script>
-</body>
+
+    <footer>
+        <div class="footer-content">
+            &copy; memorr.top
+        </div>
+    </footer>
+    </body>
 </html>
