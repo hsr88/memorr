@@ -1,13 +1,21 @@
 // Łączymy się z serwerem Socket.IO
 const socket = io();
 
-// ===== ZMIANA: NOWA LISTA EMOJI PASUJĄCA DO PIXEL ART =====
+// ===== NOWE DŹWIĘKI =====
+// Używamy "new Audio()" do załadowania plików dźwiękowych
+const flipSound = new Audio('flip.mp3');
+const winSound = new Audio('win.mp3');
+// Ustawienie głośności, aby nie były zbyt głośne
+flipSound.volume = 0.5;
+winSound.volume = 0.3;
+// =========================
+
+// Definicje emoji
 const allEmojis = [
-    '👾', '🤖', '👽', '👻', '💀', '🎃', '💎', '🍄', '🚀', '🛸', 
-    '☄️', '🪐', '🕹️', '💾', '💿', '📼', '📞', '📺', '💰', '💣', 
-    '⚔️', '🛡️', '🔑', '🎁', '🍕', '🍔', '🍟', '🧱', '🧭', '🔋'
+    '🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼', '🐨', '🐯', 
+    '🦁', '🐮', '🐷', '🐸', '🐵', '🐔', '🐧', '🐦', '🐤', '🦋', 
+    '🐞', '🐢', '🐍', '🐠', '🐙', '🐬', '🐳', '🦀', '🦄', '🦖'
 ];
-// ========================================================
 
 // Funkcja tasująca
 function shuffle(array) {
@@ -42,32 +50,26 @@ document.addEventListener('DOMContentLoaded', () => {
     const multiCreateJoin = document.getElementById('multi-create-join');
     const multiCreateDetails = document.getElementById('multi-create-details');
     const multiJoinDetails = document.getElementById('multi-join-details');
-
+    // ... (reszta przycisków lobby) ...
     const btnSelectSolo = document.getElementById('btn-select-solo');
     const btnSelectMulti = document.getElementById('btn-select-multi');
-
     const btnSoloEasy = document.getElementById('btn-solo-easy');
     const btnSoloMedium = document.getElementById('btn-solo-medium');
     const btnSoloHard = document.getElementById('btn-solo-hard');
     const btnBackToMode = document.getElementById('btn-back-to-mode');
-
     const btnShowCreateGame = document.getElementById('btn-show-create-game');
     const btnShowJoinGame = document.getElementById('btn-show-join-game');
     const btnBackToModeMulti = document.getElementById('btn-back-to-mode-multi');
-
     const btnMultiEasy = document.getElementById('btn-multi-easy');
     const btnMultiMedium = document.getElementById('btn-multi-medium');
     const btnMultiHard = document.getElementById('btn-multi-hard');
     const btnBackToMultiOptionsFromCreate = document.getElementById('btn-back-to-multi-options-from-create');
-    
     const gameIdInput = document.getElementById('game-id-input');
     const btnJoinGame = document.getElementById('btn-join-game');
     const btnBackToMultiOptionsFromJoin = document.getElementById('btn-back-to-multi-options-from-join');
-
     const gameIdContainer = document.getElementById('game-id-container');
     const gameIdDisplay = document.getElementById('game-id-display');
     const copyGameIdBtn = document.getElementById('copy-game-id-btn');
-    
     const lobbyMessage = document.getElementById('lobby-message');
 
     // --- Pobranie elementów DOM (Gra) ---
@@ -81,13 +83,20 @@ document.addEventListener('DOMContentLoaded', () => {
     const opponentTotalPairsSpan = document.getElementById('opponent-total-pairs');
     const bestScoreContainer = document.getElementById('best-score-container');
     const bestScoreSpan = document.getElementById('best-score');
+    // NOWY ELEMENT STATYSTYK
+    const gamesPlayedContainer = document.getElementById('games-played-container');
+    const gamesPlayedSpan = document.getElementById('games-played');
 
     // --- Pobranie elementów DOM (Modal) ---
     const winModal = document.getElementById('win-modal');
     const modalTitle = document.getElementById('modal-title');
     const modalMessage = document.getElementById('modal-message');
     const modalRecordMessage = document.getElementById('modal-record-message');
+    // NOWE ELEMENTY REWANŻU
     const modalPlayAgainBtn = document.getElementById('modal-play-again');
+    const modalRematchBtn = document.getElementById('modal-rematch');
+    const modalRematchStatus = document.getElementById('modal-rematch-status');
+
 
     // ================================================================
     // ===== LOGIKA LOBBY I NAWIGACJI =================================
@@ -101,13 +110,12 @@ document.addEventListener('DOMContentLoaded', () => {
         gameIdContainer.classList.add('hidden');
         gameIdInput.value = '';
     }
-
+    // ... (reszta funkcji nawigacji w lobby: showSoloOptions, showMultiOptions, itd.) ...
     function showSoloOptions() {
         modeSelection.classList.add('hidden');
         soloOptions.classList.remove('hidden');
         lobbyMessage.textContent = '';
     }
-
     function showMultiOptions() {
         modeSelection.classList.add('hidden');
         multiOptions.classList.remove('hidden');
@@ -118,14 +126,12 @@ document.addEventListener('DOMContentLoaded', () => {
         gameIdContainer.classList.add('hidden');
         gameIdInput.value = '';
     }
-
     function showMultiCreateDetails() {
         multiCreateJoin.classList.add('hidden');
         multiCreateDetails.classList.remove('hidden');
         lobbyMessage.textContent = '';
         gameIdContainer.classList.add('hidden');
     }
-
     function showMultiJoinDetails() {
         multiCreateJoin.classList.add('hidden');
         multiJoinDetails.classList.remove('hidden');
@@ -181,9 +187,17 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Przyciski "Powrót do Lobby"
+    // Przyciski "Powrót do Lobby" i "Rewanż"
     btnRestart.addEventListener('click', () => window.location.reload());
     modalPlayAgainBtn.addEventListener('click', () => window.location.reload());
+
+    // ===== NOWY LISTENER DLA PRZYCISKU REWANŻ =====
+    modalRematchBtn.addEventListener('click', () => {
+        socket.emit('requestRematch');
+        modalRematchStatus.textContent = 'Wysłano prośbę o rewanż... Czekam...';
+        modalRematchBtn.classList.add('hidden'); // Ukryj przycisk po kliknięciu
+    });
+    // ===============================================
 
     function createMultiGame(rows, cols) {
         lobbyMessage.textContent = 'Tworzenie gry...';
@@ -213,7 +227,11 @@ document.addEventListener('DOMContentLoaded', () => {
         lobbyMessage.textContent = 'Stworzono grę. Czekam na przeciwnika...';
     });
     
-    socket.on('gameStarted', (data) => startMultiplayerGame(data));
+    // ZAKTUALIZOWANE: Ukryj modal, jeśli był otwarty
+    socket.on('gameStarted', (data) => {
+        winModal.classList.add('hidden'); // Ukryj modal wygranej/rewanżu
+        startMultiplayerGame(data);
+    });
     
     socket.on('opponentFoundMatch', () => {
         opponentPairsFound++;
@@ -230,12 +248,34 @@ document.addEventListener('DOMContentLoaded', () => {
         showWinModal(false, false);
     });
     
+    // ===== NOWY LISTENER DLA OFERTY REWANŻU =====
+    socket.on('rematchOffered', () => {
+        // Pokaż modal, jeśli jeszcze nie jest widoczny (bo przeciwnik wygrał)
+        if (winModal.classList.contains('hidden')) {
+            showWinModal(false, false); // Pokaż jako przegrany
+        }
+        modalRematchStatus.textContent = 'Przeciwnik chce zagrać rewanż!';
+        modalRematchBtn.classList.remove('hidden'); // Upewnij się, że przycisk jest widoczny
+    });
+    // =============================================
+    
     socket.on('opponentDisconnected', () => {
         stopTimer();
-        modalTitle.textContent = 'Koniec Gry';
-        modalMessage.textContent = 'Przeciwnik się rozłączył. Wygrałeś!';
-        modalRecordMessage.classList.add('hidden');
-        winModal.classList.remove('hidden');
+        // Jeśli jesteśmy w grze, pokaż modal
+        if (gameScreen.classList.contains('hidden') === false) {
+            modalTitle.textContent = 'Koniec Gry';
+            modalMessage.textContent = 'Przeciwnik się rozłączył. Wygrałeś!';
+            modalRecordMessage.classList.add('hidden');
+            // Pokaż tylko przycisk "Powrót do lobby"
+            modalPlayAgainBtn.classList.remove('hidden');
+            modalRematchBtn.classList.add('hidden');
+            modalRematchStatus.classList.add('hidden');
+            winModal.classList.remove('hidden');
+        } else {
+            // Jeśli jesteśmy w lobby (np. czekamy na dołączenie), po prostu zresetuj lobby
+            showLobbyUI();
+            lobbyMessage.textContent = "Przeciwnik się rozłączył.";
+        }
     });
     
     socket.on('error', (message) => {
@@ -246,7 +286,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // ================================================================
-    // ===== LOGIKA GRY (KOMPLETNA) ===================================
+    // ===== LOGIKA GRY ===============================================
     // ================================================================
 
     function startSoloGame(rows, cols) {
@@ -255,8 +295,8 @@ document.addEventListener('DOMContentLoaded', () => {
         currentCols = cols;
         totalPairs = (rows * cols) / 2;
         resetGameState();
-        loadBestScore();
-        gameScreen.classList.add('solo-mode'); // Ta linia ukrywa panel przeciwnika
+        loadSoloStats(); // ZAKTUALIZOWANO
+        gameScreen.classList.add('solo-mode');
         totalPairsSpan.textContent = totalPairs;
         const emojisForGame = allEmojis.slice(0, totalPairs);
         const cardValues = [...emojisForGame, ...emojisForGame];
@@ -270,7 +310,7 @@ document.addEventListener('DOMContentLoaded', () => {
         totalPairs = data.totalPairs;
         opponentPairsFound = 0;
         resetGameState();
-        gameScreen.classList.remove('solo-mode'); // Ta linia pokazuje panel przeciwnika
+        gameScreen.classList.remove('solo-mode');
         totalPairsSpan.textContent = totalPairs;
         opponentTotalPairsSpan.textContent = totalPairs;
         buildBoard(data.board, data.rows, data.cols);
@@ -309,6 +349,7 @@ document.addEventListener('DOMContentLoaded', () => {
         pairsFoundSpan.textContent = '0';
         opponentPairsSpan.textContent = '0';
         bestScoreSpan.textContent = '--';
+        gamesPlayedSpan.textContent = '0'; // Zresetuj też statystyki gier
     }
     
     function startTimer() {
@@ -326,7 +367,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function handleCardClick() {
         if (lockBoard || this.classList.contains('matched') || this === firstCard) return;
-        startTimer();
+        
+        // ===== DODANO DŹWIĘK =====
+        try {
+            flipSound.currentTime = 0; // Pozwala na szybkie, wielokrotne odtwarzanie
+            flipSound.play();
+        } catch (e) {
+            console.warn("Nie można odtworzyć dźwięku:", e);
+        }
+        // ========================
+
         this.classList.add('flipped');
         if (!firstCard) {
             firstCard = this;
@@ -349,15 +399,17 @@ document.addEventListener('DOMContentLoaded', () => {
         secondCard.classList.add('matched');
         pairsFound++;
         pairsFoundSpan.textContent = pairsFound;
+        
         if (isSoloMode) {
             if (pairsFound === totalPairs) {
                 stopTimer();
-                const isNewRecord = checkAndSaveBestScore();
+                const isNewRecord = updateSoloStats(); // ZAKTUALIZOWANO
                 showWinModal(true, true, isNewRecord);
             }
         } else {
             socket.emit('foundMatch');
             if (pairsFound === totalPairs) {
+                stopTimer(); // Zatrzymaj stoper od razu po wygranej
                 socket.emit('gameFinished');
             }
         }
@@ -378,47 +430,90 @@ document.addEventListener('DOMContentLoaded', () => {
         lockBoard = false;
     }
 
-    function getStorageKey() {
+    // ===== NOWE FUNKCJE STATYSTYK SOLO =====
+    function getTimeStorageKey() {
+        if (currentRows === 0 || currentCols === 0) return null;
         return `memoryBestTime_${currentRows}x${currentCols}`;
     }
 
+    function getStatsStorageKey() {
+        if (currentRows === 0 || currentCols === 0) return null;
+        return `memoryGamesPlayed_${currentRows}x${currentCols}`;
+    }
 
-    function loadBestScore() {
-        if (currentRows === 0 || currentCols === 0) return;
-        const bestTime = localStorage.getItem(getStorageKey());
+    function loadSoloStats() {
+        const timeKey = getTimeStorageKey();
+        const statsKey = getStatsStorageKey();
+        if (!timeKey || !statsKey) return;
+
+        const bestTime = localStorage.getItem(timeKey);
+        const gamesPlayed = localStorage.getItem(statsKey) || '0';
+
         if (bestTime) {
             bestScoreSpan.textContent = `${bestTime}s`;
         } else {
             bestScoreSpan.textContent = '--';
         }
+        gamesPlayedSpan.textContent = gamesPlayed;
     }
 
-    function checkAndSaveBestScore() {
-        const storageKey = getStorageKey();
-        const bestTime = localStorage.getItem(storageKey);
+    function updateSoloStats() {
+        const timeKey = getTimeStorageKey();
+        const statsKey = getStatsStorageKey();
+        if (!timeKey || !statsKey) return;
+        
+        // Zaktualizuj liczbę gier
+        let gamesPlayed = parseInt(localStorage.getItem(statsKey) || '0');
+        gamesPlayed++;
+        localStorage.setItem(statsKey, gamesPlayed.toString());
+        gamesPlayedSpan.textContent = gamesPlayed.toString();
+
+        // Zaktualizuj najlepszy czas
+        const bestTime = localStorage.getItem(timeKey);
         let newRecord = false;
         if (!bestTime || seconds < parseInt(bestTime)) {
-            localStorage.setItem(storageKey, seconds);
+            localStorage.setItem(timeKey, seconds);
             bestScoreSpan.textContent = `${seconds}s`;
             newRecord = true;
         }
         return newRecord;
     }
+    // ======================================
 
+    // ZAKTUALIZOWANA FUNKCJA MODALA (Rewanż + Dźwięk)
     function showWinModal(didPlayerWin, soloMode, isNewRecord = false) {
+        
+        // Zresetuj stan przycisków
+        modalPlayAgainBtn.classList.add('hidden');
+        modalRematchBtn.classList.add('hidden');
+        modalRematchStatus.textContent = ''; // Wyczyść status rewanżu
+        modalRecordMessage.classList.add('hidden');
+        
         if (soloMode) {
             modalTitle.textContent = 'Gratulacje!';
             modalMessage.textContent = `Ukończyłeś grę w ${seconds}s i ${moves} ruchach!`;
+            modalPlayAgainBtn.classList.remove('hidden'); // Pokaż "Powrót do lobby"
+            
             if (isNewRecord) {
                 modalRecordMessage.classList.remove('hidden');
-            } else {
-                modalRecordMessage.classList.add('hidden');
             }
+            
+            // ===== DODANO DŹWIĘK =====
+            if(didPlayerWin) { // W solo zawsze wygrywasz, jeśli ukończysz
+                 try { winSound.play(); } catch(e) {}
+            }
+            // ========================
+
         } else {
-            modalRecordMessage.classList.add('hidden');
+            // Tryb Multiplayer
+            modalRematchBtn.classList.remove('hidden'); // Pokaż "Rewanż"
+            
             if (didPlayerWin) {
                 modalTitle.textContent = 'Gratulacje!';
                 modalMessage.textContent = `Wygrałeś w ${seconds}s i ${moves} ruchach!`;
+                // ===== DODANO DŹWIĘK =====
+                try { winSound.play(); } catch(e) {}
+                // ========================
             } else {
                 modalTitle.textContent = 'Niestety!';
                 modalMessage.textContent = 'Przeciwnik był szybszy. Spróbuj jeszcze raz!';

@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Memory - Soft & Bubbly</title>
-    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap" rel="stylesheet">
+    <title>Material Memory</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     <script src="/socket.io/socket.io.js"></script>
 </head>
@@ -14,12 +14,13 @@
 
     <div id="lobby-screen" class="panel">
         <h2>Wybierz Tryb Gry</h2>
-
+        <p class="game-description">
+            Witaj w Memory! Sprawdź swoją pamięć grając solo lub zmierz się ze znajomymi w trybie multiplayer. Celem jest znalezienie wszystkich par. Powodzenia!
+        </p>
         <div id="mode-selection">
             <button id="btn-select-solo" class="btn green">GRA SOLO</button>
             <button id="btn-select-multi" class="btn blue">GRA WIELOOSOBOWA</button>
         </div>
-
         <div id="solo-options" class="hidden">
             <h3>GRA SOLO - Wybierz Poziom</h3>
             <div class="difficulty-select">
@@ -29,7 +30,6 @@
             </div>
             <button id="btn-back-to-mode" class="btn purple">POWRÓT</button>
         </div>
-
         <div id="multi-options" class="hidden">
             <h3>GRA WIELOOSOBOWA</h3>
             <div id="multi-create-join">
@@ -37,7 +37,6 @@
                 <button id="btn-show-join-game" class="btn blue">DOŁĄCZ DO GRY</button>
                 <button id="btn-back-to-mode-multi" class="btn purple">POWRÓT</button>
             </div>
-
             <div id="multi-create-details" class="hidden">
                 <h4>STWÓRZ GRĘ - Wybierz Poziom</h4>
                 <div class="difficulty-select">
@@ -52,7 +51,6 @@
                 </div>
                 <button id="btn-back-to-multi-options-from-create" class="btn purple">POWRÓT</button>
             </div>
-
             <div id="multi-join-details" class="hidden">
                 <h4>DOŁĄCZ DO GRY</h4>
                 <input type="text" id="game-id-input" placeholder="Wpisz ID Gry" class="input-field">
@@ -60,7 +58,6 @@
                 <button id="btn-back-to-multi-options-from-join" class="btn purple">POWRÓT</button>
             </div>
         </div>
-        
         <p id="lobby-message" class="error-text"></p>
     </div>
 
@@ -78,7 +75,10 @@
                 <div id="best-score-container" class="info-row">
                     Rekord: <span id="best-score">--</span>s
                 </div>
-            </div>
+                <div id="games-played-container" class="info-row">
+                    Gry: <span id="games-played">0</span>
+                </div>
+                </div>
             
             <div id="opponent-info" class="info-container panel">
                 <h3>PRZECIWNIK</h3>
@@ -86,8 +86,7 @@
             </div>
         </div>
 
-        <div id="game-board">
-        </div>
+        <div id="game-board"></div>
     </div>
 
     <div id="win-modal" class="modal-overlay hidden">
@@ -95,8 +94,11 @@
             <h2 id="modal-title">Gratulacje!</h2>
             <p id="modal-message"></p>
             <p id="modal-record-message" class="hidden">NOWY REKORD!</p>
+            
+            <p id="modal-rematch-status"></p>
             <button id="modal-play-again" class="btn green">POWRÓT DO LOBBY</button>
-        </div>
+            <button id="modal-rematch" class="btn blue hidden">REWANŻ</button>
+            </div>
     </div>
     
     <script src="script.js"></script>

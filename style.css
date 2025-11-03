@@ -2,24 +2,20 @@
 @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&display=swap');
 
 :root {
-    /* NOWA PALETA KOLORÓW */
-    --bg-light: #F6F6F6;       /* Jasnoszary */
-    --bg-white: #FFFFFF;         /* Biel paneli */
-    --text-primary: #212121;   /* Ciemny grafit */
-    --text-secondary: #708993; /* Szaro-niebieski */
+    /* Paleta kolorów */
+    --bg-light: #F6F6F6;
+    --bg-white: #FFFFFF;
+    --text-primary: #212121;
+    --text-secondary: #708993;
     
-    /* Akcenty z palety */
-    --accent-green: #D9CAB3;     /* Beżowy (dla Solo) */
-    --accent-blue: #6D9886;      /* Morski zielony (dla Multi i tyłu kart) */
-    --accent-purple: #708993;    /* POPRAWIONY: Szaro-niebieski (dla Wstecz) */
-    --accent-gold: #D9CAB3;      /* Beżowy (dla Rekordu) */
-
-    /* Uzupełniające akcenty */
-    --accent-red: #E74C3C;       /* Stonowana czerwień (dla błędów/przeciwnika) */
+    --accent-green: #D9CAB3;
+    --accent-blue: #6D9886;
+    --accent-purple: #708993;
+    --accent-gold: #D9CAB3;
+    --accent-red: #E74C3C;
     
     --font-main: 'Nunito', sans-serif;
     
-    /* Miękkie cienie */
     --shadow-soft: 0 4px 12px rgba(0, 0, 0, 0.05);
     --shadow-medium: 0 6px 16px rgba(0, 0, 0, 0.08);
 }
@@ -48,7 +44,7 @@ h2 { font-size: 2em; }
 h3 { font-size: 1.5em; }
 h4 { font-size: 1.2em; color: var(--text-secondary); }
 
-/* Przyciski w stylu "Bubbly" */
+/* Przyciski */
 .btn {
     font-family: var(--font-main);
     padding: 10px 22px;
@@ -76,7 +72,6 @@ h4 { font-size: 1.2em; color: var(--text-secondary); }
     box-shadow: 0 2px 5px rgba(109, 152, 134, 0.3);
 }
 
-/* Kolorowe przyciski */
 .btn.green {
     background-color: var(--accent-green);
     color: var(--text-primary);
@@ -91,15 +86,14 @@ h4 { font-size: 1.2em; color: var(--text-secondary); }
 }
 .btn.blue:hover { box-shadow: 0 6px 12px rgba(109, 152, 134, 0.4); }
 
-/* POPRAWIONY STYL PRZYCISKU "POWRÓT" */
 .btn.purple {
     background-color: var(--accent-purple);
-    color: var(--bg-white); /* Jasny tekst na ciemniejszym przycisku */
-    box-shadow: 0 4px 10px rgba(112, 137, 147, 0.3); /* Nowy cień */
+    color: var(--bg-white);
+    box-shadow: 0 4px 10px rgba(112, 137, 147, 0.3);
 }
 .btn.purple:hover { box-shadow: 0 6px 12px rgba(112, 137, 147, 0.4); }
 
-/* Pola tekstowe (też zaokrąglone) */
+/* Pola tekstowe */
 .input-field {
     font-family: var(--font-main);
     font-weight: 700;
@@ -120,7 +114,7 @@ h4 { font-size: 1.2em; color: var(--text-secondary); }
     box-shadow: inset 0 2px 4px rgba(0,0,0,0.05), 0 0 0 3px rgba(109, 152, 134, 0.4);
 }
 
-/* Panele (Lobby, Info, Modal) */
+/* Panele */
 .panel {
     width: 100%;
     max-width: 600px;
@@ -135,6 +129,16 @@ h4 { font-size: 1.2em; color: var(--text-secondary); }
 /* ===== KLASA DO UKRYWANIA ===== */
 .hidden {
     display: none !important;
+}
+
+/* Opis gry */
+.game-description {
+    font-size: 1.1em;
+    font-weight: 400;
+    color: var(--text-secondary);
+    max-width: 500px;
+    margin: -10px auto 30px auto; 
+    line-height: 1.6;
 }
 
 /* ===== STYLE LOBBY ===== */
@@ -167,7 +171,6 @@ h4 { font-size: 1.2em; color: var(--text-secondary); }
     margin: 15px 0;
 }
 
-/* Kontener ID Gry */
 #game-id-container {
     font-size: 1.2em;
     margin-top: 20px;
@@ -189,7 +192,6 @@ h4 { font-size: 1.2em; color: var(--text-secondary); }
     font-weight: 800;
 }
 
-/* Przycisk Kopiowania (dopasowany do stylu) */
 .copy-btn {
     background: #E9ECEF;
     border: none;
@@ -275,6 +277,16 @@ h4 { font-size: 1.2em; color: var(--text-secondary); }
     color: var(--accent-green);
 }
 
+/* ===== NOWY STYL DLA STATYSTYK GRY ===== */
+#games-played-container {
+    color: var(--accent-green);
+    font-weight: 700;
+}
+#games-played-container span {
+    color: var(--accent-green);
+}
+/* ======================================= */
+
 #opponent-info h3 {
     color: var(--accent-red);
 }
@@ -289,9 +301,15 @@ h4 { font-size: 1.2em; color: var(--text-secondary); }
 #game-screen.solo-mode #best-score-container {
     display: block !important;
 }
+#game-screen.solo-mode #games-played-container {
+    display: block !important;
+}
 
 /* Logika CSS dla trybu Multi */
 #game-screen:not(.solo-mode) #best-score-container {
+    display: none !important;
+}
+#game-screen:not(.solo-mode) #games-played-container {
     display: none !important;
 }
 #game-screen:not(.solo-mode) #opponent-info {
@@ -335,17 +353,15 @@ h4 { font-size: 1.2em; color: var(--text-secondary); }
     box-shadow: var(--shadow-soft);
 }
 
-/* Rewers (tył karty) */
 .card-back {
     transform: rotateY(0deg);
-    background-color: var(--accent-blue); /* Morski zielony tył */
+    background-color: var(--accent-blue);
 }
 .card:not(.matched):not(.flipped):hover .card-back {
     transform: translateY(-3px);
     box-shadow: var(--shadow-medium);
 }
 
-/* Awers (przód karty) */
 .card-front {
     transform: rotateY(180deg);
     display: flex;
@@ -353,7 +369,7 @@ h4 { font-size: 1.2em; color: var(--text-secondary); }
     align-items: center;
     font-size: 40px;
     background-color: var(--bg-white);
-    color: var(--text-primary); /* Ciemny grafit emoji */
+    color: var(--text-primary);
 }
 .card.matched .card-front {
     background-color: var(--bg-light);
@@ -382,7 +398,7 @@ h4 { font-size: 1.2em; color: var(--text-secondary); }
 }
 
 .modal-content h2 {
-    color: var(--accent-green); /* Beżowy tytuł wygranej */
+    color: var(--accent-green);
     margin-top: 0;
     margin-bottom: 20px;
     font-weight: 800;
@@ -395,11 +411,19 @@ h4 { font-size: 1.2em; color: var(--text-secondary); }
 }
 
 #modal-record-message {
-    color: var(--accent-gold); /* Beżowy kolor rekordu */
+    color: var(--accent-gold);
     font-weight: 700;
     font-size: 1.3em;
     margin-bottom: 25px;
 }
+
+/* ===== NOWY STYL STATUSU REWANŻU ===== */
+#modal-rematch-status {
+    color: var(--text-secondary);
+    font-style: italic;
+    min-height: 20px;
+}
+/* ===================================== */
 
 #modal-play-again {
     padding: 12px 20px;
