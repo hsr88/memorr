@@ -1,117 +1,128 @@
-/* Importujemy czcionkę pixelową */
-@import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
+/* Importujemy czcionkę "Nunito" */
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&display=swap');
 
 :root {
-    /* Paleta kolorów - Clean & Vibrant Pixel Art */
-    --bg-light: #F0F4F8;       /* Jasne, lekko niebieskie tło */
-    --bg-panel: #FFFFFF;       /* Czysta biel paneli */
-    --bg-panel-dark: #34495E; /* Ciemne tło dla planszy (wklęsłe) */
+    /* Paleta kolorów - Soft & Bubbly */
+    --bg-light: #F8F9FA;       /* Bardzo jasne tło */
+    --bg-white: #FFFFFF;         /* Biel paneli */
+    --text-primary: #333A40;   /* Ciemny tekst */
+    --text-secondary: #7A869A; /* Drugorzędny tekst */
     
-    --text-dark: #2C3E50;    /* Ciemny tekst */
-    --text-light: #FFFFFF;     /* Jasny tekst (na przyciskach) */
+    /* Żywe, ale miękkie akcenty */
+    --accent-green: #20C997;
+    --accent-blue: #0D6EFD;
+    --accent-red: #DC3545;
+    --accent-purple: #6F42C1;
+    --accent-gold: #FFC107;
     
-    --border-dark: #2C3E50;
-    --border-light: #7F8C8D;    /* Cień dla białych paneli */
+    --font-main: 'Nunito', sans-serif;
     
-    /* Żywe kolory akcentów */
-    --accent-green: #2ECC71;
-    --accent-blue: #3498DB;
-    --accent-red: #E74C3C;
-    --accent-purple: #9B59B6;
-    --accent-gold: #F1C40F;
-    
-    --border-width: 3px;
-    --shadow-distance: 5px;
-    --font-pixel: 'VT323', monospace;
+    /* Miękkie cienie */
+    --shadow-soft: 0 4px 12px rgba(0, 0, 0, 0.05);
+    --shadow-medium: 0 6px 16px rgba(0, 0, 0, 0.08);
 }
 
-/* Ustawienia globalne */
 body {
-    font-family: var(--font-pixel);
+    font-family: var(--font-main);
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     background-color: var(--bg-light);
-    color: var(--text-dark);
+    color: var(--text-primary);
     min-height: 100vh;
     padding: 20px 0;
     cursor: default;
-    
-    -webkit-font-smoothing: none;
-    -moz-osx-font-smoothing: grayscale;
-    image-rendering: pixelated;
-    image-rendering: -moz-crisp-edges;
-    image-rendering: crisp-edges;
 }
 
 h1, h2, h3, h4 {
-    color: var(--text-dark);
+    color: var(--text-primary);
+    font-weight: 800; /* Grubsza czcionka dla "bąbelkowego" wyglądu */
     margin-top: 0;
     margin-bottom: 25px;
-    font-weight: normal;
 }
-h1 { font-size: 4em; color: var(--accent-blue); }
-h2 { font-size: 2.8em; }
-h3 { font-size: 2.2em; }
-h4 { font-size: 1.8em; color: var(--text-secondary); }
+h1 { font-size: 3em; color: var(--accent-blue); }
+h2 { font-size: 2em; }
+h3 { font-size: 1.5em; }
+h4 { font-size: 1.2em; color: var(--text-secondary); }
 
-/* Przyciski w stylu "Chunky" Pixel Art */
-.pixel-btn {
-    font-family: var(--font-pixel);
-    padding: 8px 14px;
-    font-size: 1.8em;
-    border: var(--border-width) solid var(--border-dark);
-    border-radius: 0;
+/* Przyciski w stylu "Bubbly" (kształt pigułki) */
+.btn {
+    font-family: var(--font-main);
+    padding: 10px 22px;
+    font-size: 1.1em;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border: none;
+    border-radius: 50px; /* Bardzo okrągłe */
     background-color: var(--accent-blue);
-    color: var(--text-light);
+    color: var(--bg-white);
     cursor: pointer;
-    transition: none;
-    box-shadow: var(--shadow-distance) var(--shadow-distance) 0px var(--border-dark);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    /* Cień w kolorze przycisku */
+    box-shadow: 0 4px 10px rgba(13, 110, 253, 0.3);
     position: relative;
 }
 
-.pixel-btn:active, .pixel-btn:focus {
+.btn:hover {
+    transform: translateY(-3px); /* Uniesienie */
+    box-shadow: 0 6px 12px rgba(13, 110, 253, 0.4);
+}
+.btn:active, .btn:focus {
     outline: none;
-    transform: translate(var(--shadow-distance), var(--shadow-distance));
-    box-shadow: none;
-}
-.pixel-btn:hover {
-    filter: brightness(110%);
+    transform: translateY(0px);
+    box-shadow: 0 2px 5px rgba(13, 110, 253, 0.3);
 }
 
-.pixel-btn.green { background-color: var(--accent-green); }
-.pixel-btn.blue { background-color: var(--accent-blue); }
-.pixel-btn.purple { background-color: var(--accent-purple); }
+/* Kolorowe przyciski */
+.btn.green {
+    background-color: var(--accent-green);
+    box-shadow: 0 4px 10px rgba(32, 201, 151, 0.3);
+}
+.btn.green:hover { box-shadow: 0 6px 12px rgba(32, 201, 151, 0.4); }
 
-/* Pola tekstowe (wklęsłe) */
-.pixel-input {
-    font-family: var(--font-pixel);
-    padding: 8px 10px;
-    font-size: 1.8em;
-    border: var(--border-width) solid var(--border-dark);
-    border-radius: 0;
-    background-color: var(--bg-light);
-    color: var(--text-dark);
+.btn.blue {
+    background-color: var(--accent-blue);
+    box-shadow: 0 4px 10px rgba(13, 110, 253, 0.3);
+}
+.btn.blue:hover { box-shadow: 0 6px 12px rgba(13, 110, 253, 0.4); }
+
+.btn.purple {
+    background-color: var(--accent-purple);
+    box-shadow: 0 4px 10px rgba(111, 66, 193, 0.3);
+}
+.btn.purple:hover { box-shadow: 0 6px 12px rgba(111, 66, 193, 0.4); }
+
+/* Pola tekstowe (też zaokrąglone) */
+.input-field {
+    font-family: var(--font-main);
+    font-weight: 700;
+    padding: 10px 18px;
+    font-size: 1.1em;
+    border: none;
+    border-radius: 50px;
+    background-color: #F0F0F0; /* Jasnoszare tło */
+    color: var(--text-primary);
     outline: none;
     margin-right: 10px;
     width: 200px;
     text-align: center;
-    box-shadow: inset 3px 3px 0px var(--border-light);
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.05); /* Wklęsły cień */
+    transition: box-shadow 0.3s;
 }
-.pixel-input:focus {
-    background-color: var(--bg-panel);
-    border-color: var(--accent-blue);
+.input-field:focus {
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.05), 0 0 0 3px rgba(13, 110, 253, 0.3);
 }
 
-/* Panele (Lobby, Info, Modal) - Wypukłe */
-.pixel-panel {
+/* Panele (Lobby, Info, Modal) */
+.panel {
     width: 100%;
     max-width: 600px;
     padding: 30px;
-    background-color: var(--bg-panel);
-    border: var(--border-width) solid var(--border-dark);
-    box-shadow: var(--shadow-distance) var(--shadow-distance) 0px var(--border-light);
+    background-color: var(--bg-white);
+    border-radius: 16px; /* Zaokrąglone rogi */
+    box-shadow: var(--shadow-medium);
     text-align: center;
     margin-bottom: 40px;
 }
@@ -140,7 +151,7 @@ h4 { font-size: 1.8em; color: var(--text-secondary); }
     margin-top: 20px;
     padding-top: 20px;
     width: 100%;
-    border-top: var(--border-width) dashed var(--border-light);
+    border-top: 1px solid #E9ECEF; /* Cienka linia */
 }
 
 .difficulty-select {
@@ -151,51 +162,56 @@ h4 { font-size: 1.8em; color: var(--text-secondary); }
     margin: 15px 0;
 }
 
+/* Kontener ID Gry */
 #game-id-container {
-    font-size: 1.8em;
+    font-size: 1.2em;
     margin-top: 20px;
     margin-bottom: 20px;
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 10px;
-    padding: 10px;
+    padding: 12px 15px;
     background-color: var(--bg-light);
-    border: var(--border-width) solid var(--border-light);
+    border-radius: 12px;
 }
 #game-id-container span {
-    color: var(--border-light);
+    color: var(--text-secondary);
 }
 #game-id-container strong {
     color: var(--accent-blue);
     font-size: 1.3em;
+    font-weight: 800;
 }
 
+/* Przycisk Kopiowania (dopasowany do stylu) */
 .copy-btn {
-    background: var(--bg-panel);
-    border: var(--border-width) solid var(--border-dark);
+    background: #E9ECEF;
+    border: none;
     cursor: pointer;
-    width: 40px;
-    height: 40px;
+    width: 36px;
+    height: 36px;
     padding: 0;
     margin-left: 5px;
-    box-shadow: 3px 3px 0px var(--border-light);
-    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="%232C3E50"><path d="M0 0h24v24H0z" fill="none"/><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>');
+    border-radius: 50%;
+    transition: background-color 0.2s;
+    
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 0 24 24" width="20px" fill="%237A869A"><path d="M0 0h24v24H0z" fill="none"/><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>');
     background-repeat: no-repeat;
     background-position: center;
-    background-size: 24px 24px;
+    background-size: 20px 20px;
 }
-.copy-btn:active {
-    transform: translate(3px, 3px);
-    box-shadow: none;
+.copy-btn:hover {
+    background-color: #DEE2E6;
 }
 .copy-btn.copied {
-    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="%232ECC71"><path d="M0 0h24v24H0z" fill="none"/><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>');
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 0 24 24" width="20px" fill="%2320C997"><path d="M0 0h24v24H0z" fill="none"/><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>');
 }
 
 .error-text {
     color: var(--accent-red);
-    font-size: 1.5em;
+    font-weight: 700;
+    font-size: 1.1em;
     min-height: 20px;
     margin-top: 15px;
 }
@@ -220,31 +236,35 @@ h4 { font-size: 1.8em; color: var(--text-secondary); }
     margin-bottom: 30px;
 }
 
-.info-container.pixel-panel {
-    font-size: 1.5em;
+.info-container.panel {
+    font-size: 1em;
     padding: 20px;
     min-width: 220px;
     text-align: left;
     max-width: 300px;
-    border-color: var(--accent-purple);
-    box-shadow: var(--shadow-distance) var(--shadow-distance) 0px var(--border-light);
+    border-radius: 12px;
 }
 .info-container h3 {
     text-align: center;
     margin-bottom: 15px;
-    font-size: 1.5em;
+    font-size: 1.2em;
     color: var(--accent-blue);
+    font-weight: 800;
 }
 .info-row {
     margin-bottom: 8px;
+    color: var(--text-secondary);
+    font-weight: 400;
+    font-size: 1.1em;
 }
 .info-row span {
-    color: var(--text-dark);
-    font-size: 1.1em;
+    color: var(--text-primary);
+    font-weight: 700;
 }
 
 #best-score-container {
     color: var(--accent-green);
+    font-weight: 700;
 }
 #best-score-container span {
     color: var(--accent-green);
@@ -257,36 +277,28 @@ h4 { font-size: 1.8em; color: var(--text-secondary); }
     color: var(--accent-red);
 }
 
-/* ===== TO SĄ REGUŁY, KTÓRE NAPRAWIAJĄ BŁĄD ===== */
-/* Ukryj panel przeciwnika w trybie solo */
+/* Logika CSS dla trybu Solo */
 #game-screen.solo-mode #opponent-info {
     display: none;
 }
-/* Pokaż panel rekordu w trybie solo */
 #game-screen.solo-mode #best-score-container {
     display: block !important;
 }
 
-/* Ukryj panel rekordu w trybie multi */
+/* Logika CSS dla trybu Multi */
 #game-screen:not(.solo-mode) #best-score-container {
     display: none !important;
 }
-/* Pokaż panel przeciwnika w trybie multi */
 #game-screen:not(.solo-mode) #opponent-info {
     display: block !important;
 }
-/* ============================================== */
-
 
 /* ===== STYLE PLANSZY I KART ===== */
-#game-board.pixel-panel.dark {
+#game-board {
     display: grid;
-    gap: 10px;
+    gap: 12px;
     perspective: 1000px;
-    padding: 10px;
-    background-color: var(--bg-panel-dark);
-    box-shadow: inset 4px 4px 0px #2C3E50;
-    border-color: var(--border-dark);
+    padding: 12px;
 }
 
 .card {
@@ -294,8 +306,8 @@ h4 { font-size: 1.8em; color: var(--text-secondary); }
     height: 80px;
     position: relative;
     cursor: pointer;
-    transform-style: preserve-3d; /* Poprawiona literówka z 'preserve-d' */
-    transition: transform 0.6s;
+    transform-style: preserve-3d;
+    transition: transform 0.6s, box-shadow 0.3s;
 }
 
 .card.flipped {
@@ -303,52 +315,44 @@ h4 { font-size: 1.8em; color: var(--text-secondary); }
 }
 
 .card.matched {
-    opacity: 0.5;
+    opacity: 0.3; /* Mocne wygaszenie */
     cursor: default;
+    box-shadow: none;
 }
 
 .card-face {
     position: absolute;
     width: 100%;
     height: 100%;
-    border-radius: 0;
+    border-radius: 12px; /* Zaokrąglone karty */
     backface-visibility: hidden;
     transition: all 0.3s ease;
-    border: var(--border-width) solid var(--border-dark);
+    box-shadow: var(--shadow-soft);
 }
 
+/* Rewers (tył karty) */
 .card-back {
     transform: rotateY(0deg);
     background-color: var(--accent-blue);
-    border-color: var(--text-light);
-    box-shadow: var(--shadow-distance) var(--shadow-distance) 0px var(--border-dark);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 3em;
-    color: var(--text-light);
 }
-.card-back::after {
-    content: '?';
-}
-
 .card:not(.matched):not(.flipped):hover .card-back {
-    transform: translateY(-2px);
-    box-shadow: 7px 7px 0px var(--border-dark);
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-medium);
 }
 
+/* Awers (przód karty) */
 .card-front {
     transform: rotateY(180deg);
     display: flex;
     justify-content: center;
     align-items: center;
     font-size: 40px;
-    background-color: var(--bg-light);
-    color: var(--text-dark); /* Ta linijka sprawia, że emoji jest widoczne */
-    box-shadow: inset 3px 3px 0px var(--border-light);
+    background-color: var(--bg-white);
+    color: var(--text-primary); /* Ustawia kolor emoji */
 }
 .card.matched .card-front {
-    background-color: var(--border-light);
+    background-color: var(--bg-light);
+    box-shadow: none;
 }
 
 /* ===== STYLE OKNA MODALNEGO ===== */
@@ -358,40 +362,43 @@ h4 { font-size: 1.8em; color: var(--text-secondary); }
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.6);
-    backdrop-filter: blur(2px);
+    background-color: rgba(10, 10, 10, 0.6);
+    backdrop-filter: blur(5px);
     display: flex;
     justify-content: center;
     align-items: center;
     z-index: 1000;
 }
 
-.modal-content.pixel-panel {
+.modal-content.panel {
     max-width: 500px;
+    box-shadow: var(--shadow-3);
     animation: fadeIn 0.3s ease-out;
 }
 
 .modal-content h2 {
-    color: var(--accent-green);
+    color: var(--accent-blue);
     margin-top: 0;
     margin-bottom: 20px;
-    font-size: 2.8em;
+    font-weight: 800;
 }
 
 .modal-content p {
-    font-size: 1.8em;
+    font-size: 1.1em;
     margin-bottom: 15px;
-    color: var(--text-dark);
+    color: var(--text-primary);
 }
 
 #modal-record-message {
     color: var(--accent-gold);
-    font-size: 2em;
+    font-weight: 700;
+    font-size: 1.3em;
     margin-bottom: 25px;
 }
 
 #modal-play-again {
     padding: 12px 20px;
+    font-size: 1.1em;
 }
 
 @keyframes fadeIn {
