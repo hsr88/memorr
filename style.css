@@ -227,7 +227,6 @@ h5 { font-size: 1.1em; color: var(--text-secondary); margin: 20px 0 10px 0; font
     margin: 15px 0;
 }
 
-/* ===== NOWY STYL WYBORU TRYBU GRY ===== */
 #game-mode-select {
     display: flex;
     flex-direction: column;
@@ -247,7 +246,6 @@ h5 { font-size: 1.1em; color: var(--text-secondary); margin: 20px 0 10px 0; font
 }
 #game-mode-select input[type="radio"] {
     margin-right: 10px;
-    /* Prosty-ale-nowoczesny radio button */
     appearance: none;
     -webkit-appearance: none;
     width: 20px;
@@ -265,7 +263,6 @@ h5 { font-size: 1.1em; color: var(--text-secondary); margin: 20px 0 10px 0; font
     color: var(--text-secondary);
     margin-left: 8px;
 }
-/* ======================================= */
 
 #game-id-container {
     font-size: 1.2em;
@@ -327,27 +324,33 @@ h5 { font-size: 1.1em; color: var(--text-secondary); margin: 20px 0 10px 0; font
     align-items: center;
 }
 
+/* ===== POPRAWKA CENTROWANIA PRZYCISKU ===== */
 .controls {
-    margin-bottom: 20px; /* Zmniejszony margines */
+    margin-bottom: 20px;
     width: 100%;
     max-width: 600px;
     display: flex;
-    justify-content: space-between;
+    justify-content: center; /* ZAWSZE centruj */
     align-items: center;
+    position: relative; /* Potrzebne dla info o turze */
+    min-height: 50px; /* Zapewnia przestrzeń */
 }
 
-/* ===== NOWY STYL WSKAŹNIKA TURY ===== */
 #turn-info {
     font-size: 1.3em;
     font-weight: 700;
     color: var(--text-secondary);
-    margin-bottom: 0; /* Usunięty domyślny margines */
+    margin-bottom: 0;
+    /* Pozycjonujemy info o turze na lewo, nie wpływając na centrowanie przycisku */
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
 }
 #turn-info.my-turn {
     color: var(--accent-blue);
 }
-/* ================================== */
-
+/* ======================================= */
 
 .all-info-container {
     display: flex;
@@ -364,16 +367,14 @@ h5 { font-size: 1.1em; color: var(--text-secondary); margin: 20px 0 10px 0; font
     text-align: left;
     max-width: 300px;
     border-radius: 12px;
-    border: 4px solid transparent; /* Ramka dla aktywnej tury */
+    border: 4px solid transparent;
     transition: border-color 0.3s ease;
 }
 
-/* ===== NOWY STYL AKTYWNEJ TURY ===== */
 .info-container.active-turn {
     border-color: var(--accent-blue);
     box-shadow: 0 0 15px rgba(109, 152, 134, 0.5);
 }
-/* ================================= */
 
 .info-container h3 {
     text-align: center;
@@ -415,7 +416,6 @@ h5 { font-size: 1.1em; color: var(--text-secondary); margin: 20px 0 10px 0; font
     color: var(--accent-red);
 }
 
-/* Logika CSS dla trybu Solo */
 #game-screen.solo-mode #opponent-info {
     display: none;
 }
@@ -425,8 +425,6 @@ h5 { font-size: 1.1em; color: var(--text-secondary); margin: 20px 0 10px 0; font
 #game-screen.solo-mode #games-played-container {
     display: block !important;
 }
-
-/* Logika CSS dla trybu Multi */
 #game-screen:not(.solo-mode) #best-score-container {
     display: none !important;
 }
