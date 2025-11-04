@@ -522,7 +522,7 @@ footer {
 
 #achievements-btn {
     position: absolute;
-    bottom: 20px; /* Przeniesione na dół */
+    bottom: 20px;
     right: 20px;
     background: none;
     border: none;
@@ -530,7 +530,7 @@ footer {
     cursor: pointer;
     opacity: 0.6;
     transition: opacity 0.2s, transform 0.2s;
-    z-index: 10; /* Upewnij się, że jest nad innymi elementami panelu */
+    z-index: 10;
 }
 #achievements-btn:hover {
     opacity: 1;
@@ -589,8 +589,7 @@ footer {
     position: fixed;
     bottom: 20px;
     left: 50%;
-    /* POPRAWKA: Przesunięcie startowe zmienione */
-    transform: translate(-50%, 20px); 
+    transform: translate(-50%, 20px); /* Przesunięcie startowe */
     background-color: var(--bg-white);
     border-radius: 12px;
     box-shadow: var(--shadow-3);
@@ -604,13 +603,12 @@ footer {
     pointer-events: none;
     
     transition: transform 0.5s cubic-bezier(0.21, 1.02, 0.73, 1), 
-                opacity 0.5s ease;
+                opacity 0.5s ease; /* Dodano przejście dla opacity */
 }
 .toast.show {
-    /* POPRAWKA: Pokazuje się, przesuwając na miejsce */
     opacity: 1;
     pointer-events: auto;
-    transform: translate(-50%, 0); 
+    transform: translate(-50%, 0); /* Pokazuje się, przesuwając na miejsce */
 }
 
 .toast-icon {
