@@ -138,6 +138,7 @@ h4 { font-size: 1.2em; color: var(--text-secondary); }
     text-align: center;
     margin-bottom: 40px;
     box-sizing: border-box;
+    position: relative; /* Potrzebne dla przycisku osiągnięć */
 }
 
 /* ===== KLASA DO UKRYWANIA ===== */
@@ -155,29 +156,29 @@ h4 { font-size: 1.2em; color: var(--text-secondary); }
     line-height: 1.6;
 }
 
-/* ===== ZMIENIONY STYL WYBORU MOTYWU ===== */
+/* Styl wyboru motywu */
 #theme-selection {
     width: 100%;
-    margin-top: 30px; /* Zwiększony margines od góry */
+    margin-top: 30px;
     padding-top: 20px;
     border-top: 1px solid #E9ECEF;
 }
 #theme-selection h4 {
-    font-size: 1em; /* Mniejszy nagłówek */
+    font-size: 1em;
     font-weight: 700;
     color: var(--text-secondary);
     margin-bottom: 15px;
 }
 .theme-btn {
     font-family: var(--font-main);
-    font-size: 1.5em; /* Mniejsze emoji */
+    font-size: 1.5em;
     border: 3px solid transparent;
-    border-radius: 10px; /* Mniejsze zaokrąglenie */
+    border-radius: 10px;
     background-color: #F0F0F0;
     color: var(--text-primary);
     cursor: pointer;
-    padding: 4px; /* Mniejszy padding */
-    width: 50px;  /* Mniejszy przycisk */
+    padding: 4px;
+    width: 50px;
     height: 50px;
     transition: all 0.2s ease;
 }
@@ -190,7 +191,6 @@ h4 { font-size: 1.2em; color: var(--text-secondary); }
     background-color: var(--bg-light);
     box-shadow: 0 0 10px rgba(109, 152, 134, 0.3);
 }
-/* ================================== */
 
 /* ===== STYLE LOBBY ===== */
 #mode-selection,
@@ -438,12 +438,26 @@ h4 { font-size: 1.2em; color: var(--text-secondary); }
     justify-content: center;
     align-items: center;
     z-index: 1000;
+    /* Domyślnie ukryty modal ma pointer-events: none */
+    pointer-events: none; 
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+/* Pokazany modal */
+.modal-overlay:not(.hidden) {
+    pointer-events: auto;
+    opacity: 1;
 }
 
 .modal-content.panel {
     max-width: 500px;
     box-shadow: var(--shadow-3);
-    animation: fadeIn 0.3s ease-out;
+    /* Animacja pojawiania się */
+    transform: scale(0.95);
+    transition: transform 0.3s ease;
+}
+.modal-overlay:not(.hidden) .modal-content.panel {
+    transform: scale(1);
 }
 
 .modal-content h2 {
@@ -476,17 +490,6 @@ h4 { font-size: 1.2em; color: var(--text-secondary); }
     font-size: 1.1em;
 }
 
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: scale(0.9);
-    }
-    to {
-        opacity: 1;
-        transform: scale(1);
-    }
-}
-
 /* ===== STOPKA ===== */
 footer {
     width: 100%;
@@ -500,4 +503,110 @@ footer {
     color: var(--text-secondary);
     font-size: 0.9em;
     font-weight: 700;
+}
+
+
+/* ===== NOWE STYLE OSIĄGNIĘĆ ===== */
+
+#achievements-btn {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: none;
+    border: none;
+    font-size: 2em;
+    cursor: pointer;
+    opacity: 0.6;
+    transition: opacity 0.2s, transform 0.2s;
+}
+#achievements-btn:hover {
+    opacity: 1;
+    transform: scale(1.1);
+}
+
+#achievements-list {
+    list-style: none;
+    padding: 0;
+    margin: 20px 0;
+    max-height: 40vh; /* Ograniczenie wysokości */
+    overflow-y: auto; /* Przewijanie, jeśli jest za dużo */
+    text-align: left;
+}
+
+.achievement-item {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    background: var(--bg-light);
+    opacity: 0.5; /* Domyślnie zablokowane */
+}
+
+.achievement-item.unlocked {
+    opacity: 1; /* Odblokowane są w pełni widoczne */
+    background: #fff;
+    border: 2px solid var(--accent-green);
+}
+
+.achievement-icon {
+    font-size: 2em;
+    margin-right: 15px;
+}
+
+.achievement-details h5 {
+    font-weight: 800;
+    font-size: 1.1em;
+    margin: 0 0 5px 0;
+    color: var(--text-primary);
+}
+
+.achievement-details p {
+    font-size: 0.9em;
+    margin: 0;
+    color: var(--text-secondary);
+}
+
+.achievement-item.unlocked .achievement-details h5 {
+    color: var(--accent-green);
+}
+
+/* ===== NOWE STYLE POWIADOMIENIA (TOAST) ===== */
+.toast {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translate(-50%, 100px); /* Domyślnie ukryty pod ekranem */
+    background-color: var(--bg-white);
+    border-radius: 12px;
+    box-shadow: var(--shadow-3);
+    display: flex;
+    align-items: center;
+    padding: 15px 20px;
+    z-index: 2000;
+    transition: transform 0.5s cubic-bezier(0.21, 1.02, 0.73, 1); /* Animacja "sprężyny" */
+}
+.toast.show {
+    transform: translate(-50%, 0); /* Pokazuje powiadomienie */
+}
+
+.toast-icon {
+    font-size: 1.5em;
+    margin-right: 15px;
+}
+
+.toast-content {
+    display: flex;
+    flex-direction: column;
+}
+
+.toast-title {
+    font-weight: 800;
+    font-size: 1.1em;
+    color: var(--text-primary);
+}
+
+.toast-message {
+    font-weight: 400;
+    color: var(--text-secondary);
 }

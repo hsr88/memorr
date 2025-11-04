@@ -12,7 +12,7 @@
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://memorr.top">
 
-    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&display.swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     <script src="/socket.io/socket.io.js"></script>
 </head>
@@ -22,6 +22,7 @@
         <h1>Memo<span class="rr">rr</span></h1>
 
         <div id="lobby-screen" class="panel">
+            <button id="achievements-btn" title="Osiągnięcia">🏆</button>
             <h2>Wybierz Tryb Gry</h2>
 
             <div id="mode-selection">
@@ -40,7 +41,7 @@
                     <button id="btn-solo-medium" class="btn green">Średni (6x4)</button>
                     <button id="btn-solo-hard" class="btn green">Trudny (6x6)</button>
                 </div>
-                <button id="btn-back-to-mode" class="btn purple">POWRÓT</button>
+                <div id="theme-selection-solo"></div> <button id="btn-back-to-mode" class="btn purple">POWRÓT</button>
             </div>
 
             <div id="multi-options" class="hidden">
@@ -57,7 +58,7 @@
                         <button id="btn-multi-medium" class="btn blue">Średni (6x4)</button>
                         <button id="btn-multi-hard" class="btn blue">Trudny (6x6)</button>
                     </div>
-                    <div id="game-id-container" class="hidden">
+                    <div id="theme-selection-multi"></div> <div id="game-id-container" class="hidden">
                         <span>ID Gry:</span>
                         <strong id="game-id-display"></strong>
                         <button id="copy-game-id-btn" class="copy-btn" title="Kopiuj do schowka"></button>
@@ -122,6 +123,21 @@
         </div>
     </div>
 
+    <div id="achievements-modal" class="modal-overlay hidden">
+        <div class="modal-content panel">
+            <h2>Twoje Osiągnięcia</h2>
+            <ul id="achievements-list">
+                </ul>
+            <button id="achievements-close-btn" class="btn purple">ZAMKNIJ</button>
+        </div>
+    </div>
+    <div id="toast-notification" class="toast">
+        <span class="toast-icon">🏆</span>
+        <div class="toast-content">
+            <span class="toast-title">Osiągnięcie odblokowane!</span>
+            <span class="toast-message">Dobra robota!</span>
+        </div>
+    </div>
     <footer>
         <div class="footer-content">
             &copy; memorr.top
