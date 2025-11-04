@@ -15,6 +15,17 @@ const themes = {
     animals: ['🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼', '🐨', '🐯', '🦁', '🐮', '🐷', '🐸', '🐵', '🐔', '🐧', '🐦']
 };
 
+// ===== DEFINICJA OSIĄGNIĘĆ =====
+const allAchievements = {
+    'first_solo_game': { icon: '🌱', title: 'Pierwsze Kroki', description: 'Ukończ swoją pierwszą grę solo.' },
+    'fast_win_easy':   { icon: '⚡', title: 'Szybki jak Błyskawica', description: 'Ukończ grę 4x4 w mniej niż 30 sekund.' },
+    'perfect_game':    { icon: '🎯', title: 'Perfekcjonista', description: 'Ukończ grę solo bez ani jednej pomyłki.' },
+    'master_mind':     { icon: '🧠', title: 'Geniusz Pamięci', description: 'Ukończ grę na poziomie 6x6.' },
+    'first_multi_win': { icon: '⚔️', title: 'Pierwsze Zwycięstwo', description: 'Wygraj swój pierwszy pojedynek multiplayer.' }
+};
+let unlockedAchievements = new Set();
+// ===================================
+
 // Funkcja tasująca
 function shuffle(array) {
     for (let i = array.length - 1; i > 0; i--) {
@@ -328,10 +339,13 @@ document.addEventListener('DOMContentLoaded', () => {
     // ===== LOGIKA OSIĄGNIĘĆ ========================================
     // ================================================================
 
+    // ===== POPRAWKA BŁĘDU: Sprawdź `data` zanim użyjesz JSON.parse =====
     function loadAchievements() {
         const data = localStorage.getItem('memorr_achievements');
-        unlockedAchievements = new Set(JSON.parse(data) || []);
+        // Jeśli 'data' jest null (pierwsze uruchomienie), użyj pustej tablicy '[]'
+        unlockedAchievements = new Set(JSON.parse(data || '[]'));
     }
+    // =================================================================
 
     function saveAchievements() {
         localStorage.setItem('memorr_achievements', JSON.stringify([...unlockedAchievements]));
@@ -379,17 +393,24 @@ document.addEventListener('DOMContentLoaded', () => {
         achievementsModal.classList.remove('hidden');
     }
     
-    achievementsBtn.addEventListener('click', showAchievementsModal);
-    achievementsCloseBtn.addEventListener('click', () => achievementsModal.classList.add('hidden'));
-    achievementsModal.addEventListener('click', (e) => {
-        if (e.target === achievementsModal) {
-            achievementsModal.classList.add('hidden');
-        }
-    });
+    // Upewnij się, że przyciski są klikalne (nie są null)
+    if (achievementsBtn) {
+        achievementsBtn.addEventListener('click', showAchievementsModal);
+    }
+    if (achievementsCloseBtn) {
+        achievementsCloseBtn.addEventListener('click', () => achievementsModal.classList.add('hidden'));
+    }
+    if (achievementsModal) {
+        achievementsModal.addEventListener('click', (e) => {
+            if (e.target === achievementsModal) {
+                achievementsModal.classList.add('hidden');
+            }
+        });
+    }
 
 
     // ================================================================
-    // ===== LOGIKA GRY (ZAKTUALIZOWANA O RWD) ========================
+    // ===== LOGIKA GRY (ZAKTUALIZOWANA O OSIĄGNIĘCIA) ==================
     // ================================================================
 
     function startSoloGame(rows, cols) {
@@ -427,23 +448,16 @@ document.addEventListener('DOMContentLoaded', () => {
         showGameUI();
     }
 
-    // ===== POPRAWIONA FUNKCJA BUILDBOARD (RWD) =====
     function buildBoard(cardValues, rows, cols) {
-        // Zamiast sztywnego 80px, ustawiamy siatkę na elastyczne '1fr'
         gameBoard.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
-        // Usuwamy sztywną wysokość wierszy
         gameBoard.style.gridTemplateRows = `repeat(${rows}, auto)`;
         
-        // Ustawiamy maksymalną szerokość planszy, aby nie była za duża na desktopie
-        // (Szerokość karty * kolumny) + (odstępy * (kolumny - 1))
-        // Dla 80px karty i 12px odstępu:
         if (cols === 6) {
             gameBoard.style.maxWidth = `${(80*6) + (12*5)}px`; // 540px
         } else { // cols === 4
             gameBoard.style.maxWidth = `${(80*4) + (12*3)}px`; // 356px
         }
 
-        // Reszta funkcji bez zmian
         cardValues.forEach(value => {
             const card = document.createElement('div');
             card.classList.add('card');
@@ -528,6 +542,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 stopTimer();
                 const stats = updateSoloStats();
                 checkSoloAchievements(stats);
+CSS
                 showWinModal(true, true, stats.newRecord);
             }
         } else {
@@ -599,7 +614,6 @@ document.addEventListener('DOMContentLoaded', () => {
         return { newRecord, gamesPlayed };
     }
     
-    // ZAKTUALIZOWANE: Sprawdzanie osiągnięć
     function checkSoloAchievements(stats) {
         if (stats.gamesPlayed === 1) {
             unlockAchievement('first_solo_game');
