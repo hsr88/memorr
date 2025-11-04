@@ -589,7 +589,8 @@ footer {
     position: fixed;
     bottom: 20px;
     left: 50%;
-    transform: translate(-50%, 20px); /* Przesunięcie startowe */
+    /* POPRAWKA: Przesunięcie startowe zmienione */
+    transform: translate(-50%, 150px); /* Ukryty 150px pod ekranem */
     background-color: var(--bg-white);
     border-radius: 12px;
     box-shadow: var(--shadow-3);
@@ -610,6 +611,7 @@ footer {
     pointer-events: auto;
     transform: translate(-50%, 0); /* Pokazuje się, przesuwając na miejsce */
 }
+/* ================================================= */
 
 .toast-icon {
     font-size: 1.5em;
