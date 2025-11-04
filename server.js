@@ -13,12 +13,14 @@ const PORT = process.env.PORT || 3000;
 // 3. Ustaw Expressa, aby serwował pliki statyczne
 app.use(express.static(__dirname));
 
-// --- Logika Gry ---
-const allEmojis = [
-    '🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼', '🐨', '🐯', 
-    '🦁', '🐮', '🐷', '🐸', '🐵', '🐔', '🐧', '🐦', '🐤', '🦋', 
-    '🐞', '🐢', '🐍', '🐠', '🐙', '🐬', '🐳', '🦀', '🦄', '🦖'
-];
+// ===== POPRAWIONA LOGIKA MOTYWÓW =====
+const themes = {
+    default: ['💎', '🤖', '👽', '👻', '💀', '🎃', '🚀', '🍄', '🛸', '☄️', '🪐', '🕹️', '💾', '💿', '📼', '📞', '📺', '💰', '💣', '⚔️', '🛡️', '🔑', '🎁', '🧱', '🧭', '🔋', '🧪', '🧬', '🔭', '💡'],
+    nature: ['🌳', '🌲', '🍁', '🍂', '🌿', '🌸', '🌻', '🌊', '⛰️', '🌋', '🌾', '🐚', '🕸️', '🐞', '🦋', '🏞️', '🌅', '🌌'],
+    food: ['🍕', '🍔', '🍟', '🌭', '🍿', '🥐', '🍞', '🥨', '🧀', '🥞', '🧇', '🍗', '🍣', '🍤', '🍩', '🍪', '🍰', '🧁'],
+    animals: ['🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼', '🐨', '🐯', '🦁', '🐮', '🐷', '🐸', '🐵', '🐔', '🐧', '🐦']
+};
+// ===================================
 
 function shuffle(array) {
     for (let i = array.length - 1; i > 0; i--) {
@@ -41,16 +43,18 @@ io.on('connection', (socket) => {
                 gameID = Math.floor(1000 + Math.random() * 9000).toString();
             } while (games[gameID]);
             
+            // Poprawnie zapisuje motyw
             games[gameID] = {
                 players: [socket.id],
                 rows: data.rows,
                 cols: data.cols,
+                theme: data.theme || 'default',
                 board: null,
-                rematch: [] // NOWA WŁAŚCIWOŚĆ DO ŚLEDZENIA REWANŻU
+                rematch: []
             };
 
             socket.join(gameID);
-            console.log(`Gracz ${socket.id} stworzył grę ${gameID}`);
+            console.log(`Gracz ${socket.id} stworzył grę ${gameID} (Motyw: ${games[gameID].theme})`);
             socket.emit('gameCreated', { gameID });
 
         } catch (e) {
@@ -78,12 +82,15 @@ io.on('connection', (socket) => {
             game.players.push(socket.id);
             console.log(`Gracz ${socket.id} dołączył do gry ${gameID}`);
 
-            // Resetuj stan rewanżu na start gry
             game.rematch = [];
             
-            const { rows, cols } = game;
+            // ===== POPRAWIONA LOGIKA PLANSZY (UŻYWA MOTYWU) =====
+            const { rows, cols, theme } = game;
+            const themeEmojis = themes[theme] || themes['default'];
             const totalPairs = (rows * cols) / 2;
-            const emojisForGame = allEmojis.slice(0, totalPairs);
+            const emojisForGame = themeEmojis.slice(0, totalPairs);
+            // ==================================================
+            
             const cardValues = [...emojisForGame, ...emojisForGame];
             shuffle(cardValues);
             game.board = cardValues;
@@ -112,48 +119,40 @@ io.on('connection', (socket) => {
     // --- Zakończenie gry ---
     socket.on('gameFinished', () => {
         const gameID = getGameIDBySocket(socket);
-        if (gameID) {
-            // Zresetuj stan rewanżu na koniec gry
+        if (gameID && games[gameID]) {
             games[gameID].rematch = []; 
-            
             socket.emit('youWon');
             socket.broadcast.to(gameID).emit('youLost');
-            
-            // KRYTYCZNA ZMIANA: Już nie usuwamy gry po zakończeniu!
-            // Pozwalamy jej istnieć, aby umożliwić rewanż.
-            // delete games[gameID]; // <--- USUNIĘTE
         }
     });
 
-    // ===== NOWA LOGIKA REWANŻU =====
+    // ===== POPRAWIONA LOGIKA REWANŻU (UŻYWA MOTYWU) =====
     socket.on('requestRematch', () => {
         const gameID = getGameIDBySocket(socket);
         if (!gameID || !games[gameID]) return;
 
         const game = games[gameID];
         
-        // Dodaj gracza do listy chętnych na rewanż
         if (!game.rematch.includes(socket.id)) {
             game.rematch.push(socket.id);
         }
 
-        // Poinformuj drugiego gracza, że ten chce rewanżu
         socket.broadcast.to(gameID).emit('rematchOffered', socket.id);
 
-        // Sprawdź, czy OBAJ gracze chcą rewanżu
         if (game.rematch.length === 2) {
-            // TAK! Zresetuj stan i uruchom nową grę
-            game.rematch = []; // Wyczyść listę
+            game.rematch = [];
             
-            // Wygeneruj nową planszę (ten sam kod co w 'joinGame')
-            const { rows, cols } = game;
+            // ===== POPRAWIONA LOGIKA PLANSZY (UŻYWA MOTYWU) =====
+            const { rows, cols, theme } = game;
+            const themeEmojis = themes[theme] || themes['default'];
             const totalPairs = (rows * cols) / 2;
-            const emojisForGame = allEmojis.slice(0, totalPairs);
+            const emojisForGame = themeEmojis.slice(0, totalPairs);
+            // ==================================================
+
             const cardValues = [...emojisForGame, ...emojisForGame];
             shuffle(cardValues);
             game.board = cardValues;
 
-            // Wyślij 'gameStarted' do obu graczy
             io.to(gameID).emit('gameStarted', {
                 board: cardValues,
                 rows: rows,
@@ -162,14 +161,12 @@ io.on('connection', (socket) => {
             });
         }
     });
-    // ===============================
 
     // --- Rozłączenie ---
     socket.on('disconnect', () => {
         console.log(`Użytkownik rozłączony: ${socket.id}`);
         const gameID = getGameIDBySocket(socket);
         
-        // ZAKTUALIZOWANE: Jeśli gra istnieje, powiadom drugiego gracza i USUŃ grę
         if (gameID && games[gameID]) {
             socket.broadcast.to(gameID).emit('opponentDisconnected');
             delete games[gameID];
@@ -178,7 +175,6 @@ io.on('connection', (socket) => {
     });
 });
 
-// Funkcja pomocnicza
 function getGameIDBySocket(socket) {
     for (const gameID in games) {
         if (games[gameID].players.includes(socket.id)) {

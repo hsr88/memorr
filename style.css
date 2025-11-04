@@ -20,7 +20,6 @@
     --shadow-medium: 0 6px 16px rgba(0, 0, 0, 0.08);
 }
 
-/* ===== ZAKTUALIZOWANE BODY I NOWY MAIN ===== */
 body {
     font-family: var(--font-main);
     display: flex;
@@ -28,24 +27,21 @@ body {
     align-items: center;
     background-color: var(--bg-light);
     color: var(--text-primary);
-    min-height: 100vh; /* Ważne dla przyklejonej stopki */
-    margin: 0; /* Usuwa domyślny margines */
-    padding: 20px 15px; /* Dodaje padding do krawędzi */
+    min-height: 100vh;
+    margin: 0;
+    padding: 20px 15px;
     box-sizing: border-box;
     cursor: default;
 }
 
 main {
-    flex-grow: 1; /* Pozwala <main> zająć całe wolne miejsce */
+    flex-grow: 1;
     width: 100%;
-    /* Centruje zawartość (lobby/grę) w pionie i poziomie */
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
 }
-/* ========================================= */
-
 
 h1, h2, h3, h4 {
     color: var(--text-primary);
@@ -54,13 +50,9 @@ h1, h2, h3, h4 {
     margin-bottom: 25px;
 }
 h1 { font-size: 3em; color: var(--text-primary); }
-
-/* ===== NOWY STYL DLA "RR" W TYTULE ===== */
 h1 .rr {
-    color: var(--accent-blue); /* Morski zielony */
+    color: var(--accent-blue);
 }
-/* ======================================= */
-
 h2 { font-size: 2em; }
 h3 { font-size: 1.5em; }
 h4 { font-size: 1.2em; color: var(--text-secondary); }
@@ -145,7 +137,7 @@ h4 { font-size: 1.2em; color: var(--text-secondary); }
     box-shadow: var(--shadow-medium);
     text-align: center;
     margin-bottom: 40px;
-    box-sizing: border-box; /* Ważne dla paddingu */
+    box-sizing: border-box;
 }
 
 /* ===== KLASA DO UKRYWANIA ===== */
@@ -162,6 +154,43 @@ h4 { font-size: 1.2em; color: var(--text-secondary); }
     margin: 30px auto 0 auto; 
     line-height: 1.6;
 }
+
+/* ===== ZMIENIONY STYL WYBORU MOTYWU ===== */
+#theme-selection {
+    width: 100%;
+    margin-top: 30px; /* Zwiększony margines od góry */
+    padding-top: 20px;
+    border-top: 1px solid #E9ECEF;
+}
+#theme-selection h4 {
+    font-size: 1em; /* Mniejszy nagłówek */
+    font-weight: 700;
+    color: var(--text-secondary);
+    margin-bottom: 15px;
+}
+.theme-btn {
+    font-family: var(--font-main);
+    font-size: 1.5em; /* Mniejsze emoji */
+    border: 3px solid transparent;
+    border-radius: 10px; /* Mniejsze zaokrąglenie */
+    background-color: #F0F0F0;
+    color: var(--text-primary);
+    cursor: pointer;
+    padding: 4px; /* Mniejszy padding */
+    width: 50px;  /* Mniejszy przycisk */
+    height: 50px;
+    transition: all 0.2s ease;
+}
+.theme-btn:hover {
+    background-color: #E9ECEF;
+    border-color: #DEE2E6;
+}
+.theme-btn.selected {
+    border-color: var(--accent-blue);
+    background-color: var(--bg-light);
+    box-shadow: 0 0 10px rgba(109, 152, 134, 0.3);
+}
+/* ================================== */
 
 /* ===== STYLE LOBBY ===== */
 #mode-selection,
@@ -458,17 +487,17 @@ h4 { font-size: 1.2em; color: var(--text-secondary); }
     }
 }
 
-/* ===== NOWA STOPKA ===== */
+/* ===== STOPKA ===== */
 footer {
     width: 100%;
     text-align: center;
     padding: 20px 0;
-    margin-top: auto; /* Kluczowe dla "przyklejonej" stopki */
+    margin-top: auto;
 }
 
 .footer-content {
     font-family: var(--font-main);
-    color: var(--text-secondary); /* Szaro-niebieski, stonowany */
+    color: var(--text-secondary);
     font-size: 0.9em;
     font-weight: 700;
 }

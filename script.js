@@ -1,21 +1,20 @@
 // Łączymy się z serwerem Socket.IO
 const socket = io();
 
-// ===== NOWE DŹWIĘKI =====
-// Używamy "new Audio()" do załadowania plików dźwiękowych
+// ===== DŹWIĘKI =====
 const flipSound = new Audio('flip.mp3');
 const winSound = new Audio('win.mp3');
-// Ustawienie głośności, aby nie były zbyt głośne
 flipSound.volume = 0.5;
 winSound.volume = 0.3;
-// =========================
 
-// Definicje emoji
-const allEmojis = [
-    '🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼', '🐨', '🐯', 
-    '🦁', '🐮', '🐷', '🐸', '🐵', '🐔', '🐧', '🐦', '🐤', '🦋', 
-    '🐞', '🐢', '🐍', '🐠', '🐙', '🐬', '🐳', '🦀', '🦄', '🦖'
-];
+// ===== OBIEKT MOTYWÓW =====
+const themes = {
+    default: ['💎', '🤖', '👽', '👻', '💀', '🎃', '🚀', '🍄', '🛸', '☄️', '🪐', '🕹️', '💾', '💿', '📼', '📞', '📺', '💰', '💣', '⚔️', '🛡️', '🔑', '🎁', '🧱', '🧭', '🔋', '🧪', '🧬', '🔭', '💡'],
+    nature: ['🌳', '🌲', '🍁', '🍂', '🌿', '🌸', '🌻', '🌊', '⛰️', '🌋', '🌾', '🐚', '🕸️', '🐞', '🦋', '🏞️', '🌅', '🌌'],
+    food: ['🍕', '🍔', '🍟', '🌭', '🍿', '🥐', '🍞', '🥨', '🧀', '🥞', '🧇', '🍗', '🍣', '🍤', '🍩', '🍪', '🍰', '🧁'],
+    animals: ['🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼', '🐨', '🐯', '🦁', '🐮', '🐷', '🐸', '🐵', '🐔', '🐧', '🐦']
+};
+// Stara tablica allEmojis została usunięta
 
 // Funkcja tasująca
 function shuffle(array) {
@@ -40,6 +39,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let isSoloMode = false;
     let currentRows = 0;
     let currentCols = 0;
+    let currentTheme = 'default';
 
     // --- Pobranie elementów DOM (Lobby) ---
     const lobbyScreen = document.getElementById('lobby-screen');
@@ -50,26 +50,35 @@ document.addEventListener('DOMContentLoaded', () => {
     const multiCreateJoin = document.getElementById('multi-create-join');
     const multiCreateDetails = document.getElementById('multi-create-details');
     const multiJoinDetails = document.getElementById('multi-join-details');
-    // ... (reszta przycisków lobby) ...
+    const themeSelection = document.getElementById('theme-selection'); 
+    const themeBtns = document.querySelectorAll('.theme-btn');
+    const gameDescription = document.querySelector('.game-description');
+
     const btnSelectSolo = document.getElementById('btn-select-solo');
     const btnSelectMulti = document.getElementById('btn-select-multi');
+
     const btnSoloEasy = document.getElementById('btn-solo-easy');
     const btnSoloMedium = document.getElementById('btn-solo-medium');
     const btnSoloHard = document.getElementById('btn-solo-hard');
     const btnBackToMode = document.getElementById('btn-back-to-mode');
+
     const btnShowCreateGame = document.getElementById('btn-show-create-game');
     const btnShowJoinGame = document.getElementById('btn-show-join-game');
     const btnBackToModeMulti = document.getElementById('btn-back-to-mode-multi');
+
     const btnMultiEasy = document.getElementById('btn-multi-easy');
     const btnMultiMedium = document.getElementById('btn-multi-medium');
     const btnMultiHard = document.getElementById('btn-multi-hard');
     const btnBackToMultiOptionsFromCreate = document.getElementById('btn-back-to-multi-options-from-create');
+    
     const gameIdInput = document.getElementById('game-id-input');
     const btnJoinGame = document.getElementById('btn-join-game');
     const btnBackToMultiOptionsFromJoin = document.getElementById('btn-back-to-multi-options-from-join');
+
     const gameIdContainer = document.getElementById('game-id-container');
     const gameIdDisplay = document.getElementById('game-id-display');
     const copyGameIdBtn = document.getElementById('copy-game-id-btn');
+    
     const lobbyMessage = document.getElementById('lobby-message');
 
     // --- Pobranie elementów DOM (Gra) ---
@@ -83,7 +92,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const opponentTotalPairsSpan = document.getElementById('opponent-total-pairs');
     const bestScoreContainer = document.getElementById('best-score-container');
     const bestScoreSpan = document.getElementById('best-score');
-    // NOWY ELEMENT STATYSTYK
     const gamesPlayedContainer = document.getElementById('games-played-container');
     const gamesPlayedSpan = document.getElementById('games-played');
 
@@ -92,48 +100,69 @@ document.addEventListener('DOMContentLoaded', () => {
     const modalTitle = document.getElementById('modal-title');
     const modalMessage = document.getElementById('modal-message');
     const modalRecordMessage = document.getElementById('modal-record-message');
-    // NOWE ELEMENTY REWANŻU
     const modalPlayAgainBtn = document.getElementById('modal-play-again');
     const modalRematchBtn = document.getElementById('modal-rematch');
     const modalRematchStatus = document.getElementById('modal-rematch-status');
 
-
     // ================================================================
-    // ===== LOGIKA LOBBY I NAWIGACJI =================================
+    // ===== LOGIKA LOBBY I NAWIGACJI (ZAKTUALIZOWANA) =================
     // ================================================================
 
     function showModeSelection() {
         modeSelection.classList.remove('hidden');
+        gameDescription.classList.remove('hidden');
+        themeSelection.classList.add('hidden');
         soloOptions.classList.add('hidden');
         multiOptions.classList.add('hidden');
         lobbyMessage.textContent = '';
         gameIdContainer.classList.add('hidden');
         gameIdInput.value = '';
     }
-    // ... (reszta funkcji nawigacji w lobby: showSoloOptions, showMultiOptions, itd.) ...
+
     function showSoloOptions() {
+        isSoloMode = true;
         modeSelection.classList.add('hidden');
+        gameDescription.classList.add('hidden');
+        multiOptions.classList.add('hidden');
+        
+        soloOptions.insertBefore(themeSelection, btnBackToMode);
+        themeSelection.classList.remove('hidden');
         soloOptions.classList.remove('hidden');
+        
         lobbyMessage.textContent = '';
     }
+
     function showMultiOptions() {
+        isSoloMode = false;
         modeSelection.classList.add('hidden');
+        gameDescription.classList.add('hidden');
+        soloOptions.classList.add('hidden');
+        
         multiOptions.classList.remove('hidden');
         multiCreateJoin.classList.remove('hidden');
         multiCreateDetails.classList.add('hidden');
         multiJoinDetails.classList.add('hidden');
+        
         lobbyMessage.textContent = '';
         gameIdContainer.classList.add('hidden');
         gameIdInput.value = '';
     }
+
     function showMultiCreateDetails() {
         multiCreateJoin.classList.add('hidden');
+        
+        multiCreateDetails.insertBefore(themeSelection, gameIdContainer);
+        themeSelection.classList.remove('hidden');
         multiCreateDetails.classList.remove('hidden');
+        
         lobbyMessage.textContent = '';
         gameIdContainer.classList.add('hidden');
     }
+
     function showMultiJoinDetails() {
         multiCreateJoin.classList.add('hidden');
+        multiCreateDetails.classList.add('hidden');
+        themeSelection.classList.add('hidden');
         multiJoinDetails.classList.remove('hidden');
         lobbyMessage.textContent = '';
     }
@@ -141,12 +170,22 @@ document.addEventListener('DOMContentLoaded', () => {
     // Nasłuchiwacze dla przycisków nawigacji w lobby
     btnSelectSolo.addEventListener('click', showSoloOptions);
     btnSelectMulti.addEventListener('click', showMultiOptions);
+    
     btnBackToMode.addEventListener('click', showModeSelection);
     btnBackToModeMulti.addEventListener('click', showModeSelection);
     btnShowCreateGame.addEventListener('click', showMultiCreateDetails);
     btnShowJoinGame.addEventListener('click', showMultiJoinDetails);
     btnBackToMultiOptionsFromCreate.addEventListener('click', showMultiOptions);
     btnBackToMultiOptionsFromJoin.addEventListener('click', showMultiOptions);
+
+    // Logika wyboru motywu
+    themeBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            themeBtns.forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            currentTheme = btn.dataset.theme;
+        });
+    });
 
     // Nasłuchiwacze dla Trybu Solo
     btnSoloEasy.addEventListener('click', () => startSoloGame(4, 4));
@@ -191,17 +230,15 @@ document.addEventListener('DOMContentLoaded', () => {
     btnRestart.addEventListener('click', () => window.location.reload());
     modalPlayAgainBtn.addEventListener('click', () => window.location.reload());
 
-    // ===== NOWY LISTENER DLA PRZYCISKU REWANŻ =====
     modalRematchBtn.addEventListener('click', () => {
         socket.emit('requestRematch');
         modalRematchStatus.textContent = 'Wysłano prośbę o rewanż... Czekam...';
-        modalRematchBtn.classList.add('hidden'); // Ukryj przycisk po kliknięciu
+        modalRematchBtn.classList.add('hidden');
     });
-    // ===============================================
 
     function createMultiGame(rows, cols) {
         lobbyMessage.textContent = 'Tworzenie gry...';
-        socket.emit('createGame', { rows, cols });
+        socket.emit('createGame', { rows, cols, theme: currentTheme });
     }
 
     function showLobbyUI() {
@@ -227,9 +264,8 @@ document.addEventListener('DOMContentLoaded', () => {
         lobbyMessage.textContent = 'Stworzono grę. Czekam na przeciwnika...';
     });
     
-    // ZAKTUALIZOWANE: Ukryj modal, jeśli był otwarty
     socket.on('gameStarted', (data) => {
-        winModal.classList.add('hidden'); // Ukryj modal wygranej/rewanżu
+        winModal.classList.add('hidden');
         startMultiplayerGame(data);
     });
     
@@ -248,31 +284,25 @@ document.addEventListener('DOMContentLoaded', () => {
         showWinModal(false, false);
     });
     
-    // ===== NOWY LISTENER DLA OFERTY REWANŻU =====
     socket.on('rematchOffered', () => {
-        // Pokaż modal, jeśli jeszcze nie jest widoczny (bo przeciwnik wygrał)
         if (winModal.classList.contains('hidden')) {
-            showWinModal(false, false); // Pokaż jako przegrany
+            showWinModal(false, false);
         }
         modalRematchStatus.textContent = 'Przeciwnik chce zagrać rewanż!';
-        modalRematchBtn.classList.remove('hidden'); // Upewnij się, że przycisk jest widoczny
+        modalRematchBtn.classList.remove('hidden');
     });
-    // =============================================
     
     socket.on('opponentDisconnected', () => {
         stopTimer();
-        // Jeśli jesteśmy w grze, pokaż modal
         if (gameScreen.classList.contains('hidden') === false) {
             modalTitle.textContent = 'Koniec Gry';
             modalMessage.textContent = 'Przeciwnik się rozłączył. Wygrałeś!';
             modalRecordMessage.classList.add('hidden');
-            // Pokaż tylko przycisk "Powrót do lobby"
             modalPlayAgainBtn.classList.remove('hidden');
             modalRematchBtn.classList.add('hidden');
             modalRematchStatus.classList.add('hidden');
             winModal.classList.remove('hidden');
         } else {
-            // Jeśli jesteśmy w lobby (np. czekamy na dołączenie), po prostu zresetuj lobby
             showLobbyUI();
             lobbyMessage.textContent = "Przeciwnik się rozłączył.";
         }
@@ -286,7 +316,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // ================================================================
-    // ===== LOGIKA GRY ===============================================
+    // ===== LOGIKA GRY (KOMPLETNA I NAPRAWIONA) ======================
     // ================================================================
 
     function startSoloGame(rows, cols) {
@@ -294,11 +324,18 @@ document.addEventListener('DOMContentLoaded', () => {
         currentRows = rows;
         currentCols = cols;
         totalPairs = (rows * cols) / 2;
+        
         resetGameState();
-        loadSoloStats(); // ZAKTUALIZOWANO
+        loadSoloStats();
+        
         gameScreen.classList.add('solo-mode');
         totalPairsSpan.textContent = totalPairs;
-        const emojisForGame = allEmojis.slice(0, totalPairs);
+        
+        // ===== POPRAWKA: Użyj themes[currentTheme] zamiast allEmojis =====
+        const themeEmojis = themes[currentTheme] || themes['default'];
+        const emojisForGame = themeEmojis.slice(0, totalPairs);
+        // ==============================================================
+        
         const cardValues = [...emojisForGame, ...emojisForGame];
         shuffle(cardValues);
         buildBoard(cardValues, rows, cols);
@@ -309,7 +346,9 @@ document.addEventListener('DOMContentLoaded', () => {
         isSoloMode = false;
         totalPairs = data.totalPairs;
         opponentPairsFound = 0;
+        
         resetGameState();
+        
         gameScreen.classList.remove('solo-mode');
         totalPairsSpan.textContent = totalPairs;
         opponentTotalPairsSpan.textContent = totalPairs;
@@ -344,19 +383,20 @@ document.addEventListener('DOMContentLoaded', () => {
         secondCard = null;
         opponentPairsFound = 0;
         gameBoard.innerHTML = '';
-        timerSpan.textContent = '0';
-        moveCounterSpan.textContent = '0';
-        pairsFoundSpan.textContent = '0';
-        opponentPairsSpan.textContent = '0';
-        bestScoreSpan.textContent = '--';
-        gamesPlayedSpan.textContent = '0'; // Zresetuj też statystyki gier
+        
+        if (timerSpan) timerSpan.textContent = '0';
+        if (moveCounterSpan) moveCounterSpan.textContent = '0';
+        if (pairsFoundSpan) pairsFoundSpan.textContent = '0';
+        if (opponentPairsSpan) opponentPairsSpan.textContent = '0';
+        if (bestScoreSpan) bestScoreSpan.textContent = '--';
+        if (gamesPlayedSpan) gamesPlayedSpan.textContent = '0';
     }
     
     function startTimer() {
         if (timerInterval) return;
         timerInterval = setInterval(() => {
             seconds++;
-            timerSpan.textContent = seconds;
+            if (timerSpan) timerSpan.textContent = seconds;
         }, 1000);
     }
 
@@ -368,14 +408,14 @@ document.addEventListener('DOMContentLoaded', () => {
     function handleCardClick() {
         if (lockBoard || this.classList.contains('matched') || this === firstCard) return;
         
-        // ===== DODANO DŹWIĘK =====
+        startTimer();
+        
         try {
-            flipSound.currentTime = 0; // Pozwala na szybkie, wielokrotne odtwarzanie
+            flipSound.currentTime = 0;
             flipSound.play();
         } catch (e) {
             console.warn("Nie można odtworzyć dźwięku:", e);
         }
-        // ========================
 
         this.classList.add('flipped');
         if (!firstCard) {
@@ -403,13 +443,13 @@ document.addEventListener('DOMContentLoaded', () => {
         if (isSoloMode) {
             if (pairsFound === totalPairs) {
                 stopTimer();
-                const isNewRecord = updateSoloStats(); // ZAKTUALIZOWANO
+                const isNewRecord = updateSoloStats();
                 showWinModal(true, true, isNewRecord);
             }
         } else {
             socket.emit('foundMatch');
             if (pairsFound === totalPairs) {
-                stopTimer(); // Zatrzymaj stoper od razu po wygranej
+                stopTimer();
                 socket.emit('gameFinished');
             }
         }
@@ -430,15 +470,15 @@ document.addEventListener('DOMContentLoaded', () => {
         lockBoard = false;
     }
 
-    // ===== NOWE FUNKCJE STATYSTYK SOLO =====
+    // ===== FUNKCJE STATYSTYK SOLO =====
     function getTimeStorageKey() {
         if (currentRows === 0 || currentCols === 0) return null;
-        return `memoryBestTime_${currentRows}x${currentCols}`;
+        return `memoryBestTime_${currentTheme}_${currentRows}x${currentCols}`;
     }
 
     function getStatsStorageKey() {
         if (currentRows === 0 || currentCols === 0) return null;
-        return `memoryGamesPlayed_${currentRows}x${currentCols}`;
+        return `memoryGamesPlayed_${currentTheme}_${currentRows}x${currentCols}`;
     }
 
     function loadSoloStats() {
@@ -460,15 +500,13 @@ document.addEventListener('DOMContentLoaded', () => {
     function updateSoloStats() {
         const timeKey = getTimeStorageKey();
         const statsKey = getStatsStorageKey();
-        if (!timeKey || !statsKey) return;
+        if (!timeKey || !statsKey) return false;
         
-        // Zaktualizuj liczbę gier
         let gamesPlayed = parseInt(localStorage.getItem(statsKey) || '0');
         gamesPlayed++;
         localStorage.setItem(statsKey, gamesPlayed.toString());
         gamesPlayedSpan.textContent = gamesPlayed.toString();
 
-        // Zaktualizuj najlepszy czas
         const bestTime = localStorage.getItem(timeKey);
         let newRecord = false;
         if (!bestTime || seconds < parseInt(bestTime)) {
@@ -478,42 +516,34 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         return newRecord;
     }
-    // ======================================
-
-    // ZAKTUALIZOWANA FUNKCJA MODALA (Rewanż + Dźwięk)
+    
     function showWinModal(didPlayerWin, soloMode, isNewRecord = false) {
         
-        // Zresetuj stan przycisków
         modalPlayAgainBtn.classList.add('hidden');
         modalRematchBtn.classList.add('hidden');
-        modalRematchStatus.textContent = ''; // Wyczyść status rewanżu
+        modalRematchStatus.textContent = '';
         modalRecordMessage.classList.add('hidden');
         
         if (soloMode) {
             modalTitle.textContent = 'Gratulacje!';
             modalMessage.textContent = `Ukończyłeś grę w ${seconds}s i ${moves} ruchach!`;
-            modalPlayAgainBtn.classList.remove('hidden'); // Pokaż "Powrót do lobby"
+            modalPlayAgainBtn.classList.remove('hidden');
             
             if (isNewRecord) {
                 modalRecordMessage.classList.remove('hidden');
             }
             
-            // ===== DODANO DŹWIĘK =====
-            if(didPlayerWin) { // W solo zawsze wygrywasz, jeśli ukończysz
+            if(didPlayerWin) {
                  try { winSound.play(); } catch(e) {}
             }
-            // ========================
 
         } else {
-            // Tryb Multiplayer
-            modalRematchBtn.classList.remove('hidden'); // Pokaż "Rewanż"
+            modalRematchBtn.classList.remove('hidden');
             
             if (didPlayerWin) {
                 modalTitle.textContent = 'Gratulacje!';
                 modalMessage.textContent = `Wygrałeś w ${seconds}s i ${moves} ruchach!`;
-                // ===== DODANO DŹWIĘK =====
                 try { winSound.play(); } catch(e) {}
-                // ========================
             } else {
                 modalTitle.textContent = 'Niestety!';
                 modalMessage.textContent = 'Przeciwnik był szybszy. Spróbuj jeszcze raz!';

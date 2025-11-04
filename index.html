@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
     <title>Memorr - Gra Pamięciowa Online (Solo & Multiplayer)</title>
     <meta name="description" content="Zagraj w Memorr, darmową grę pamięciową online. Trenuj pamięć w trybie solo lub rywalizuj ze znajomymi w pojedynkach multiplayer!">
     <meta name="keywords" content="gra memory, gra pamięciowa, memory online, multiplayer, gra na dwie osoby, memorr, memorr.top">
@@ -12,6 +11,7 @@
     <meta property="og:description" content="Rzuć wyzwanie znajomym w szybkiej grze memory multiplayer lub trenuj samemu.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://memorr.top">
+
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     <script src="/socket.io/socket.io.js"></script>
@@ -32,7 +32,7 @@
             <p class="game-description">
                 Witaj w Memorr! Sprawdź swoją pamięć grając solo lub zmierz się ze znajomymi w trybie multiplayer. Celem jest znalezienie wszystkich par. Powodzenia!
             </p>
-
+            
             <div id="solo-options" class="hidden">
                 <h3>GRA SOLO - Wybierz Poziom</h3>
                 <div class="difficulty-select">
@@ -75,6 +75,16 @@
             <p id="lobby-message" class="error-text"></p>
         </div>
 
+        <div id="theme-selection" class="hidden">
+            <h4>Wybierz motyw kart</h4>
+            <div class="difficulty-select">
+                <button class="theme-btn selected" data-theme="default" title="Klasyczny">💎</button>
+                <button class="theme-btn" data-theme="nature" title="Natura">🌳</button>
+                <button class="theme-btn" data-theme="food" title="Jedzenie">🍕</button>
+                <button class="theme-btn" data-theme="animals" title="Zwierzęta">🐶</button>
+            </div>
+        </div>
+
         <div id="game-screen" class="hidden">
             <div class="controls">
                 <button id="btn-restart" class="btn purple">POWRÓT DO LOBBY</button> 
@@ -99,8 +109,9 @@
             </div>
             <div id="game-board"></div>
         </div>
-
-    </main> <div id="win-modal" class="modal-overlay hidden">
+    </main> 
+    
+    <div id="win-modal" class="modal-overlay hidden">
         <div class="modal-content panel">
             <h2 id="modal-title">Gratulacje!</h2>
             <p id="modal-message"></p>
@@ -110,6 +121,7 @@
             <button id="modal-rematch" class="btn blue hidden">REWANŻ</button>
         </div>
     </div>
+
     <footer>
         <div class="footer-content">
             &copy; memorr.top
