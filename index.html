@@ -13,8 +13,7 @@
     <meta property="og:url" content="https://memorr.top">
 
     <link rel="icon" type="image/png" href="favicon.png"> 
-
-    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&display.swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     <script src="/socket.io/socket.io.js"></script>
 </head>
@@ -43,7 +42,8 @@
                     <button id="btn-solo-medium" class="btn green">Średni (6x4)</button>
                     <button id="btn-solo-hard" class="btn green">Trudny (6x6)</button>
                 </div>
-                <div id="theme-selection-solo"></div> <button id="btn-back-to-mode" class="btn purple">POWRÓT</button>
+                <div id="theme-selection-solo"></div>
+                <button id="btn-back-to-mode" class="btn purple">POWRÓT</button>
             </div>
 
             <div id="multi-options" class="hidden">
@@ -54,13 +54,26 @@
                     <button id="btn-back-to-mode-multi" class="btn purple">POWRÓT</button>
                 </div>
                 <div id="multi-create-details" class="hidden">
-                    <h4>STWÓRZ GRĘ - Wybierz Poziom</h4>
+                    <h4>STWÓRZ GRĘ</h4>
+
+                    <div id="game-mode-select">
+                        <label>
+                            <input type="radio" name="gameMode" value="race" checked> Wyścig
+                            <span>(Kto pierwszy znajdzie pary na własnej planszy)</span>
+                        </label>
+                        <label>
+                            <input type="radio" name="gameMode" value="classic"> Klasyczny
+                            <span>(Wspólna plansza, gra na punkty i tury)</span>
+                        </label>
+                    </div>
+                    <h5>Wybierz Poziom</h5>
                     <div class="difficulty-select">
                         <button id="btn-multi-easy" class="btn blue">Łatwy (4x4)</button>
                         <button id="btn-multi-medium" class="btn blue">Średni (6x4)</button>
                         <button id="btn-multi-hard" class="btn blue">Trudny (6x6)</button>
                     </div>
-                    <div id="theme-selection-multi"></div> <div id="game-id-container" class="hidden">
+                    <div id="theme-selection-multi"></div>
+                    <div id="game-id-container" class="hidden">
                         <span>ID Gry:</span>
                         <strong id="game-id-display"></strong>
                         <button id="copy-game-id-btn" class="copy-btn" title="Kopiuj do schowka"></button>
@@ -90,6 +103,7 @@
 
         <div id="game-screen" class="hidden">
             <div class="controls">
+                <h3 id="turn-info" class="hidden"></h3>
                 <button id="btn-restart" class="btn purple">POWRÓT DO LOBBY</button> 
             </div>
             <div class="all-info-container">
@@ -97,7 +111,7 @@
                     <h3>GRACZ</h3>
                     <div class="info-row">Czas: <span id="timer">0</span>s</div>
                     <div class="info-row">Ruchy: <span id="move-counter">0</span></div>
-                    <div class="info-row">Pary: <span id="pairs-found">0</span> / <span id="total-pairs">0</span></div>
+                    <div class="info-row">Punkty: <span id="pairs-found">0</span> / <span id="total-pairs">0</span></div>
                     <div id="best-score-container" class="info-row">
                         Rekord: <span id="best-score">--</span>s
                     </div>
@@ -105,9 +119,10 @@
                         Gry: <span id="games-played">0</span>
                     </div>
                 </div>
+                
                 <div id="opponent-info" class="info-container panel">
                     <h3>PRZECIWNIK</h3>
-                    <div class="info-row">Pary: <span id="opponent-pairs-found">0</span> / <span id="opponent-total-pairs">0</span></div>
+                    <div class="info-row">Punkty: <span id="opponent-pairs-found">0</span> / <span id="opponent-total-pairs">0</span></div>
                 </div>
             </div>
             <div id="game-board"></div>
@@ -133,6 +148,7 @@
             <button id="achievements-close-btn" class="btn purple">ZAMKNIJ</button>
         </div>
     </div>
+
     <div id="toast-notification" class="toast">
         <span class="toast-icon">🏆</span>
         <div class="toast-content">
@@ -140,6 +156,7 @@
             <span class="toast-message">Dobra robota!</span>
         </div>
     </div>
+
     <footer>
         <div class="footer-content">
             &copy; memorr.top | <a href="help.html">Pomoc</a> | <a href="contact.html">Kontakt</a>
