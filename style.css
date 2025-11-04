@@ -365,24 +365,21 @@ h4 { font-size: 1.2em; color: var(--text-secondary); }
     display: block !important;
 }
 
-/* ===== STYLE PLANSZY I KART (ZAKTUALIZOWANE) ===== */
+/* ===== STYLE PLANSZY I KART ===== */
 #game-board {
     display: grid;
     gap: 12px;
     perspective: 1000px;
     padding: 12px;
     
-    /* POPRAWKA RWD: Plansza ma 100% szerokości i określoną max szerokość */
     width: 100%;
     box-sizing: border-box;
-    /* Domyślna max szerokość (dla 4 kolumn) */
     max-width: 400px; 
 }
 
 .card {
-    /* POPRAWKA RWD: Usunięto sztywne 80x80px */
     width: 100%;
-    aspect-ratio: 1 / 1; /* Karta zawsze będzie kwadratem */
+    aspect-ratio: 1 / 1;
     position: relative;
     cursor: pointer;
     transform-style: preserve-3d;
@@ -400,7 +397,6 @@ h4 { font-size: 1.2em; color: var(--text-secondary); }
 }
 
 .card-face {
-    /* POPRAWKA RWD: Dopasowanie do elastycznego rodzica */
     position: absolute;
     top: 0;
     left: 0;
@@ -426,7 +422,6 @@ h4 { font-size: 1.2em; color: var(--text-secondary); }
     display: flex;
     justify-content: center;
     align-items: center;
-    /* POPRAWKA RWD: Elastyczny rozmiar fontu */
     font-size: 2.5rem; 
     background-color: var(--bg-white);
     color: var(--text-primary);
@@ -435,8 +430,6 @@ h4 { font-size: 1.2em; color: var(--text-secondary); }
     background-color: var(--bg-light);
     box-shadow: none;
 }
-
-/* ================================================= */
 
 /* ===== STYLE OKNA MODALNEGO ===== */
 .modal-overlay {
@@ -529,8 +522,7 @@ footer {
 
 #achievements-btn {
     position: absolute;
-    /* POPRAWKA: Przeniesienie na dół */
-    bottom: 20px;
+    bottom: 20px; /* Przeniesione na dół */
     right: 20px;
     background: none;
     border: none;
@@ -538,6 +530,7 @@ footer {
     cursor: pointer;
     opacity: 0.6;
     transition: opacity 0.2s, transform 0.2s;
+    z-index: 10; /* Upewnij się, że jest nad innymi elementami panelu */
 }
 #achievements-btn:hover {
     opacity: 1;
@@ -591,12 +584,13 @@ footer {
     color: var(--accent-green);
 }
 
-/* ===== STYLE POWIADOMIENIA (TOAST) ===== */
+/* ===== POPRAWIONY STYL POWIADOMIENIA (TOAST) ===== */
 .toast {
     position: fixed;
     bottom: 20px;
     left: 50%;
-    transform: translate(-50%, 100px);
+    /* POPRAWKA: Przesunięcie startowe zmienione */
+    transform: translate(-50%, 20px); 
     background-color: var(--bg-white);
     border-radius: 12px;
     box-shadow: var(--shadow-3);
@@ -604,10 +598,19 @@ footer {
     align-items: center;
     padding: 15px 20px;
     z-index: 2000;
-    transition: transform 0.5s cubic-bezier(0.21, 1.02, 0.73, 1);
+    
+    /* POPRAWKA: Domyślnie ukryty i nieklikalny */
+    opacity: 0;
+    pointer-events: none;
+    
+    transition: transform 0.5s cubic-bezier(0.21, 1.02, 0.73, 1), 
+                opacity 0.5s ease;
 }
 .toast.show {
-    transform: translate(-50%, 0);
+    /* POPRAWKA: Pokazuje się, przesuwając na miejsce */
+    opacity: 1;
+    pointer-events: auto;
+    transform: translate(-50%, 0); 
 }
 
 .toast-icon {
