@@ -138,7 +138,7 @@ h4 { font-size: 1.2em; color: var(--text-secondary); }
     text-align: center;
     margin-bottom: 40px;
     box-sizing: border-box;
-    position: relative; /* Potrzebne dla przycisku osiągnięć */
+    position: relative;
 }
 
 /* ===== KLASA DO UKRYWANIA ===== */
@@ -365,17 +365,24 @@ h4 { font-size: 1.2em; color: var(--text-secondary); }
     display: block !important;
 }
 
-/* ===== STYLE PLANSZY I KART ===== */
+/* ===== STYLE PLANSZY I KART (ZAKTUALIZOWANE) ===== */
 #game-board {
     display: grid;
     gap: 12px;
     perspective: 1000px;
     padding: 12px;
+    
+    /* POPRAWKA RWD: Plansza ma 100% szerokości i określoną max szerokość */
+    width: 100%;
+    box-sizing: border-box;
+    /* Domyślna max szerokość (dla 4 kolumn) */
+    max-width: 400px; 
 }
 
 .card {
-    width: 80px;
-    height: 80px;
+    /* POPRAWKA RWD: Usunięto sztywne 80x80px */
+    width: 100%;
+    aspect-ratio: 1 / 1; /* Karta zawsze będzie kwadratem */
     position: relative;
     cursor: pointer;
     transform-style: preserve-3d;
@@ -393,7 +400,10 @@ h4 { font-size: 1.2em; color: var(--text-secondary); }
 }
 
 .card-face {
+    /* POPRAWKA RWD: Dopasowanie do elastycznego rodzica */
     position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
     height: 100%;
     border-radius: 12px;
@@ -416,7 +426,8 @@ h4 { font-size: 1.2em; color: var(--text-secondary); }
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 40px;
+    /* POPRAWKA RWD: Elastyczny rozmiar fontu */
+    font-size: 2.5rem; 
     background-color: var(--bg-white);
     color: var(--text-primary);
 }
@@ -424,6 +435,8 @@ h4 { font-size: 1.2em; color: var(--text-secondary); }
     background-color: var(--bg-light);
     box-shadow: none;
 }
+
+/* ================================================= */
 
 /* ===== STYLE OKNA MODALNEGO ===== */
 .modal-overlay {
@@ -438,12 +451,10 @@ h4 { font-size: 1.2em; color: var(--text-secondary); }
     justify-content: center;
     align-items: center;
     z-index: 1000;
-    /* Domyślnie ukryty modal ma pointer-events: none */
     pointer-events: none; 
     opacity: 0;
     transition: opacity 0.3s ease;
 }
-/* Pokazany modal */
 .modal-overlay:not(.hidden) {
     pointer-events: auto;
     opacity: 1;
@@ -452,7 +463,6 @@ h4 { font-size: 1.2em; color: var(--text-secondary); }
 .modal-content.panel {
     max-width: 500px;
     box-shadow: var(--shadow-3);
-    /* Animacja pojawiania się */
     transform: scale(0.95);
     transition: transform 0.3s ease;
 }
@@ -504,13 +514,23 @@ footer {
     font-size: 0.9em;
     font-weight: 700;
 }
+.footer-content a {
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-weight: 700;
+    transition: color 0.2s;
+}
+.footer-content a:hover {
+    color: var(--accent-blue);
+}
 
 
-/* ===== NOWE STYLE OSIĄGNIĘĆ ===== */
+/* ===== STYLE OSIĄGNIĘĆ ===== */
 
 #achievements-btn {
     position: absolute;
-    top: 20px;
+    /* POPRAWKA: Przeniesienie na dół */
+    bottom: 20px;
     right: 20px;
     background: none;
     border: none;
@@ -528,8 +548,8 @@ footer {
     list-style: none;
     padding: 0;
     margin: 20px 0;
-    max-height: 40vh; /* Ograniczenie wysokości */
-    overflow-y: auto; /* Przewijanie, jeśli jest za dużo */
+    max-height: 40vh;
+    overflow-y: auto;
     text-align: left;
 }
 
@@ -540,11 +560,11 @@ footer {
     border-radius: 8px;
     margin-bottom: 10px;
     background: var(--bg-light);
-    opacity: 0.5; /* Domyślnie zablokowane */
+    opacity: 0.5;
 }
 
 .achievement-item.unlocked {
-    opacity: 1; /* Odblokowane są w pełni widoczne */
+    opacity: 1;
     background: #fff;
     border: 2px solid var(--accent-green);
 }
@@ -571,12 +591,12 @@ footer {
     color: var(--accent-green);
 }
 
-/* ===== NOWE STYLE POWIADOMIENIA (TOAST) ===== */
+/* ===== STYLE POWIADOMIENIA (TOAST) ===== */
 .toast {
     position: fixed;
     bottom: 20px;
     left: 50%;
-    transform: translate(-50%, 100px); /* Domyślnie ukryty pod ekranem */
+    transform: translate(-50%, 100px);
     background-color: var(--bg-white);
     border-radius: 12px;
     box-shadow: var(--shadow-3);
@@ -584,10 +604,10 @@ footer {
     align-items: center;
     padding: 15px 20px;
     z-index: 2000;
-    transition: transform 0.5s cubic-bezier(0.21, 1.02, 0.73, 1); /* Animacja "sprężyny" */
+    transition: transform 0.5s cubic-bezier(0.21, 1.02, 0.73, 1);
 }
 .toast.show {
-    transform: translate(-50%, 0); /* Pokazuje powiadomienie */
+    transform: translate(-50%, 0);
 }
 
 .toast-icon {
@@ -609,73 +629,4 @@ footer {
 .toast-message {
     font-weight: 400;
     color: var(--text-secondary);
-}
-
-/* ===== Style dla stron Pomoc i Kontakt ===== */
-.page-content {
-    text-align: left;
-}
-
-.page-content h2 {
-    text-align: center;
-    margin-bottom: 30px;
-}
-
-.page-content h3 {
-    color: var(--accent-blue);
-    margin-top: 35px;
-    margin-bottom: 15px;
-    font-size: 1.4em;
-}
-
-.page-content h4 {
-    color: var(--accent-green);
-    margin-top: 25px;
-    margin-bottom: 10px;
-    font-size: 1.2em;
-}
-
-.page-content p {
-    line-height: 1.7;
-    margin-bottom: 15px;
-    color: var(--text-primary);
-}
-
-.page-content ul {
-    list-style-type: disc;
-    padding-left: 25px;
-    margin-bottom: 20px;
-    color: var(--text-primary);
-}
-
-.page-content ul li {
-    margin-bottom: 8px;
-    line-height: 1.6;
-}
-
-.page-content a {
-    color: var(--accent-blue);
-    text-decoration: none;
-    font-weight: 700;
-}
-
-.page-content a:hover {
-    text-decoration: underline;
-}
-
-.page-content .btn {
-    margin-top: 30px;
-    display: inline-block; /* Aby przycisk był na środku */
-}
-
-/* Dostosowanie stopki dla linków */
-.footer-content a {
-    color: var(--text-secondary); /* Linki w stopce mają ten sam kolor */
-    text-decoration: none;
-    font-weight: 700;
-    transition: color 0.2s;
-}
-
-.footer-content a:hover {
-    color: var(--accent-blue); /* Zmienia kolor na niebieski po najechaniu */
 }

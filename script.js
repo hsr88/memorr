@@ -15,17 +15,6 @@ const themes = {
     animals: ['🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼', '🐨', '🐯', '🦁', '🐮', '🐷', '🐸', '🐵', '🐔', '🐧', '🐦']
 };
 
-// ===== NOWA DEFINICJA OSIĄGNIĘĆ =====
-const allAchievements = {
-    'first_solo_game': { icon: '🌱', title: 'Pierwsze Kroki', description: 'Ukończ swoją pierwszą grę solo.' },
-    'fast_win_easy':   { icon: '⚡', title: 'Szybki jak Błyskawica', description: 'Ukończ grę 4x4 w mniej niż 30 sekund.' },
-    'perfect_game':    { icon: '🎯', title: 'Perfekcjonista', description: 'Ukończ grę solo bez ani jednej pomyłki.' },
-    'master_mind':     { icon: '🧠', title: 'Geniusz Pamięci', description: 'Ukończ grę na poziomie 6x6.' },
-    'first_multi_win': { icon: '⚔️', title: 'Pierwsze Zwycięstwo', description: 'Wygraj swój pierwszy pojedynek multiplayer.' }
-};
-let unlockedAchievements = new Set();
-// ===================================
-
 // Funkcja tasująca
 function shuffle(array) {
     for (let i = array.length - 1; i > 0; i--) {
@@ -64,7 +53,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const themeBtns = document.querySelectorAll('.theme-btn');
     const gameDescription = document.querySelector('.game-description');
 
-    // Kontenery do przenoszenia motywów
     const themeSelectionSoloContainer = document.getElementById('theme-selection-solo');
     const themeSelectionMultiContainer = document.getElementById('theme-selection-multi');
 
@@ -125,7 +113,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const achievementsCloseBtn = document.getElementById('achievements-close-btn');
     const toastNotification = document.getElementById('toast-notification');
 
-
     // ================================================================
     // ===== LOGIKA LOBBY I NAWIGACJI =================================
     // ================================================================
@@ -147,7 +134,6 @@ document.addEventListener('DOMContentLoaded', () => {
         gameDescription.classList.add('hidden');
         multiOptions.classList.add('hidden');
         
-        // Przenieś motywy do panelu Solo
         themeSelectionSoloContainer.appendChild(themeSelection);
         themeSelection.classList.remove('hidden');
         soloOptions.classList.remove('hidden');
@@ -174,7 +160,6 @@ document.addEventListener('DOMContentLoaded', () => {
     function showMultiCreateDetails() {
         multiCreateJoin.classList.add('hidden');
         
-        // Przenieś motywy do panelu Tworzenia Gry
         themeSelectionMultiContainer.appendChild(themeSelection);
         themeSelection.classList.remove('hidden');
         multiCreateDetails.classList.remove('hidden');
@@ -281,18 +266,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // ================================================================
     // ===== OBSŁUGA ZDARZEŃ SOCKET.IO =================================
     // ================================================================
-    
-    // (Ta sekcja jest kompletna i poprawna z poprzedniej odpowiedzi)
-    socket.on('gameCreated', (data) => { /* ... */ });
-    socket.on('gameStarted', (data) => { /* ... */ });
-    socket.on('opponentFoundMatch', () => { /* ... */ });
-    socket.on('youWon', () => { /* ... */ });
-    socket.on('youLost', () => { /* ... */ });
-    socket.on('rematchOffered', () => { /* ... */ });
-    socket.on('opponentDisconnected', () => { /* ... */ });
-    socket.on('error', (message) => { /* ... */ });
-    
-    // (Wklejony pełny kod tej sekcji dla pewności)
+
     socket.on('gameCreated', (data) => {
         gameIdDisplay.textContent = data.gameID;
         gameIdContainer.classList.remove('hidden');
@@ -351,7 +325,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // ================================================================
-    // ===== NOWA LOGIKA OSIĄGNIĘĆ ====================================
+    // ===== LOGIKA OSIĄGNIĘĆ ========================================
     // ================================================================
 
     function loadAchievements() {
@@ -364,15 +338,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function showAchievementToast(achievement) {
-        // Ustaw treść powiadomienia
         toastNotification.querySelector('.toast-icon').textContent = achievement.icon;
         toastNotification.querySelector('.toast-title').textContent = achievement.title;
         toastNotification.querySelector('.toast-message').textContent = achievement.description;
-        
-        // Pokaż powiadomienie
         toastNotification.classList.add('show');
-        
-        // Ukryj po 3 sekundach
         setTimeout(() => {
             toastNotification.classList.remove('show');
         }, 3000);
@@ -387,14 +356,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function showAchievementsModal() {
-        achievementsList.innerHTML = ''; // Wyczyść starą listę
-        
-        // Przejdź przez wszystkie zdefiniowane osiągnięcia
+        achievementsList.innerHTML = ''; 
         for (const id in allAchievements) {
             const achievement = allAchievements[id];
             const isUnlocked = unlockedAchievements.has(id);
             
-            // Stwórz element listy
             const li = document.createElement('li');
             li.classList.add('achievement-item');
             if (isUnlocked) {
@@ -410,14 +376,11 @@ document.addEventListener('DOMContentLoaded', () => {
             `;
             achievementsList.appendChild(li);
         }
-        
         achievementsModal.classList.remove('hidden');
     }
     
-    // Listenery dla modala osiągnięć
     achievementsBtn.addEventListener('click', showAchievementsModal);
     achievementsCloseBtn.addEventListener('click', () => achievementsModal.classList.add('hidden'));
-    // Zamykanie modala po kliknięciu na tło
     achievementsModal.addEventListener('click', (e) => {
         if (e.target === achievementsModal) {
             achievementsModal.classList.add('hidden');
@@ -426,7 +389,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     // ================================================================
-    // ===== LOGIKA GRY (ZAKTUALIZOWANA O OSIĄGNIĘCIA) ==================
+    // ===== LOGIKA GRY (ZAKTUALIZOWANA O RWD) ========================
     // ================================================================
 
     function startSoloGame(rows, cols) {
@@ -464,9 +427,23 @@ document.addEventListener('DOMContentLoaded', () => {
         showGameUI();
     }
 
+    // ===== POPRAWIONA FUNKCJA BUILDBOARD (RWD) =====
     function buildBoard(cardValues, rows, cols) {
-        gameBoard.style.gridTemplateColumns = `repeat(${cols}, 80px)`;
-        gameBoard.style.gridTemplateRows = `repeat(${rows}, 80px)`;
+        // Zamiast sztywnego 80px, ustawiamy siatkę na elastyczne '1fr'
+        gameBoard.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+        // Usuwamy sztywną wysokość wierszy
+        gameBoard.style.gridTemplateRows = `repeat(${rows}, auto)`;
+        
+        // Ustawiamy maksymalną szerokość planszy, aby nie była za duża na desktopie
+        // (Szerokość karty * kolumny) + (odstępy * (kolumny - 1))
+        // Dla 80px karty i 12px odstępu:
+        if (cols === 6) {
+            gameBoard.style.maxWidth = `${(80*6) + (12*5)}px`; // 540px
+        } else { // cols === 4
+            gameBoard.style.maxWidth = `${(80*4) + (12*3)}px`; // 356px
+        }
+
+        // Reszta funkcji bez zmian
         cardValues.forEach(value => {
             const card = document.createElement('div');
             card.classList.add('card');
@@ -549,9 +526,9 @@ document.addEventListener('DOMContentLoaded', () => {
         if (isSoloMode) {
             if (pairsFound === totalPairs) {
                 stopTimer();
-                const isNewRecord = updateSoloStats(); // Zapisz staty i sprawdź rekord
-                checkSoloAchievements(isNewRecord); // Sprawdź osiągnięcia
-                showWinModal(true, true, isNewRecord);
+                const stats = updateSoloStats();
+                checkSoloAchievements(stats);
+                showWinModal(true, true, stats.newRecord);
             }
         } else {
             socket.emit('foundMatch');
@@ -602,7 +579,6 @@ document.addEventListener('DOMContentLoaded', () => {
         gamesPlayedSpan.textContent = gamesPlayed;
     }
 
-    // ZAKTUALIZOWANE: Zwraca liczbę gier
     function updateSoloStats() {
         const timeKey = getTimeStorageKey();
         const statsKey = getStatsStorageKey();
@@ -620,32 +596,24 @@ document.addEventListener('DOMContentLoaded', () => {
             bestScoreSpan.textContent = `${seconds}s`;
             newRecord = true;
         }
-        return { newRecord, gamesPlayed }; // Zwróć obiekt
+        return { newRecord, gamesPlayed };
     }
     
-    // ===== NOWA FUNKCJA SPRAWDZANIA OSIĄGNIĘĆ =====
+    // ZAKTUALIZOWANE: Sprawdzanie osiągnięć
     function checkSoloAchievements(stats) {
-        // Osiągnięcie 1: Pierwsza gra
         if (stats.gamesPlayed === 1) {
             unlockAchievement('first_solo_game');
         }
-        
-        // Osiągnięcie 2: Szybka gra (4x4 w < 30s)
         if (currentRows === 4 && currentCols === 4 && seconds < 30) {
             unlockAchievement('fast_win_easy');
         }
-
-        // Osiągnięcie 3: Perfekcyjna gra (ruchy = pary)
         if (moves === totalPairs) {
             unlockAchievement('perfect_game');
         }
-        
-        // Osiągnięcie 4: Ukończ 6x6
         if (currentRows === 6 && currentCols === 6) {
             unlockAchievement('master_mind');
         }
     }
-    // ============================================
     
     function showWinModal(didPlayerWin, soloMode, isNewRecord = false) {
         
@@ -668,17 +636,13 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
         } else {
-            // Tryb Multiplayer
             modalRematchBtn.classList.remove('hidden');
             
             if (didPlayerWin) {
                 modalTitle.textContent = 'Gratulacje!';
                 modalMessage.textContent = `Wygrałeś w ${seconds}s i ${moves} ruchach!`;
                 try { winSound.play(); } catch(e) {}
-                
-                // Sprawdź osiągnięcie wygranej multi
                 unlockAchievement('first_multi_win'); 
-
             } else {
                 modalTitle.textContent = 'Niestety!';
                 modalMessage.textContent = 'Przeciwnik był szybszy. Spróbuj jeszcze raz!';
@@ -687,7 +651,7 @@ document.addEventListener('DOMContentLoaded', () => {
         winModal.classList.remove('hidden');
     }
 
-    // Domyślnie pokaż lobby na starcie i załaduj osiągnięcia
+    // Domyślnie pokaż lobby na starcie
     loadAchievements();
     showLobbyUI();
 });
