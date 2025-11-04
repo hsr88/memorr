@@ -610,3 +610,72 @@ footer {
     font-weight: 400;
     color: var(--text-secondary);
 }
+
+/* ===== Style dla stron Pomoc i Kontakt ===== */
+.page-content {
+    text-align: left;
+}
+
+.page-content h2 {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.page-content h3 {
+    color: var(--accent-blue);
+    margin-top: 35px;
+    margin-bottom: 15px;
+    font-size: 1.4em;
+}
+
+.page-content h4 {
+    color: var(--accent-green);
+    margin-top: 25px;
+    margin-bottom: 10px;
+    font-size: 1.2em;
+}
+
+.page-content p {
+    line-height: 1.7;
+    margin-bottom: 15px;
+    color: var(--text-primary);
+}
+
+.page-content ul {
+    list-style-type: disc;
+    padding-left: 25px;
+    margin-bottom: 20px;
+    color: var(--text-primary);
+}
+
+.page-content ul li {
+    margin-bottom: 8px;
+    line-height: 1.6;
+}
+
+.page-content a {
+    color: var(--accent-blue);
+    text-decoration: none;
+    font-weight: 700;
+}
+
+.page-content a:hover {
+    text-decoration: underline;
+}
+
+.page-content .btn {
+    margin-top: 30px;
+    display: inline-block; /* Aby przycisk był na środku */
+}
+
+/* Dostosowanie stopki dla linków */
+.footer-content a {
+    color: var(--text-secondary); /* Linki w stopce mają ten sam kolor */
+    text-decoration: none;
+    font-weight: 700;
+    transition: color 0.2s;
+}
+
+.footer-content a:hover {
+    color: var(--accent-blue); /* Zmienia kolor na niebieski po najechaniu */
+}
