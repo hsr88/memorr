@@ -46,10 +46,9 @@ io.on('connection', (socket) => {
                 rows: data.rows,
                 cols: data.cols,
                 theme: data.theme || 'default',
-                gameMode: data.gameMode || 'race', // NOWY TRYB GRY
+                gameMode: data.gameMode || 'race',
                 board: null,
                 rematch: [],
-                // Logika dla trybu klasycznego
                 turn: null, 
                 scores: {},
                 classicState: {
@@ -99,16 +98,14 @@ io.on('connection', (socket) => {
             shuffle(cardValues);
             game.board = cardValues;
 
-            // Logika startowa dla trybu klasycznego
             if (gameMode === 'classic') {
-                game.turn = game.players[0]; // Gracz 1 zaczyna
+                game.turn = game.players[0];
                 game.scores = {
                     [game.players[0]]: 0,
                     [game.players[1]]: 0
                 };
                 game.classicState = { firstCard: null, secondCard: null, lockBoard: false };
                 
-                // Wyślij stan początkowy
                 io.to(gameID).emit('classic:scoreUpdate', game.scores);
                 io.to(game.players[0]).emit('classic:turnUpdate', true);
                 io.to(game.players[1]).emit('classic:turnUpdate', false);
@@ -119,7 +116,7 @@ io.on('connection', (socket) => {
                 rows: rows,
                 cols: cols,
                 totalPairs: totalPairs,
-                gameMode: gameMode // Wyślij tryb gry do klientów
+                gameMode: gameMode
             });
 
         } catch (e) {
@@ -146,7 +143,7 @@ io.on('connection', (socket) => {
         }
     });
 
-    // ===== NOWA LOGIKA: TRYB KLASYCZNY (TUROWY) =====
+    // ===== LOGIKA: TRYB KLASYCZNY (TUROWY) =====
     socket.on('classic:flip', (data) => {
         const gameID = getGameIDBySocket(socket);
         const game = games[gameID];
@@ -154,24 +151,20 @@ io.on('connection', (socket) => {
             return;
         }
 
-        // Sprawdź, czy to tura tego gracza
         if (socket.id !== game.turn) {
-            return; // Nie twoja tura
+            return;
         }
 
         const cardIndex = data.cardIndex;
-        // Poinformuj obu graczy, aby odwrócili kartę
         io.to(gameID).emit('classic:boardUpdate', { type: 'flip', cardIndex });
 
         const state = game.classicState;
 
         if (!state.firstCard) {
-            // Pierwsza karta w turze
             state.firstCard = { index: cardIndex, value: game.board[cardIndex] };
         } else {
-            // Druga karta w turze
             state.secondCard = { index: cardIndex, value: game.board[cardIndex] };
-            state.lockBoard = true; // Zablokuj planszę na czas sprawdzania
+            state.lockBoard = true;
 
             if (state.firstCard.value === state.secondCard.value) {
                 // PARA ZNALEZIONA
@@ -183,26 +176,29 @@ io.on('connection', (socket) => {
                     cardIndex2: state.secondCard.index
                 });
 
-                // Sprawdź warunek zwycięstwa (suma punktów = wszystkie pary)
                 const totalScore = Object.values(game.scores).reduce((a, b) => a + b, 0);
                 if (totalScore === game.board.length / 2) {
                     // KONIEC GRY
                     const winner = game.scores[game.players[0]] > game.scores[game.players[1]] ? game.players[0] : game.players[1];
                     const loser = winner === game.players[0] ? game.players[1] : game.players[0];
-                    // Obsługa remisu
                     if(game.scores[game.players[0]] === game.scores[game.players[1]]) {
                         io.to(gameID).emit('classic:gameTied');
                     } else {
                         io.to(winner).emit('youWon');
                         io.to(loser).emit('youLost');
                     }
-                    games[gameID].rematch = []; // Zresetuj rewanż
+                    games[gameID].rematch = [];
                 }
 
                 // Gracz kontynuuje turę
                 state.firstCard = null;
                 state.secondCard = null;
                 state.lockBoard = false;
+
+                // ===== POPRAWKA BŁĘDU =====
+                // Powiedz klientowi, że plansza jest odblokowana i to wciąż jego tura
+                socket.emit('classic:turnUpdate', true);
+                // =========================
 
             } else {
                 // PUDŁO
@@ -220,11 +216,10 @@ io.on('connection', (socket) => {
                     state.secondCard = null;
                     state.lockBoard = false;
                     
-                    // Poinformuj graczy o zmianie tury
                     io.to(otherPlayer).emit('classic:turnUpdate', true);
                     socket.emit('classic:turnUpdate', false);
 
-                }, 1000); // 1 sekunda na zapamiętanie
+                }, 1000);
             }
         }
     });
@@ -255,9 +250,8 @@ io.on('connection', (socket) => {
             shuffle(cardValues);
             game.board = cardValues;
 
-            // Zresetuj stan dla trybu klasycznego
             if (gameMode === 'classic') {
-                game.turn = game.players[0]; // Gracz 1 zaczyna ponownie
+                game.turn = game.players[0];
                 game.scores = {
                     [game.players[0]]: 0,
                     [game.players[1]]: 0
