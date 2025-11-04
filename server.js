@@ -161,8 +161,17 @@ io.on('connection', (socket) => {
         const state = game.classicState;
 
         if (!state.firstCard) {
+            // Pierwsza karta w turze
             state.firstCard = { index: cardIndex, value: game.board[cardIndex] };
+            
+            // ===== POPRAWKA BŁĘDU =====
+            // Klient ustawił lockBoard = true, musimy go odblokować,
+            // aby mógł wybrać drugą kartę.
+            socket.emit('classic:turnUpdate', true);
+            // =========================
+
         } else {
+            // Druga karta w turze
             state.secondCard = { index: cardIndex, value: game.board[cardIndex] };
             state.lockBoard = true;
 
@@ -194,11 +203,9 @@ io.on('connection', (socket) => {
                 state.firstCard = null;
                 state.secondCard = null;
                 state.lockBoard = false;
-
-                // ===== POPRAWKA BŁĘDU =====
+                
                 // Powiedz klientowi, że plansza jest odblokowana i to wciąż jego tura
                 socket.emit('classic:turnUpdate', true);
-                // =========================
 
             } else {
                 // PUDŁO
