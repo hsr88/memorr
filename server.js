@@ -99,7 +99,7 @@ io.on('connection', (socket) => {
             game.board = cardValues;
 
             if (gameMode === 'classic') {
-                game.turn = game.players[0];
+                game.turn = game.players[0]; // Gracz 1 zaczyna
                 game.scores = {
                     [game.players[0]]: 0,
                     [game.players[1]]: 0
@@ -107,8 +107,11 @@ io.on('connection', (socket) => {
                 game.classicState = { firstCard: null, secondCard: null, lockBoard: false };
                 
                 io.to(gameID).emit('classic:scoreUpdate', game.scores);
-                io.to(game.players[0]).emit('classic:turnUpdate', true);
-                io.to(game.players[1]).emit('classic:turnUpdate', false);
+                
+                // ===== POPRAWKA BŁĘDU =====
+                // USUWAMY wysyłanie 'classic:turnUpdate' stąd...
+                // io.to(game.players[0]).emit('classic:turnUpdate', true);
+                // io.to(game.players[1]).emit('classic:turnUpdate', false);
             }
 
             io.to(gameID).emit('gameStarted', {
@@ -116,7 +119,8 @@ io.on('connection', (socket) => {
                 rows: rows,
                 cols: cols,
                 totalPairs: totalPairs,
-                gameMode: gameMode
+                gameMode: gameMode,
+                turn: game.turn // ...I DODAJEMY informację o turze DO PAKIETU 'gameStarted'
             });
 
         } catch (e) {
@@ -210,7 +214,7 @@ io.on('connection', (socket) => {
             } else {
                 // PUDŁO
                 const otherPlayer = game.players.find(id => id !== socket.id);
-                game.turn = otherPlayer; // Zmień turę
+                game.turn = otherPlayer;
 
                 setTimeout(() => {
                     io.to(gameID).emit('classic:boardUpdate', {
@@ -266,8 +270,11 @@ io.on('connection', (socket) => {
                 game.classicState = { firstCard: null, secondCard: null, lockBoard: false };
                 
                 io.to(gameID).emit('classic:scoreUpdate', game.scores);
-                io.to(game.players[0]).emit('classic:turnUpdate', true);
-                io.to(game.players[1]).emit('classic:turnUpdate', false);
+                
+                // ===== POPRAWKA BŁĘDU =====
+                // USUWAMY wysyłanie 'classic:turnUpdate' stąd...
+                // io.to(game.players[0]).emit('classic:turnUpdate', true);
+                // io.to(game.players[1]).emit('classic:turnUpdate', false);
             }
 
             io.to(gameID).emit('gameStarted', {
@@ -275,7 +282,8 @@ io.on('connection', (socket) => {
                 rows: rows,
                 cols: cols,
                 totalPairs: totalPairs,
-                gameMode: gameMode
+                gameMode: gameMode,
+                turn: game.turn // ...I DODAJEMY informację o turze DO PAKIETU 'gameStarted'
             });
         }
     });

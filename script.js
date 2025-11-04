@@ -49,8 +49,8 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentRows = 0;
     let currentCols = 0;
     let currentTheme = 'default';
-    let currentGameMode = 'race'; // 'race' lub 'classic'
-    let myTurn = false; // Tylko dla trybu klasycznego
+    let currentGameMode = 'race';
+    let myTurn = false; // Kluczowe dla trybu klasycznego
 
     // --- Pobranie elementów DOM (Lobby) ---
     const lobbyScreen = document.getElementById('lobby-screen');
@@ -175,7 +175,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function showMultiCreateDetails() {
         multiCreateJoin.classList.add('hidden');
         
-        themeSelectionMultiContainer.appendChild(themeSelection);
+        multiCreateDetails.insertBefore(themeSelection, gameIdContainer);
         themeSelection.classList.remove('hidden');
         multiCreateDetails.classList.remove('hidden');
         
@@ -262,7 +262,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function createMultiGame(rows, cols) {
         lobbyMessage.textContent = 'Tworzenie gry...';
-        // Odczytaj wybrany tryb gry
         const selectedMode = document.querySelector('input[name="gameMode"]:checked').value;
         currentGameMode = selectedMode;
         
@@ -297,13 +296,22 @@ document.addEventListener('DOMContentLoaded', () => {
         lobbyMessage.textContent = 'Stworzono grę. Czekam na przeciwnika...';
     });
     
+    // ===== POPRAWKA BŁĘDU: Ustaw tury PO resecie stanu =====
     socket.on('gameStarted', (data) => {
         winModal.classList.add('hidden');
-        currentGameMode = data.gameMode; // Zapisz tryb gry
-        startMultiplayerGame(data);
+        currentGameMode = data.gameMode;
+        
+        // 1. Uruchom grę (to resetuje 'myTurn' na false)
+        startMultiplayerGame(data); 
+        
+        // 2. DOPIERO TERAZ ustaw poprawną turę
+        if (currentGameMode === 'classic') {
+            myTurn = (socket.id === data.turn);
+            updateTurnUI(myTurn); 
+        }
     });
+    // ===================================================
     
-    // Tylko dla trybu 'race'
     socket.on('opponentFoundMatch', () => {
         if (currentGameMode === 'race') {
             opponentPairsFound++;
@@ -321,9 +329,7 @@ document.addEventListener('DOMContentLoaded', () => {
         showWinModal(false, false);
     });
 
-    // ===== NOWE EVENTY DLA TRYBU KLASYCZNEGO =====
     socket.on('classic:boardUpdate', (data) => {
-        // Serwer zarządza planszą, my tylko ją rysujemy
         const allCards = document.querySelectorAll('.card');
         if (data.type === 'flip') {
             allCards[data.cardIndex].classList.add('flipped');
@@ -331,7 +337,7 @@ document.addEventListener('DOMContentLoaded', () => {
             allCards[data.cardIndex1].classList.add('matched');
             allCards[data.cardIndex2].classList.add('matched');
         } else if (data.type === 'unflip') {
-            lockBoard = true; // Zablokuj planszę na czas odwracania
+            lockBoard = true;
             setTimeout(() => {
                 allCards[data.cardIndex1].classList.remove('flipped');
                 allCards[data.cardIndex2].classList.remove('flipped');
@@ -346,7 +352,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     socket.on('classic:scoreUpdate', (scores) => {
-        // Serwer przysyła obiekt z ID graczy, musimy znaleźć, który jest który
         const myScore = scores[socket.id];
         const opponentSocketId = Object.keys(scores).find(id => id !== socket.id);
         const opponentScore = opponentSocketId ? scores[opponentSocketId] : 0;
@@ -356,11 +361,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     socket.on('classic:gameTied', () => {
-        // Obsługa remisu
         stopTimer();
-        showWinModal(false, false, true); // (wygrana=false, solo=false, remis=true)
+        showWinModal(false, false, true);
     });
-    // ============================================
     
     socket.on('rematchOffered', () => {
         if (winModal.classList.contains('hidden')) {
@@ -477,9 +480,7 @@ document.addEventListener('DOMContentLoaded', () => {
         loadSoloStats();
         
         gameScreen.classList.add('solo-mode');
-        // Ukryj info o turze w trybie solo
         turnInfo.classList.add('hidden');
-        // Pokaż licznik czasu i ruchów
         timerSpan.parentElement.classList.remove('hidden');
         moveCounterSpan.parentElement.classList.remove('hidden');
 
@@ -496,23 +497,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function startMultiplayerGame(data) {
         isSoloMode = false;
-        currentGameMode = data.gameMode; // 'race' lub 'classic'
+        currentGameMode = data.gameMode;
         totalPairs = data.totalPairs;
         opponentPairsFound = 0;
         
-        resetGameState();
+        resetGameState(); // <-- TO WYWOŁUJE 'myTurn = false'
         
         gameScreen.classList.remove('solo-mode');
         totalPairsSpan.textContent = totalPairs;
         opponentTotalPairsSpan.textContent = totalPairs;
 
         if (currentGameMode === 'classic') {
-            // W trybie klasycznym nie liczymy czasu ani ruchów
             timerSpan.parentElement.classList.add('hidden');
             moveCounterSpan.parentElement.classList.add('hidden');
             turnInfo.classList.remove('hidden');
         } else {
-            // W trybie wyścigu POKAZUJEMY czas/ruchy
             timerSpan.parentElement.classList.remove('hidden');
             moveCounterSpan.parentElement.classList.remove('hidden');
             turnInfo.classList.add('hidden');
@@ -523,7 +522,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function buildBoard(cardValues, rows, cols) {
-        gameBoard.innerHTML = ''; // Wyczyść planszę przed budowaniem
+        gameBoard.innerHTML = '';
         gameBoard.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
         gameBoard.style.gridTemplateRows = `repeat(${rows}, auto)`;
         
@@ -536,13 +535,12 @@ document.addEventListener('DOMContentLoaded', () => {
         cardValues.forEach((value, index) => {
             const card = document.createElement('div');
             card.classList.add('card');
-            card.dataset.index = index; // Dodajemy index dla trybu klasycznego
+            card.dataset.index = index;
             card.dataset.value = value;
             card.innerHTML = `
                 <div class="card-face card-back"></div>
                 <div class="card-face card-front">${value}</div>
             `;
-            // Listener jest teraz dodawany w pętli, ale logika jest w handleCardClick
             card.addEventListener('click', handleCardClick);
             gameBoard.appendChild(card);
         });
@@ -558,15 +556,13 @@ document.addEventListener('DOMContentLoaded', () => {
         firstCard = null;
         secondCard = null;
         opponentPairsFound = 0;
-        myTurn = false; // Zresetuj turę
+        myTurn = false; // <-- Ten reset jest problemem
         gameBoard.innerHTML = '';
         
-        // Zawsze pokazuj liczniki czasu/ruchów przy resecie
         if (timerSpan) timerSpan.parentElement.classList.remove('hidden');
         if (moveCounterSpan) moveCounterSpan.parentElement.classList.remove('hidden');
         if (turnInfo) turnInfo.classList.add('hidden');
         
-        // Zdejmij podświetlenie tury
         if (playerInfoPanel) playerInfoPanel.classList.remove('active-turn');
         if (opponentInfoPanel) opponentInfoPanel.classList.remove('active-turn');
 
@@ -593,7 +589,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ===== GŁÓWNY KONTROLER KLIKNIĘĆ =====
     function handleCardClick() {
-        // 'this' odnosi się do klikniętej karty
         if (isSoloMode || currentGameMode === 'race') {
             handleSoloOrRaceClick(this);
         } else if (currentGameMode === 'classic') {
@@ -618,7 +613,7 @@ document.addEventListener('DOMContentLoaded', () => {
         lockBoard = true;
         moves++;
         moveCounterSpan.textContent = moves;
-        checkForMatch(cardElement); // Przekaż drugi element
+        checkForMatch();
     }
 
     // Logika dla Trybu Klasycznego (wysyłanie do serwera)
@@ -628,15 +623,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         
         try { flipSound.currentTime = 0; flipSound.play(); } catch (e) {}
-
-        // W trybie klasycznym nie dodajemy 'flipped' od razu
-        // Czekamy na potwierdzenie od serwera
         
-        lockBoard = true; // Blokujemy do czasu odpowiedzi serwera
+        lockBoard = true;
         socket.emit('classic:flip', { cardIndex: cardElement.dataset.index });
     }
     
-    // Zaktualizowane, aby przyjmować 'cardElement'
     function checkForMatch() {
         const isMatch = firstCard.dataset.value === secondCard.dataset.value;
         isMatch ? disableCards() : unflipCards();
@@ -755,7 +746,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
     
-    // ZAKTUALIZOWANE: Obsługuje remis
     function showWinModal(didPlayerWin, soloMode, isTie = false) {
         
         modalPlayAgainBtn.classList.add('hidden');
@@ -777,7 +767,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
         } else {
-            // Tryb Multiplayer
             modalRematchBtn.classList.remove('hidden');
             
             if (isTie) {
