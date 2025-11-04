@@ -10,8 +10,21 @@ const io = new Server(server);
 
 const PORT = process.env.PORT || 3000;
 
+// ===== NOWY BLOK: Przekierowanie z index.html na / =====
+// Ten kod musi znaleźć się PRZED `app.use(express.static...`
+app.use((req, res, next) => {
+    if (req.url === '/index.html') {
+        res.redirect(301, '/');
+    } else {
+        next(); // Przejdź do następnego middleware (czyli express.static)
+    }
+});
+// =======================================================
+
 // 3. Ustaw Expressa, aby serwował pliki statyczne
 app.use(express.static(__dirname));
+
+// ===== CAŁA RESZTA PLIKU server.js (MOTYWY, LOGIKA GRY) POZOSTAJE BEZ ZMIAN =====
 
 const themes = {
     default: ['💎', '🤖', '👽', '👻', '💀', '🎃', '🚀', '🍄', '🛸', '☄️', '🪐', '🕹️', '💾', '💿', '📼', '📞', '📺', '💰', '💣', '⚔️', '🛡️', '🔑', '🎁', '🧱', '🧭', '🔋', '🧪', '🧬', '🔭', '💡'],
@@ -99,7 +112,7 @@ io.on('connection', (socket) => {
             game.board = cardValues;
 
             if (gameMode === 'classic') {
-                game.turn = game.players[0]; // Gracz 1 zaczyna
+                game.turn = game.players[0];
                 game.scores = {
                     [game.players[0]]: 0,
                     [game.players[1]]: 0
@@ -107,11 +120,6 @@ io.on('connection', (socket) => {
                 game.classicState = { firstCard: null, secondCard: null, lockBoard: false };
                 
                 io.to(gameID).emit('classic:scoreUpdate', game.scores);
-                
-                // ===== POPRAWKA BŁĘDU =====
-                // USUWAMY wysyłanie 'classic:turnUpdate' stąd...
-                // io.to(game.players[0]).emit('classic:turnUpdate', true);
-                // io.to(game.players[1]).emit('classic:turnUpdate', false);
             }
 
             io.to(gameID).emit('gameStarted', {
@@ -120,7 +128,7 @@ io.on('connection', (socket) => {
                 cols: cols,
                 totalPairs: totalPairs,
                 gameMode: gameMode,
-                turn: game.turn // ...I DODAJEMY informację o turze DO PAKIETU 'gameStarted'
+                turn: game.turn
             });
 
         } catch (e) {
@@ -147,7 +155,7 @@ io.on('connection', (socket) => {
         }
     });
 
-    // ===== LOGIKA: TRYB KLASYCZNY (TUROWY) =====
+    // --- LOGIKA: TRYB KLASYCZNY (TUROWY) ---
     socket.on('classic:flip', (data) => {
         const gameID = getGameIDBySocket(socket);
         const game = games[gameID];
@@ -165,17 +173,9 @@ io.on('connection', (socket) => {
         const state = game.classicState;
 
         if (!state.firstCard) {
-            // Pierwsza karta w turze
             state.firstCard = { index: cardIndex, value: game.board[cardIndex] };
-            
-            // ===== POPRAWKA BŁĘDU =====
-            // Klient ustawił lockBoard = true, musimy go odblokować,
-            // aby mógł wybrać drugą kartę.
             socket.emit('classic:turnUpdate', true);
-            // =========================
-
         } else {
-            // Druga karta w turze
             state.secondCard = { index: cardIndex, value: game.board[cardIndex] };
             state.lockBoard = true;
 
@@ -203,12 +203,9 @@ io.on('connection', (socket) => {
                     games[gameID].rematch = [];
                 }
 
-                // Gracz kontynuuje turę
                 state.firstCard = null;
                 state.secondCard = null;
                 state.lockBoard = false;
-                
-                // Powiedz klientowi, że plansza jest odblokowana i to wciąż jego tura
                 socket.emit('classic:turnUpdate', true);
 
             } else {
@@ -234,7 +231,6 @@ io.on('connection', (socket) => {
             }
         }
     });
-    // ===============================================
 
     // --- Logika Rewanżu ---
     socket.on('requestRematch', () => {
@@ -270,11 +266,6 @@ io.on('connection', (socket) => {
                 game.classicState = { firstCard: null, secondCard: null, lockBoard: false };
                 
                 io.to(gameID).emit('classic:scoreUpdate', game.scores);
-                
-                // ===== POPRAWKA BŁĘDU =====
-                // USUWAMY wysyłanie 'classic:turnUpdate' stąd...
-                // io.to(game.players[0]).emit('classic:turnUpdate', true);
-                // io.to(game.players[1]).emit('classic:turnUpdate', false);
             }
 
             io.to(gameID).emit('gameStarted', {
@@ -283,7 +274,7 @@ io.on('connection', (socket) => {
                 cols: cols,
                 totalPairs: totalPairs,
                 gameMode: gameMode,
-                turn: game.turn // ...I DODAJEMY informację o turze DO PAKIETU 'gameStarted'
+                turn: game.turn
             });
         }
     });
