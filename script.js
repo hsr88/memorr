@@ -51,7 +51,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentCols = 0;
     let currentTheme = 'default';
     let currentGameMode = 'race';
-    let myTurn = false; // Kluczowe dla trybu klasycznego
+    let myTurn = false; 
 
     // --- Pobranie elementów DOM (Lobby) ---
     const lobbyScreen = document.getElementById('lobby-screen');
@@ -349,6 +349,8 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     socket.on('classic:scoreUpdate', (scores) => {
+        if (!pairsFoundSpan || !opponentPairsSpan) return; 
+
         const myScore = scores[socket.id];
         const opponentSocketId = Object.keys(scores).find(id => id !== socket.id);
         const opponentScore = opponentSocketId ? scores[opponentSocketId] : 0;
@@ -397,13 +399,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // ===== LOGIKA OSIĄGNIĘĆ ========================================
     // ================================================================
 
-    // ===== POPRAWKA BŁĘDU: Sprawdź `data` zanim użyjesz JSON.parse =====
     function loadAchievements() {
         const data = localStorage.getItem('memorr_achievements');
-        // Jeśli 'data' jest null (pierwsze uruchomienie), użyj pustej tablicy '[]'
         unlockedAchievements = new Set(JSON.parse(data || '[]'));
     }
-    // =================================================================
 
     function saveAchievements() {
         localStorage.setItem('memorr_achievements', JSON.stringify([...unlockedAchievements]));
@@ -634,18 +633,20 @@ document.addEventListener('DOMContentLoaded', () => {
         isMatch ? disableCards() : unflipCards();
     }
 
+    // ===== POPRAWIONA FUNKCJA disableCards (Usunięty błąd 'CSS') =====
     function disableCards() {
         firstCard.classList.add('matched');
         secondCard.classList.add('matched');
         pairsFound++;
-        pairsFoundSpan.textContent = pairsFound;
+        if (pairsFoundSpan) pairsFoundSpan.textContent = pairsFound;
         
         if (isSoloMode) {
             if (pairsFound === totalPairs) {
                 stopTimer();
                 const stats = updateSoloStats();
                 checkSoloAchievements(stats);
-                showWinModal(true, true, stats.newRecord);
+                // BŁĄD 'CSS' BYŁ TUTAJ I ZOSTAŁ USUNIĘTY
+                showWinModal(true, true, stats.newRecord); // Teraz się wykona
             }
         } else { // Tryb 'race'
             socket.emit('foundMatch');
@@ -656,6 +657,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         resetTurn();
     }
+    // ============================================
 
     function unflipCards() {
         setTimeout(() => {
@@ -747,6 +749,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
     
+    // ZAKTUALIZOWANE: Obsługuje remis (3ci parametr)
     function showWinModal(didPlayerWin, soloMode, isTie = false) {
         
         modalPlayAgainBtn.classList.add('hidden');
@@ -759,8 +762,12 @@ document.addEventListener('DOMContentLoaded', () => {
             modalMessage.textContent = `Ukończyłeś grę w ${seconds}s i ${moves} ruchach!`;
             modalPlayAgainBtn.classList.remove('hidden');
             
+            // ===== POPRAWKA BŁĘDU: Sprawdź 'isTie' (trzeci parametr), który przechowuje 'isNewRecord' dla solo =====
+            const isNewRecord = isTie; 
             if (isNewRecord) {
                 modalRecordMessage.classList.remove('hidden');
+            } else {
+                modalRecordMessage.classList.add('hidden');
             }
             
             if(didPlayerWin) {
@@ -768,6 +775,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
         } else {
+            // Tryb Multiplayer
             modalRematchBtn.classList.remove('hidden');
             
             if (isTie) {
@@ -791,6 +799,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Domyślnie pokaż lobby na starcie
-    loadAchievements();
+    loadAchievements(); // To była przyczyna błędu
     showLobbyUI();
 });
