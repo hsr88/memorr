@@ -24,6 +24,7 @@ const allAchievements = {
     'first_multi_win': { icon: '⚔️', title: 'Pierwsze Zwycięstwo', description: 'Wygraj swój pierwszy pojedynek multiplayer.' }
 };
 let unlockedAchievements = new Set();
+// ===================================
 
 // Funkcja tasująca
 function shuffle(array) {
@@ -296,7 +297,6 @@ document.addEventListener('DOMContentLoaded', () => {
         lobbyMessage.textContent = 'Stworzono grę. Czekam na przeciwnika...';
     });
     
-    // ===== POPRAWKA BŁĘDU: Ustaw tury PO resecie stanu =====
     socket.on('gameStarted', (data) => {
         winModal.classList.add('hidden');
         currentGameMode = data.gameMode;
@@ -310,7 +310,6 @@ document.addEventListener('DOMContentLoaded', () => {
             updateTurnUI(myTurn); 
         }
     });
-    // ===================================================
     
     socket.on('opponentFoundMatch', () => {
         if (currentGameMode === 'race') {
@@ -400,10 +399,13 @@ document.addEventListener('DOMContentLoaded', () => {
     // ===== LOGIKA OSIĄGNIĘĆ ========================================
     // ================================================================
 
+    // ===== POPRAWKA BŁĘDU: Sprawdź `data` zanim użyjesz JSON.parse =====
     function loadAchievements() {
         const data = localStorage.getItem('memorr_achievements');
+        // Jeśli 'data' jest null (pierwsze uruchomienie), użyj pustej tablicy '[]'
         unlockedAchievements = new Set(JSON.parse(data || '[]'));
     }
+    // =================================================================
 
     function saveAchievements() {
         localStorage.setItem('memorr_achievements', JSON.stringify([...unlockedAchievements]));
@@ -465,8 +467,9 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+
     // ================================================================
-    // ===== LOGIKA GRY (ZAKTUALIZOWANA O TRYBY GRY) ==================
+    // ===== LOGIKA GRY (ZAKTUALIZOWANA O OSIĄGNIĘCIA) ==================
     // ================================================================
 
     function startSoloGame(rows, cols) {
@@ -501,7 +504,7 @@ document.addEventListener('DOMContentLoaded', () => {
         totalPairs = data.totalPairs;
         opponentPairsFound = 0;
         
-        resetGameState(); // <-- TO WYWOŁUJE 'myTurn = false'
+        resetGameState();
         
         gameScreen.classList.remove('solo-mode');
         totalPairsSpan.textContent = totalPairs;
@@ -556,7 +559,7 @@ document.addEventListener('DOMContentLoaded', () => {
         firstCard = null;
         secondCard = null;
         opponentPairsFound = 0;
-        myTurn = false; // <-- Ten reset jest problemem
+        myTurn = false;
         gameBoard.innerHTML = '';
         
         if (timerSpan) timerSpan.parentElement.classList.remove('hidden');
