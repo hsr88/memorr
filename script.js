@@ -301,10 +301,8 @@ document.addEventListener('DOMContentLoaded', () => {
         winModal.classList.add('hidden');
         currentGameMode = data.gameMode;
         
-        // 1. Uruchom grę (to resetuje 'myTurn' na false)
         startMultiplayerGame(data); 
         
-        // 2. DOPIERO TERAZ ustaw poprawną turę
         if (currentGameMode === 'classic') {
             myTurn = (socket.id === data.turn);
             updateTurnUI(myTurn); 
