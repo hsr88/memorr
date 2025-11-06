@@ -24,7 +24,6 @@ const allAchievements = {
     'first_multi_win': { icon: '⚔️', title: 'Pierwsze Zwycięstwo', description: 'Wygraj swój pierwszy pojedynek multiplayer.' }
 };
 let unlockedAchievements = new Set();
-// ===================================
 
 // Funkcja tasująca
 function shuffle(array) {
@@ -260,7 +259,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 authMessage.style.color = "var(--accent-red)";
                 authMessage.textContent = data.message;
             } else {
-                // SUKCES!
                 currentUsername = data.user.username;
                 isGuest = false;
                 authToken = data.token;
@@ -572,22 +570,19 @@ document.addEventListener('DOMContentLoaded', () => {
     // ===== LOGIKA OSIĄGNIĘĆ ========================================
     // ================================================================
 
-    // ZAKTUALIZOWANE: Wczytuje z serwera lub localStorage
     function loadAchievements(achievementsFromServer = null) {
         if (isGuest) {
-            const data = localStorage.getItem('memorr_achievements_guest'); // Inny klucz dla gościa
+            const data = localStorage.getItem('memorr_achievements_guest');
             unlockedAchievements = new Set(JSON.parse(data || '[]'));
         } else {
             unlockedAchievements = new Set(achievementsFromServer || []);
         }
     }
 
-    // Zapisuje osiągnięcia (tylko dla gości)
     function saveAchievementsToLocal() {
         localStorage.setItem('memorr_achievements_guest', JSON.stringify([...unlockedAchievements]));
     }
     
-    // NOWA: Zapisuje osiągnięcia w chmurze
     async function saveAchievementToCloud(achievementId) {
         try {
             const token = localStorage.getItem('memorr_token');
@@ -616,7 +611,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 3000);
     }
 
-    // ZAKTUALIZOWANE: Decyduje, gdzie zapisać
     function unlockAchievement(id) {
         if (!unlockedAchievements.has(id)) {
             unlockedAchievements.add(id);
@@ -888,7 +882,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // Funkcje statystyk solo
     function getTimeStorageKey() {
         if (currentRows === 0 || currentCols === 0) return null;
-        // Zapisy dla gościa są oddzielne
         const keyPrefix = isGuest ? 'guest' : currentUsername.toLowerCase();
         return `memoryBestTime_${keyPrefix}_${currentTheme}_${currentRows}x${currentCols}`;
     }
@@ -898,7 +891,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return `memoryGamesPlayed_${keyPrefix}_${currentTheme}_${currentRows}x${currentCols}`;
     }
     function loadSoloStats() {
-        // Zalogowani gracze (isGuest === false) będą mieli statystyki wczytywane z chmury (TODO)
+        // TODO: Zalogowani gracze będą mieli statystyki wczytywane z chmury
         if (!isGuest) {
             bestScoreContainer.classList.add('hidden');
             gamesPlayedContainer.classList.add('hidden');

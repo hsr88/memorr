@@ -4,7 +4,7 @@ const http = require('http');
 const { Server } = require("socket.io");
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken'); // Ważne dla tokenów
+const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
 // 2. Skonfiguruj serwer
@@ -21,12 +21,12 @@ mongoose.connect(dbUrl)
     .then(() => console.log('Połączono z bazą danych MongoDB Atlas!'))
     .catch((err) => console.error('BŁĄD POŁĄCZENIA Z BAZĄ DANYCH:', err));
 
-// ===== MODEL (SCHEMAT) UŻYTKOWNIKA (ZAKTUALIZOWANY) =====
+// ===== MODEL (SCHEMAT) UŻYTKOWNIKA =====
 const UserSchema = new mongoose.Schema({
     username: { type: String, required: true, unique: true, minlength: 3, lowercase: true },
     email: { type: String, required: true, unique: true, lowercase: true },
     password: { type: String, required: true, minlength: 6 },
-    achievements: { type: [String], default: [] } // <-- Pole na osiągnięcia
+    achievements: { type: [String], default: [] }
 });
 const User = mongoose.model('User', UserSchema);
 // ============================================
@@ -78,33 +78,45 @@ app.post('/api/register', async (req, res) => {
     }
 });
 
-// ===== API DO LOGOWANIA =====
+// ===== API DO LOGOWANIA (POPRAWIONE) =====
 app.post('/api/login', async (req, res) => {
     try {
         const { username, password } = req.body;
 
+        if (!username || !password) {
+            return res.status(400).json({ message: 'Wprowadź nazwę użytkownika i hasło.' });
+        }
+
+        // 1. Znajdź użytkownika
         const user = await User.findOne({ username: username.toLowerCase() });
+        
+        // POPRAWKA: Jeśli użytkownik NIE istnieje, 'user' będzie 'null'.
+        // Dalsza próba 'bcrypt.compare(password, user.password)' spowoduje błąd 500.
+        // Dlatego najpierw sprawdzamy, czy użytkownik istnieje.
         if (!user) {
             return res.status(400).json({ message: 'Nieprawidłowa nazwa użytkownika lub hasło.' });
         }
 
+        // 2. Porównaj hasła
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) {
             return res.status(400).json({ message: 'Nieprawidłowa nazwa użytkownika lub hasło.' });
         }
 
+        // 3. Stwórz Token (Bilet)
         const token = jwt.sign(
             { userId: user._id, username: user.username },
             JWT_SECRET,
             { expiresIn: '1d' } 
         );
 
+        // 4. Wyślij Token i dane użytkownika z powrotem
         res.status(200).json({
             message: 'Zalogowano pomyślnie!',
             token: token,
             user: {
                 username: user.username,
-                achievements: user.achievements // Wysyłamy osiągnięcia przy logowaniu
+                achievements: user.achievements
             }
         });
 
@@ -113,29 +125,28 @@ app.post('/api/login', async (req, res) => {
         res.status(500).json({ message: 'Wystąpił błąd serwera.' });
     }
 });
+// ===============================
 
-// ===== NOWY MIDDLEWARE: "Strażnik" do sprawdzania tokenu =====
+// ===== MIDDLEWARE: "Strażnik" do sprawdzania tokenu =====
 function authenticateToken(req, res, next) {
     const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.split(' ')[1]; // "Bearer TOKEN"
 
-    if (token == null) return res.sendStatus(401); // Brak tokena
+    if (token == null) return res.sendStatus(401);
 
     jwt.verify(token, JWT_SECRET, (err, user) => {
-        if (err) return res.sendStatus(403); // Nieważny token
-        req.user = user; // Zapisz dane użytkownika (np. { userId: '...' })
-        next(); // Przejdź dalej
+        if (err) return res.sendStatus(403);
+        req.user = user;
+        next();
     });
 }
-// ========================================================
 
-// ===== NOWE API: Odblokowanie Osiągnięcia =====
+// ===== API: Odblokowanie Osiągnięcia =====
 app.post('/api/unlock-achievement', authenticateToken, async (req, res) => {
     try {
         const { achievementId } = req.body;
-        const userId = req.user.userId; // Pobieramy ID z tokena (dzięki middleware)
+        const userId = req.user.userId;
 
-        // Dodaj osiągnięcie do tablicy użytkownika w bazie, jeśli jeszcze go nie ma
         await User.updateOne(
             { _id: userId },
             { $addToSet: { achievements: achievementId } }
@@ -147,7 +158,6 @@ app.post('/api/unlock-achievement', authenticateToken, async (req, res) => {
         res.status(500).json({ message: 'Wystąpił błąd serwera.' });
     }
 });
-// ============================================
 
 // ===== LOGIKA GRY (Socket.IO) - BEZ ZMIAN =====
 const themes = {
