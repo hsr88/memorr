@@ -24,6 +24,7 @@ const allAchievements = {
     'first_multi_win': { icon: '⚔️', title: 'Pierwsze Zwycięstwo', description: 'Wygraj swój pierwszy pojedynek multiplayer.' }
 };
 let unlockedAchievements = new Set();
+// ===================================
 
 // Funkcja tasująca
 function shuffle(array) {
@@ -53,6 +54,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let myTurn = false; 
     let currentUsername = "Gość";
     let isGuest = true;
+    let authToken = null;
 
     // --- Pobranie elementów DOM (Autoryzacja) ---
     const authPanel = document.getElementById('auth-panel');
@@ -234,7 +236,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // ===== ZAKTUALIZOWANA LOGIKA LOGOWANIA =====
+    // Logowanie
     loginForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         authMessage.textContent = 'Logowanie...';
@@ -261,15 +263,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 // SUKCES!
                 currentUsername = data.user.username;
                 isGuest = false;
+                authToken = data.token;
                 
-                // Zapisz token w localStorage
                 localStorage.setItem('memorr_token', data.token); 
                 
-                // Wczytaj osiągnięcia z chmury (z danych, które właśnie otrzymaliśmy)
                 loadAchievements(data.user.achievements); 
 
-                authPanel.classList.add('hidden'); // Zamknij modal
-                showLobbyUI(currentUsername, isGuest); // Pokaż lobby jako zalogowany
+                authPanel.classList.add('hidden');
+                showLobbyUI(currentUsername, isGuest);
             }
         } catch (error) {
             console.error('Błąd Fetch:', error);
@@ -277,11 +278,10 @@ document.addEventListener('DOMContentLoaded', () => {
             authMessage.textContent = 'Błąd połączenia. Sprawdź, czy serwer działa.';
         }
     });
-    // =========================================
 
     // Wylogowanie
     logoutBtn.addEventListener('click', () => {
-        localStorage.removeItem('memorr_token'); // Wyczyść token
+        localStorage.removeItem('memorr_token');
         window.location.reload();
     });
 
@@ -569,45 +569,42 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // ================================================================
-    // ===== LOGIKA OSIĄGNIĘĆ (ZAKTUALIZOWANA) ========================
+    // ===== LOGIKA OSIĄGNIĘĆ ========================================
     // ================================================================
 
-    // ZAKTUALIZOWANE: Przyjmuje dane z serwera, jeśli gracz jest zalogowany
+    // ZAKTUALIZOWANE: Wczytuje z serwera lub localStorage
     function loadAchievements(achievementsFromServer = null) {
         if (isGuest) {
-            const data = localStorage.getItem('memorr_achievements');
+            const data = localStorage.getItem('memorr_achievements_guest'); // Inny klucz dla gościa
             unlockedAchievements = new Set(JSON.parse(data || '[]'));
         } else {
-            // Wczytaj osiągnięcia z danych użytkownika wysłanych przez serwer
             unlockedAchievements = new Set(achievementsFromServer || []);
         }
     }
 
     // Zapisuje osiągnięcia (tylko dla gości)
     function saveAchievementsToLocal() {
-        localStorage.setItem('memorr_achievements', JSON.stringify([...unlockedAchievements]));
+        localStorage.setItem('memorr_achievements_guest', JSON.stringify([...unlockedAchievements]));
     }
     
     // NOWA: Zapisuje osiągnięcia w chmurze
     async function saveAchievementToCloud(achievementId) {
         try {
             const token = localStorage.getItem('memorr_token');
-            if (!token) return; // Nie rób nic, jeśli nie ma tokena
+            if (!token) return; 
 
             await fetch('/api/unlock-achievement', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}` // Wyślij token
+                    'Authorization': `Bearer ${token}`
                 },
                 body: JSON.stringify({ achievementId })
             });
-            // Nie musimy sprawdzać odpowiedzi, jeśli nie chcemy
         } catch (error) {
             console.error('Nie udało się zapisać osiągnięcia w chmurze:', error);
         }
     }
-
 
     function showAchievementToast(achievement) {
         toastNotification.querySelector('.toast-icon').textContent = achievement.icon;
@@ -888,19 +885,29 @@ document.addEventListener('DOMContentLoaded', () => {
         lockBoard = false;
     }
 
-    // Funkcje statystyk solo (zapisują tylko lokalnie)
+    // Funkcje statystyk solo
     function getTimeStorageKey() {
         if (currentRows === 0 || currentCols === 0) return null;
-        // Zapisy dla gościa są oddzielne od zapisów zalogowanego użytkownika
-        const keyPrefix = isGuest ? 'guest' : currentUsername;
+        // Zapisy dla gościa są oddzielne
+        const keyPrefix = isGuest ? 'guest' : currentUsername.toLowerCase();
         return `memoryBestTime_${keyPrefix}_${currentTheme}_${currentRows}x${currentCols}`;
     }
     function getStatsStorageKey() {
         if (currentRows === 0 || currentCols === 0) return null;
-        const keyPrefix = isGuest ? 'guest' : currentUsername;
+        const keyPrefix = isGuest ? 'guest' : currentUsername.toLowerCase();
         return `memoryGamesPlayed_${keyPrefix}_${currentTheme}_${currentRows}x${currentCols}`;
     }
     function loadSoloStats() {
+        // Zalogowani gracze (isGuest === false) będą mieli statystyki wczytywane z chmury (TODO)
+        if (!isGuest) {
+            bestScoreContainer.classList.add('hidden');
+            gamesPlayedContainer.classList.add('hidden');
+            return;
+        }
+
+        bestScoreContainer.classList.remove('hidden');
+        gamesPlayedContainer.classList.remove('hidden');
+
         const timeKey = getTimeStorageKey();
         const statsKey = getStatsStorageKey();
         if (!timeKey || !statsKey) return;
@@ -917,31 +924,26 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function updateSoloStats() {
-        // Statystyki solo dla gości są zapisywane tylko w localStorage
-        if (isGuest) {
-            const timeKey = getTimeStorageKey();
-            const statsKey = getStatsStorageKey();
-            if (!timeKey || !statsKey) return { newRecord: false, gamesPlayed: 0 };
-            
-            let gamesPlayed = parseInt(localStorage.getItem(statsKey) || '0');
-            gamesPlayed++;
-            localStorage.setItem(statsKey, gamesPlayed.toString());
-            gamesPlayedSpan.textContent = gamesPlayed.toString();
+        // TODO: Dodać wysyłanie statystyk do chmury dla zalogowanych
+        
+        // Na razie zapisujemy lokalnie dla wszystkich (dla gości i zalogowanych)
+        const timeKey = getTimeStorageKey();
+        const statsKey = getStatsStorageKey();
+        if (!timeKey || !statsKey) return { newRecord: false, gamesPlayed: 0 };
+        
+        let gamesPlayed = parseInt(localStorage.getItem(statsKey) || '0');
+        gamesPlayed++;
+        localStorage.setItem(statsKey, gamesPlayed.toString());
+        if (gamesPlayedSpan) gamesPlayedSpan.textContent = gamesPlayed.toString();
 
-            const bestTime = localStorage.getItem(timeKey);
-            let newRecord = false;
-            if (!bestTime || seconds < parseInt(bestTime)) {
-                localStorage.setItem(timeKey, seconds);
-                bestScoreSpan.textContent = `${seconds}s`;
-                newRecord = true;
-            }
-            return { newRecord, gamesPlayed };
-        } else {
-            // TODO: Logika zapisywania statystyk solo w chmurze
-            // Na razie po prostu aktualizujemy UI
-            gamesPlayedSpan.textContent = (parseInt(gamesPlayedSpan.textContent) + 1).toString();
-            return { newRecord: false, gamesPlayed: parseInt(gamesPlayedSpan.textContent) };
+        const bestTime = localStorage.getItem(timeKey);
+        let newRecord = false;
+        if (!bestTime || seconds < parseInt(bestTime)) {
+            localStorage.setItem(timeKey, seconds);
+            if (bestScoreSpan) bestScoreSpan.textContent = `${seconds}s`;
+            newRecord = true;
         }
+        return { newRecord, gamesPlayed };
     }
     
     function checkSoloAchievements(stats) {
@@ -982,10 +984,8 @@ document.addEventListener('DOMContentLoaded', () => {
         modalRecordMessage.classList.add('hidden');
         
         if (soloMode) {
-            // To jest teraz obsługiwane przez showSoloWinModal
             showSoloWinModal(isTie); 
         } else {
-            // Tryb Multiplayer
             modalRematchBtn.classList.remove('hidden');
             
             if (isTie) {
@@ -1010,17 +1010,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Domyślnie pokaż lobby na starcie
     loadAchievements();
-    // Pokaż lobby gościa, ale ukryj je, jeśli mamy zapisany token
-    // (Na razie zawsze pokazuj lobby gościa, dopóki nie zaimplementujemy pełnego logowania)
-    
-    // Sprawdzenie, czy jesteśmy zalogowani (w przyszłości)
-    // const token = localStorage.getItem('memorr_token');
-    // if (token) {
-    //    // TODO: Zweryfikuj token na serwerze i zaloguj
-    //    // Na razie:
-    //    showLobbyUI("Gość", true);
-    // } else {
-         lobbyScreen.classList.remove('hidden'); // Pokaż lobby gościa
-         authPanel.classList.add('hidden'); // Ukryj modal logowania
-    // }
+    // Pokaż lobby gościa
+    showLobbyUI("Gość", true);
 });

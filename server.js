@@ -3,8 +3,8 @@ const express = require('express');
 const http = require('http');
 const { Server } = require("socket.io");
 const mongoose = require('mongoose');
-const bcrypt = require('bcryptjs'); // <--- NOWY IMPORT
-const jwt = require('jsonwebtoken'); // <--- NOWY IMPORT
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken'); // Ważne dla tokenów
 require('dotenv').config();
 
 // 2. Skonfiguruj serwer
@@ -13,10 +13,7 @@ const server = http.createServer(app);
 const io = new Server(server);
 
 const PORT = process.env.PORT || 3000;
-// ===== SEKRETNY KLUCZ DLA TOKENÓW =====
-// Powinien być w pliku .env, ale dla prostoty jest tutaj
 const JWT_SECRET = process.env.JWT_SECRET || 'bardzo-tajny-klucz-do-tokenow';
-// ===================================
 
 // ===== POŁĄCZENIE Z BAZĄ DANYCH =====
 const dbUrl = process.env.DATABASE_URL;
@@ -24,12 +21,12 @@ mongoose.connect(dbUrl)
     .then(() => console.log('Połączono z bazą danych MongoDB Atlas!'))
     .catch((err) => console.error('BŁĄD POŁĄCZENIA Z BAZĄ DANYCH:', err));
 
-// ===== MODEL (SCHEMAT) UŻYTKOWNIKA =====
+// ===== MODEL (SCHEMAT) UŻYTKOWNIKA (ZAKTUALIZOWANY) =====
 const UserSchema = new mongoose.Schema({
     username: { type: String, required: true, unique: true, minlength: 3, lowercase: true },
     email: { type: String, required: true, unique: true, lowercase: true },
     password: { type: String, required: true, minlength: 6 },
-    achievements: { type: [String], default: [] } // <-- Ważne dla następnego kroku
+    achievements: { type: [String], default: [] } // <-- Pole na osiągnięcia
 });
 const User = mongoose.model('User', UserSchema);
 // ============================================
@@ -45,7 +42,7 @@ app.use((req, res, next) => {
 app.use(express.json());
 app.use(express.static(__dirname));
 
-// ===== API DO REJESTRACJI (BEZ ZMIAN) =====
+// ===== API DO REJESTRACJI =====
 app.post('/api/register', async (req, res) => {
     try {
         const { username, email, password } = req.body;
@@ -81,38 +78,33 @@ app.post('/api/register', async (req, res) => {
     }
 });
 
-// ===== NOWE API DO LOGOWANIA =====
+// ===== API DO LOGOWANIA =====
 app.post('/api/login', async (req, res) => {
     try {
         const { username, password } = req.body;
 
-        // 1. Znajdź użytkownika
         const user = await User.findOne({ username: username.toLowerCase() });
         if (!user) {
             return res.status(400).json({ message: 'Nieprawidłowa nazwa użytkownika lub hasło.' });
         }
 
-        // 2. Porównaj hasła
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) {
             return res.status(400).json({ message: 'Nieprawidłowa nazwa użytkownika lub hasło.' });
         }
 
-        // 3. Stwórz Token (Bilet)
-        // Token przechowuje ID użytkownika i jest ważny przez 1 dzień
         const token = jwt.sign(
             { userId: user._id, username: user.username },
             JWT_SECRET,
             { expiresIn: '1d' } 
         );
 
-        // 4. Wyślij Token i dane użytkownika z powrotem
         res.status(200).json({
             message: 'Zalogowano pomyślnie!',
             token: token,
             user: {
                 username: user.username,
-                achievements: user.achievements
+                achievements: user.achievements // Wysyłamy osiągnięcia przy logowaniu
             }
         });
 
@@ -121,11 +113,43 @@ app.post('/api/login', async (req, res) => {
         res.status(500).json({ message: 'Wystąpił błąd serwera.' });
     }
 });
-// ===============================
 
+// ===== NOWY MIDDLEWARE: "Strażnik" do sprawdzania tokenu =====
+function authenticateToken(req, res, next) {
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1]; // "Bearer TOKEN"
 
-// ===== LOGIKA GRY (BEZ ZMIAN) =====
-// ... (Cała logika Socket.IO, motywów, gier, rewanżu itd. pozostaje bez zmian) ...
+    if (token == null) return res.sendStatus(401); // Brak tokena
+
+    jwt.verify(token, JWT_SECRET, (err, user) => {
+        if (err) return res.sendStatus(403); // Nieważny token
+        req.user = user; // Zapisz dane użytkownika (np. { userId: '...' })
+        next(); // Przejdź dalej
+    });
+}
+// ========================================================
+
+// ===== NOWE API: Odblokowanie Osiągnięcia =====
+app.post('/api/unlock-achievement', authenticateToken, async (req, res) => {
+    try {
+        const { achievementId } = req.body;
+        const userId = req.user.userId; // Pobieramy ID z tokena (dzięki middleware)
+
+        // Dodaj osiągnięcie do tablicy użytkownika w bazie, jeśli jeszcze go nie ma
+        await User.updateOne(
+            { _id: userId },
+            { $addToSet: { achievements: achievementId } }
+        );
+        
+        res.status(200).json({ message: 'Osiągnięcie zapisane.' });
+    } catch (error) {
+        console.error('Błąd zapisu osiągnięcia:', error);
+        res.status(500).json({ message: 'Wystąpił błąd serwera.' });
+    }
+});
+// ============================================
+
+// ===== LOGIKA GRY (Socket.IO) - BEZ ZMIAN =====
 const themes = {
     default: ['💎', '🤖', '👽', '👻', '💀', '🎃', '🚀', '🍄', '🛸', '☄️', '🪐', '🕹️', '💾', '💿', '📼', '📞', '📺', '💰', '💣', '⚔️', '🛡️', '🔑', '🎁', '🧱', '🧭', '🔋', '🧪', '🧬', '🔭', '💡'],
     nature: ['🌳', '🌲', '🍁', '🍂', '🌿', '🌸', '🌻', '🌊', '⛰️', '🌋', '🌾', '🐚', '🕸️', '🐞', '🦋', '🏞️', '🌅', '🌌'],
