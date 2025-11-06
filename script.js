@@ -24,7 +24,6 @@ const allAchievements = {
     'first_multi_win': { icon: '⚔️', title: 'Pierwsze Zwycięstwo', description: 'Wygraj swój pierwszy pojedynek multiplayer.' }
 };
 let unlockedAchievements = new Set();
-// ===================================
 
 // Funkcja tasująca
 function shuffle(array) {
@@ -52,6 +51,21 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentTheme = 'default';
     let currentGameMode = 'race';
     let myTurn = false; 
+    let currentUsername = "Gość";
+    let isGuest = true;
+
+    // --- Pobranie elementów DOM (Autoryzacja) ---
+    const authPanel = document.getElementById('auth-panel');
+    const authBtn = document.getElementById('auth-btn'); 
+    const authCloseBtn = document.getElementById('auth-close-btn'); 
+    
+    const loginTabBtn = document.getElementById('login-tab-btn');
+    const registerTabBtn = document.getElementById('register-tab-btn');
+    const loginForm = document.getElementById('login-form');
+    const registerForm = document.getElementById('register-form');
+    const authMessage = document.getElementById('auth-message');
+    const logoutBtn = document.getElementById('logout-btn');
+    const welcomeMessage = document.getElementById('welcome-message');
 
     // --- Pobranie elementów DOM (Lobby) ---
     const lobbyScreen = document.getElementById('lobby-screen');
@@ -121,6 +135,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const modalPlayAgainBtn = document.getElementById('modal-play-again');
     const modalRematchBtn = document.getElementById('modal-rematch');
     const modalRematchStatus = document.getElementById('modal-rematch-status');
+    const soloWinModal = document.getElementById('solo-win-modal');
+    const soloModalTitle = document.getElementById('solo-modal-title');
+    const soloModalMessage = document.getElementById('solo-modal-message');
+    const soloModalRecordMessage = document.getElementById('solo-modal-record-message');
+    const soloModalPlayAgainBtn = document.getElementById('solo-modal-play-again');
 
     // --- Pobranie elementów DOM (Osiągnięcia) ---
     const achievementsBtn = document.getElementById('achievements-btn');
@@ -128,6 +147,144 @@ document.addEventListener('DOMContentLoaded', () => {
     const achievementsList = document.getElementById('achievements-list');
     const achievementsCloseBtn = document.getElementById('achievements-close-btn');
     const toastNotification = document.getElementById('toast-notification');
+
+    // ================================================================
+    // ===== LOGIKA AUTORYZACJI (LOGOWANIE/REJESTRACJA) ==========
+    // ================================================================
+    
+    // Otwórz modal logowania z lobby
+    authBtn.addEventListener('click', () => {
+        authPanel.classList.remove('hidden');
+        loginTabBtn.click();
+    });
+
+    // Zamknij modal logowania (przycisk X)
+    authCloseBtn.addEventListener('click', () => {
+        authPanel.classList.add('hidden');
+    });
+
+    // Zamknij modal logowania (kliknięcie tła)
+    authPanel.addEventListener('click', (e) => {
+        if (e.target === authPanel) {
+            authPanel.classList.add('hidden');
+        }
+    });
+
+    // Przełączanie zakładek
+    loginTabBtn.addEventListener('click', () => {
+        loginTabBtn.classList.add('active');
+        registerTabBtn.classList.remove('active');
+        loginForm.classList.remove('hidden');
+        registerForm.classList.add('hidden');
+        authMessage.textContent = '';
+        authMessage.style.color = "var(--accent-red)";
+    });
+
+    registerTabBtn.addEventListener('click', () => {
+        loginTabBtn.classList.remove('active');
+        registerTabBtn.classList.add('active');
+        loginForm.classList.add('hidden');
+        registerForm.classList.remove('hidden');
+        authMessage.textContent = '';
+        authMessage.style.color = "var(--accent-red)";
+    });
+
+    // Obsługa formularza rejestracji
+    registerForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const username = document.getElementById('register-username').value;
+        const email = document.getElementById('register-email').value;
+        const password = document.getElementById('register-password').value;
+        
+        if (password.length < 6) {
+            authMessage.textContent = 'Hasło musi mieć co najmniej 6 znaków.';
+            return;
+        }
+        if (username.length < 3) {
+            authMessage.textContent = 'Nazwa użytkownika musi mieć co najmniej 3 znaki.';
+            return;
+        }
+
+        authMessage.textContent = 'Przetwarzanie...';
+        authMessage.style.color = "var(--text-secondary)";
+
+        try {
+            const response = await fetch('/api/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ username, email, password }),
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                authMessage.style.color = "var(--accent-red)";
+                authMessage.textContent = data.message;
+            } else {
+                authMessage.style.color = "var(--accent-blue)";
+                authMessage.textContent = data.message;
+                loginTabBtn.click();
+            }
+        } catch (error) {
+            console.error('Błąd Fetch:', error);
+            authMessage.style.color = "var(--accent-red)";
+            authMessage.textContent = 'Błąd połączenia. Sprawdź, czy serwer działa.';
+        }
+    });
+
+    // ===== ZAKTUALIZOWANA LOGIKA LOGOWANIA =====
+    loginForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        authMessage.textContent = 'Logowanie...';
+        authMessage.style.color = "var(--text-secondary)";
+
+        const username = document.getElementById('login-username').value;
+        const password = document.getElementById('login-password').value;
+
+        try {
+            const response = await fetch('/api/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ username, password }),
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                authMessage.style.color = "var(--accent-red)";
+                authMessage.textContent = data.message;
+            } else {
+                // SUKCES!
+                currentUsername = data.user.username;
+                isGuest = false;
+                
+                // Zapisz token w localStorage
+                localStorage.setItem('memorr_token', data.token); 
+                
+                // Wczytaj osiągnięcia z chmury (z danych, które właśnie otrzymaliśmy)
+                loadAchievements(data.user.achievements); 
+
+                authPanel.classList.add('hidden'); // Zamknij modal
+                showLobbyUI(currentUsername, isGuest); // Pokaż lobby jako zalogowany
+            }
+        } catch (error) {
+            console.error('Błąd Fetch:', error);
+            authMessage.style.color = "var(--accent-red)";
+            authMessage.textContent = 'Błąd połączenia. Sprawdź, czy serwer działa.';
+        }
+    });
+    // =========================================
+
+    // Wylogowanie
+    logoutBtn.addEventListener('click', () => {
+        localStorage.removeItem('memorr_token'); // Wyczyść token
+        window.location.reload();
+    });
+
 
     // ================================================================
     // ===== LOGIKA LOBBY I NAWIGACJI =================================
@@ -252,8 +409,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Przyciski "Powrót do Lobby" i "Rewanż"
-    btnRestart.addEventListener('click', () => window.location.reload());
-    modalPlayAgainBtn.addEventListener('click', () => window.location.reload());
+    btnRestart.addEventListener('click', () => showLobbyUI(currentUsername, isGuest));
+    modalPlayAgainBtn.addEventListener('click', () => showLobbyUI(currentUsername, isGuest));
+    soloModalPlayAgainBtn.addEventListener('click', () => showLobbyUI(currentUsername, isGuest));
 
     modalRematchBtn.addEventListener('click', () => {
         socket.emit('requestRematch');
@@ -274,10 +432,23 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    function showLobbyUI() {
+    function showLobbyUI(username, isGuest = true) {
+        authPanel.classList.add('hidden');
         lobbyScreen.classList.remove('hidden');
+        
+        welcomeMessage.textContent = `Witaj, ${username}!`;
+        
+        if (isGuest) {
+            logoutBtn.classList.add('hidden');
+            authBtn.classList.remove('hidden');
+        } else {
+            logoutBtn.classList.remove('hidden');
+            authBtn.classList.add('hidden');
+        }
+
         gameScreen.classList.add('hidden');
         winModal.classList.add('hidden');
+        soloWinModal.classList.add('hidden');
         showModeSelection();
     }
 
@@ -285,6 +456,7 @@ document.addEventListener('DOMContentLoaded', () => {
         lobbyScreen.classList.add('hidden');
         gameScreen.classList.remove('hidden');
         winModal.classList.add('hidden');
+        soloWinModal.classList.add('hidden');
     }
 
     // ================================================================
@@ -299,6 +471,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     socket.on('gameStarted', (data) => {
         winModal.classList.add('hidden');
+        soloWinModal.classList.add('hidden');
         currentGameMode = data.gameMode;
         
         startMultiplayerGame(data); 
@@ -383,7 +556,7 @@ document.addEventListener('DOMContentLoaded', () => {
             modalRematchStatus.classList.add('hidden');
             winModal.classList.remove('hidden');
         } else {
-            showLobbyUI();
+            showLobbyUI(currentUsername, isGuest);
             lobbyMessage.textContent = "Przeciwnik się rozłączył.";
         }
     });
@@ -396,17 +569,45 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // ================================================================
-    // ===== LOGIKA OSIĄGNIĘĆ ========================================
+    // ===== LOGIKA OSIĄGNIĘĆ (ZAKTUALIZOWANA) ========================
     // ================================================================
 
-    function loadAchievements() {
-        const data = localStorage.getItem('memorr_achievements');
-        unlockedAchievements = new Set(JSON.parse(data || '[]'));
+    // ZAKTUALIZOWANE: Przyjmuje dane z serwera, jeśli gracz jest zalogowany
+    function loadAchievements(achievementsFromServer = null) {
+        if (isGuest) {
+            const data = localStorage.getItem('memorr_achievements');
+            unlockedAchievements = new Set(JSON.parse(data || '[]'));
+        } else {
+            // Wczytaj osiągnięcia z danych użytkownika wysłanych przez serwer
+            unlockedAchievements = new Set(achievementsFromServer || []);
+        }
     }
 
-    function saveAchievements() {
+    // Zapisuje osiągnięcia (tylko dla gości)
+    function saveAchievementsToLocal() {
         localStorage.setItem('memorr_achievements', JSON.stringify([...unlockedAchievements]));
     }
+    
+    // NOWA: Zapisuje osiągnięcia w chmurze
+    async function saveAchievementToCloud(achievementId) {
+        try {
+            const token = localStorage.getItem('memorr_token');
+            if (!token) return; // Nie rób nic, jeśli nie ma tokena
+
+            await fetch('/api/unlock-achievement', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}` // Wyślij token
+                },
+                body: JSON.stringify({ achievementId })
+            });
+            // Nie musimy sprawdzać odpowiedzi, jeśli nie chcemy
+        } catch (error) {
+            console.error('Nie udało się zapisać osiągnięcia w chmurze:', error);
+        }
+    }
+
 
     function showAchievementToast(achievement) {
         toastNotification.querySelector('.toast-icon').textContent = achievement.icon;
@@ -418,11 +619,17 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 3000);
     }
 
+    // ZAKTUALIZOWANE: Decyduje, gdzie zapisać
     function unlockAchievement(id) {
         if (!unlockedAchievements.has(id)) {
             unlockedAchievements.add(id);
-            saveAchievements();
             showAchievementToast(allAchievements[id]);
+            
+            if (isGuest) {
+                saveAchievementsToLocal();
+            } else {
+                saveAchievementToCloud(id);
+            }
         }
     }
 
@@ -464,9 +671,8 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-
     // ================================================================
-    // ===== LOGIKA GRY (ZAKTUALIZOWANA O OSIĄGNIĘCIA) ==================
+    // ===== LOGIKA GRY ===============================================
     // ================================================================
 
     function startSoloGame(rows, cols) {
@@ -587,7 +793,6 @@ document.addEventListener('DOMContentLoaded', () => {
         timerInterval = null;
     }
 
-    // ===== GŁÓWNY KONTROLER KLIKNIĘĆ =====
     function handleCardClick() {
         if (isSoloMode || currentGameMode === 'race') {
             handleSoloOrRaceClick(this);
@@ -596,7 +801,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Logika dla Solo lub Wyścigu (lokalne sprawdzanie)
     function handleSoloOrRaceClick(cardElement) {
         if (lockBoard || cardElement.classList.contains('matched') || cardElement === firstCard) return;
         
@@ -616,7 +820,6 @@ document.addEventListener('DOMContentLoaded', () => {
         checkForMatch();
     }
 
-    // Logika dla Trybu Klasycznego (wysyłanie do serwera)
     function handleClassicClick(cardElement) {
         if (!myTurn || lockBoard || cardElement.classList.contains('matched') || cardElement.classList.contains('flipped')) {
             return;
@@ -633,7 +836,6 @@ document.addEventListener('DOMContentLoaded', () => {
         isMatch ? disableCards() : unflipCards();
     }
 
-    // ===== POPRAWIONA FUNKCJA disableCards (Usunięty błąd 'CSS') =====
     function disableCards() {
         firstCard.classList.add('matched');
         secondCard.classList.add('matched');
@@ -645,8 +847,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 stopTimer();
                 const stats = updateSoloStats();
                 checkSoloAchievements(stats);
-                // BŁĄD 'CSS' BYŁ TUTAJ I ZOSTAŁ USUNIĘTY
-                showWinModal(true, true, stats.newRecord); // Teraz się wykona
+                showSoloWinModal(stats.newRecord);
             }
         } else { // Tryb 'race'
             socket.emit('foundMatch');
@@ -657,7 +858,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         resetTurn();
     }
-    // ============================================
 
     function unflipCards() {
         setTimeout(() => {
@@ -673,7 +873,6 @@ document.addEventListener('DOMContentLoaded', () => {
         lockBoard = false;
     }
 
-    // NOWA funkcja do aktualizacji UI tury
     function updateTurnUI(isMyTurn) {
         if (isMyTurn) {
             turnInfo.textContent = "Twoja tura!";
@@ -686,17 +885,20 @@ document.addEventListener('DOMContentLoaded', () => {
             playerInfoPanel.classList.remove('active-turn');
             opponentInfoPanel.classList.add('active-turn');
         }
-        lockBoard = false; // Odblokuj planszę po otrzymaniu tury
+        lockBoard = false;
     }
 
-    // Funkcje statystyk solo
+    // Funkcje statystyk solo (zapisują tylko lokalnie)
     function getTimeStorageKey() {
         if (currentRows === 0 || currentCols === 0) return null;
-        return `memoryBestTime_${currentTheme}_${currentRows}x${currentCols}`;
+        // Zapisy dla gościa są oddzielne od zapisów zalogowanego użytkownika
+        const keyPrefix = isGuest ? 'guest' : currentUsername;
+        return `memoryBestTime_${keyPrefix}_${currentTheme}_${currentRows}x${currentCols}`;
     }
     function getStatsStorageKey() {
         if (currentRows === 0 || currentCols === 0) return null;
-        return `memoryGamesPlayed_${currentTheme}_${currentRows}x${currentCols}`;
+        const keyPrefix = isGuest ? 'guest' : currentUsername;
+        return `memoryGamesPlayed_${keyPrefix}_${currentTheme}_${currentRows}x${currentCols}`;
     }
     function loadSoloStats() {
         const timeKey = getTimeStorageKey();
@@ -715,23 +917,31 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function updateSoloStats() {
-        const timeKey = getTimeStorageKey();
-        const statsKey = getStatsStorageKey();
-        if (!timeKey || !statsKey) return { newRecord: false, gamesPlayed: 0 };
-        
-        let gamesPlayed = parseInt(localStorage.getItem(statsKey) || '0');
-        gamesPlayed++;
-        localStorage.setItem(statsKey, gamesPlayed.toString());
-        gamesPlayedSpan.textContent = gamesPlayed.toString();
+        // Statystyki solo dla gości są zapisywane tylko w localStorage
+        if (isGuest) {
+            const timeKey = getTimeStorageKey();
+            const statsKey = getStatsStorageKey();
+            if (!timeKey || !statsKey) return { newRecord: false, gamesPlayed: 0 };
+            
+            let gamesPlayed = parseInt(localStorage.getItem(statsKey) || '0');
+            gamesPlayed++;
+            localStorage.setItem(statsKey, gamesPlayed.toString());
+            gamesPlayedSpan.textContent = gamesPlayed.toString();
 
-        const bestTime = localStorage.getItem(timeKey);
-        let newRecord = false;
-        if (!bestTime || seconds < parseInt(bestTime)) {
-            localStorage.setItem(timeKey, seconds);
-            bestScoreSpan.textContent = `${seconds}s`;
-            newRecord = true;
+            const bestTime = localStorage.getItem(timeKey);
+            let newRecord = false;
+            if (!bestTime || seconds < parseInt(bestTime)) {
+                localStorage.setItem(timeKey, seconds);
+                bestScoreSpan.textContent = `${seconds}s`;
+                newRecord = true;
+            }
+            return { newRecord, gamesPlayed };
+        } else {
+            // TODO: Logika zapisywania statystyk solo w chmurze
+            // Na razie po prostu aktualizujemy UI
+            gamesPlayedSpan.textContent = (parseInt(gamesPlayedSpan.textContent) + 1).toString();
+            return { newRecord: false, gamesPlayed: parseInt(gamesPlayedSpan.textContent) };
         }
-        return { newRecord, gamesPlayed };
     }
     
     function checkSoloAchievements(stats) {
@@ -749,7 +959,21 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
     
-    // ZAKTUALIZOWANE: Obsługuje remis (3ci parametr)
+    function showSoloWinModal(isNewRecord) {
+        soloModalMessage.textContent = `Ukończyłeś grę w ${seconds}s i ${moves} ruchach!`;
+        
+        if (isNewRecord) {
+            soloModalRecordMessage.classList.remove('hidden');
+        } else {
+            soloModalRecordMessage.classList.add('hidden');
+        }
+        
+        try { winSound.play(); } catch(e) {}
+        
+        soloWinModal.classList.remove('hidden');
+    }
+
+    // Modal tylko dla MULTI
     function showWinModal(didPlayerWin, soloMode, isTie = false) {
         
         modalPlayAgainBtn.classList.add('hidden');
@@ -758,22 +982,8 @@ document.addEventListener('DOMContentLoaded', () => {
         modalRecordMessage.classList.add('hidden');
         
         if (soloMode) {
-            modalTitle.textContent = 'Gratulacje!';
-            modalMessage.textContent = `Ukończyłeś grę w ${seconds}s i ${moves} ruchach!`;
-            modalPlayAgainBtn.classList.remove('hidden');
-            
-            // ===== POPRAWKA BŁĘDU: Sprawdź 'isTie' (trzeci parametr), który przechowuje 'isNewRecord' dla solo =====
-            const isNewRecord = isTie; 
-            if (isNewRecord) {
-                modalRecordMessage.classList.remove('hidden');
-            } else {
-                modalRecordMessage.classList.add('hidden');
-            }
-            
-            if(didPlayerWin) {
-                 try { winSound.play(); } catch(e) {}
-            }
-
+            // To jest teraz obsługiwane przez showSoloWinModal
+            showSoloWinModal(isTie); 
         } else {
             // Tryb Multiplayer
             modalRematchBtn.classList.remove('hidden');
@@ -794,11 +1004,23 @@ document.addEventListener('DOMContentLoaded', () => {
                     ? 'Przeciwnik był szybszy. Spróbuj jeszcze raz!'
                     : 'Przeciwnik zebrał więcej par. Spróbuj jeszcze raz!';
             }
+            winModal.classList.remove('hidden');
         }
-        winModal.classList.remove('hidden');
     }
 
     // Domyślnie pokaż lobby na starcie
-    loadAchievements(); // To była przyczyna błędu
-    showLobbyUI();
+    loadAchievements();
+    // Pokaż lobby gościa, ale ukryj je, jeśli mamy zapisany token
+    // (Na razie zawsze pokazuj lobby gościa, dopóki nie zaimplementujemy pełnego logowania)
+    
+    // Sprawdzenie, czy jesteśmy zalogowani (w przyszłości)
+    // const token = localStorage.getItem('memorr_token');
+    // if (token) {
+    //    // TODO: Zweryfikuj token na serwerze i zaloguj
+    //    // Na razie:
+    //    showLobbyUI("Gość", true);
+    // } else {
+         lobbyScreen.classList.remove('hidden'); // Pokaż lobby gościa
+         authPanel.classList.add('hidden'); // Ukryj modal logowania
+    // }
 });

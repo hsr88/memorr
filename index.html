@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
     <title>Memorr - Gra Pamięciowa Online (Solo & Multiplayer)</title>
     <meta name="description" content="Zagraj w Memorr, darmową grę pamięciową online. Trenuj pamięć w trybie solo lub rywalizuj ze znajomymi w pojedynkach multiplayer!">
     <meta name="keywords" content="gra memory, gra pamięciowa, memory online, multiplayer, gra na dwie osoby, memorr, memorr.top">
@@ -14,15 +13,6 @@
     <meta property="og:url" content="https://memorr.top">
 
     <link rel="icon" type="image/png" href="favicon.png"> 
-
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-SFD8ETP2BN"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-    
-      gtag('config', 'G-SFD8ETP2BN');
-    </script>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     <script src="/socket.io/socket.io.js"></script>
@@ -34,7 +24,10 @@
 
         <div id="lobby-screen" class="panel">
             <button id="achievements-btn" title="Osiągnięcia">🏆</button>
-            <h2>Wybierz Tryb Gry</h2>
+            <button id="auth-btn" title="Logowanie / Rejestracja">👤</button>
+            
+            <h2 id="welcome-message">Witaj, Gościu!</h2>
+            <button id="logout-btn" class="btn purple hidden">Wyloguj</button>
 
             <div id="mode-selection">
                 <button id="btn-select-solo" class="btn green">GRA SOLO</button>
@@ -65,7 +58,6 @@
                 </div>
                 <div id="multi-create-details" class="hidden">
                     <h4>STWÓRZ GRĘ</h4>
-
                     <div id="game-mode-select">
                         <label>
                             <input type="radio" name="gameMode" value="race" checked> Wyścig
@@ -76,7 +68,6 @@
                             <span>(Wspólna plansza, gra na punkty i tury)</span>
                         </label>
                     </div>
-
                     <h5>Wybierz Poziom</h5>
                     <div class="difficulty-select">
                         <button id="btn-multi-easy" class="btn blue">Łatwy (4x4)</button>
@@ -130,7 +121,6 @@
                         Gry: <span id="games-played">0</span>
                     </div>
                 </div>
-                
                 <div id="opponent-info" class="info-container panel">
                     <h3>PRZECIWNIK</h3>
                     <div class="info-row">Punkty: <span id="opponent-pairs-found">0</span> / <span id="opponent-total-pairs">0</span></div>
@@ -151,12 +141,47 @@
         </div>
     </div>
 
+    <div id="solo-win-modal" class="modal-overlay hidden">
+        <div class="modal-content panel">
+            <h2 id="solo-modal-title">Gratulacje!</h2>
+            <p id="solo-modal-message">Ukończyłeś grę!</p>
+            <p id="solo-modal-record-message" class="hidden">NOWY REKORD!</p>
+            <button id="solo-modal-play-again" class="btn green">POWRÓT DO LOBBY</button>
+        </div>
+    </div>
+
     <div id="achievements-modal" class="modal-overlay hidden">
         <div class="modal-content panel">
             <h2>Twoje Osiągnięcia</h2>
-            <ul id="achievements-list">
-                </ul>
+            <ul id="achievements-list"></ul>
             <button id="achievements-close-btn" class="btn purple">ZAMKNIJ</button>
+        </div>
+    </div>
+    
+    <div id="auth-panel" class="modal-overlay hidden">
+        <div class="modal-content panel">
+            <div class="auth-tabs">
+                <button id="login-tab-btn" class="auth-tab active" data-form="login-form">Logowanie</button>
+                <button id="register-tab-btn" class="auth-tab" data-form="register-form">Rejestracja</button>
+            </div>
+
+            <form id="login-form" class="auth-form">
+                <h2>Witaj z powrotem!</h2>
+                <input type="text" id="login-username" class="input-field" placeholder="Nazwa użytkownika" required>
+                <input type="password" id="login-password" class="input-field" placeholder="Hasło" required>
+                <button type="submit" class="btn blue">Zaloguj się</button>
+                <a href="#" id="forgot-password-link" class="auth-link">Nie pamiętasz hasła?</a>
+            </form>
+            
+            <form id="register-form" class="auth-form hidden">
+                <h2>Dołącz do Memorr</h2>
+                <input type="text" id="register-username" class="input-field" placeholder="Nazwa użytkownika (min. 3 znaki)" required>
+                <input type="email" id="register-email" class="input-field" placeholder="Twój e-mail" required>
+                <input type="password" id="register-password" class="input-field" placeholder="Hasło (min. 6 znaków)" required>
+                <button type="submit" class="btn green">Zarejestruj się</button>
+            </form>
+            <p id="auth-message" class="error-text"></p>
+            <button id="auth-close-btn" class="auth-close-btn" title="Zamknij">✖</button>
         </div>
     </div>
 

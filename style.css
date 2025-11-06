@@ -107,6 +107,14 @@ h5 { font-size: 1.1em; color: var(--text-secondary); margin: 20px 0 10px 0; font
 }
 .btn.purple:hover { box-shadow: 0 6px 12px rgba(112, 137, 147, 0.4); }
 
+/* Mniejszy wariant przycisku */
+.btn.small {
+    font-size: 0.9em;
+    padding: 8px 18px;
+    text-transform: none;
+}
+
+
 /* Pola tekstowe */
 .input-field {
     font-family: var(--font-main);
@@ -118,8 +126,10 @@ h5 { font-size: 1.1em; color: var(--text-secondary); margin: 20px 0 10px 0; font
     background-color: #F0F0F0;
     color: var(--text-primary);
     outline: none;
-    margin-right: 10px;
-    width: 200px;
+    margin-right: 0;
+    width: 100%;
+    max-width: 300px;
+    box-sizing: border-box;
     text-align: center;
     box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
     transition: box-shadow 0.3s, border 0.3s;
@@ -193,7 +203,85 @@ h5 { font-size: 1.1em; color: var(--text-secondary); margin: 20px 0 10px 0; font
     box-shadow: 0 0 10px rgba(109, 152, 134, 0.3);
 }
 
+/* ===== STYLE LOGOWANIA/REJESTRACJI (ZAKTUALIZOWANE) ===== */
+.auth-link {
+    font-size: 0.9em;
+    font-weight: 700;
+    color: var(--text-secondary);
+    cursor: pointer;
+    text-decoration: none;
+    margin-top: 15px;
+}
+.auth-link:hover {
+    color: var(--accent-blue);
+}
+
+.auth-tabs {
+    display: flex;
+    justify-content: center;
+    border-bottom: 2px solid var(--bg-light);
+    margin-bottom: 30px;
+}
+.auth-tab {
+    font-family: var(--font-main);
+    font-size: 1.2em;
+    font-weight: 700;
+    color: var(--text-secondary);
+    background: none;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    margin-bottom: -2px;
+}
+.auth-tab.active {
+    color: var(--accent-blue);
+    border-bottom-color: var(--accent-blue);
+}
+.auth-form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+}
+.auth-form .btn {
+    margin-top: 10px;
+}
+#auth-message {
+    margin-top: 15px;
+    font-size: 1em;
+}
+
+/* Przycisk zamknięcia modala (X) */
+.auth-close-btn {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    font-size: 1.5em;
+    font-weight: 700;
+    color: var(--text-secondary);
+    background: none;
+    border: none;
+    cursor: pointer;
+    opacity: 0.5;
+    transition: opacity 0.2s, transform 0.2s;
+}
+.auth-close-btn:hover {
+    opacity: 1;
+    transform: scale(1.1);
+}
+/* ========================================= */
+
+
 /* ===== STYLE LOBBY ===== */
+#logout-btn {
+    position: absolute;
+    top: 25px;
+    left: 25px;
+    padding: 5px 15px;
+    font-size: 0.9em;
+}
+
 #mode-selection,
 #solo-options,
 #multi-options,
@@ -324,16 +412,15 @@ h5 { font-size: 1.1em; color: var(--text-secondary); margin: 20px 0 10px 0; font
     align-items: center;
 }
 
-/* ===== POPRAWKA CENTROWANIA PRZYCISKU ===== */
 .controls {
     margin-bottom: 20px;
     width: 100%;
     max-width: 600px;
     display: flex;
-    justify-content: center; /* ZAWSZE centruj */
+    justify-content: center;
     align-items: center;
-    position: relative; /* Potrzebne dla info o turze */
-    min-height: 50px; /* Zapewnia przestrzeń */
+    position: relative;
+    min-height: 50px;
 }
 
 #turn-info {
@@ -341,7 +428,6 @@ h5 { font-size: 1.1em; color: var(--text-secondary); margin: 20px 0 10px 0; font
     font-weight: 700;
     color: var(--text-secondary);
     margin-bottom: 0;
-    /* Pozycjonujemy info o turze na lewo, nie wpływając na centrowanie przycisku */
     position: absolute;
     left: 10px;
     top: 50%;
@@ -350,7 +436,6 @@ h5 { font-size: 1.1em; color: var(--text-secondary); margin: 20px 0 10px 0; font
 #turn-info.my-turn {
     color: var(--accent-blue);
 }
-/* ======================================= */
 
 .all-info-container {
     display: flex;
@@ -563,6 +648,28 @@ h5 { font-size: 1.1em; color: var(--text-secondary); margin: 20px 0 10px 0; font
     font-size: 1.1em;
 }
 
+/* ===== STYLE MODALA SOLO ===== */
+#solo-win-modal .modal-content h2 {
+    color: var(--accent-green);
+}
+#solo-win-modal .modal-content p {
+    font-size: 1.1em;
+    margin-bottom: 15px;
+    color: var(--text-primary);
+}
+#solo-win-modal #solo-modal-record-message {
+    color: var(--accent-gold);
+    font-weight: 700;
+    font-size: 1.3em;
+    margin-bottom: 25px;
+}
+#solo-win-modal .btn {
+    padding: 12px 20px;
+    font-size: 1.1em;
+}
+/* ================================== */
+
+
 /* ===== STOPKA ===== */
 footer {
     width: 100%;
@@ -606,6 +713,23 @@ footer {
     opacity: 1;
     transform: scale(1.1);
 }
+#auth-btn {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    background: none;
+    border: none;
+    font-size: 2em;
+    cursor: pointer;
+    opacity: 0.6;
+    transition: opacity 0.2s, transform 0.2s;
+    z-index: 10;
+}
+#auth-btn:hover {
+    opacity: 1;
+    transform: scale(1.1);
+}
+
 
 #achievements-list {
     list-style: none;
