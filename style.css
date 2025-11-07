@@ -107,6 +107,18 @@ h5 { font-size: 1.1em; color: var(--text-secondary); margin: 20px 0 10px 0; font
 }
 .btn.purple:hover { box-shadow: 0 6px 12px rgba(112, 137, 147, 0.4); }
 
+/* NOWY STYL DLA PRZYCISKU WYLOGOWANIA */
+.btn.red {
+    background-color: var(--accent-red);
+    color: var(--bg-white);
+    box-shadow: 0 4px 10px rgba(220, 53, 69, 0.3);
+}
+.btn.red:hover { 
+    background-color: #E74C3C;
+    box-shadow: 0 6px 12px rgba(220, 53, 69, 0.4); 
+}
+
+
 /* Mniejszy wariant przycisku */
 .btn.small {
     font-size: 0.9em;
@@ -274,13 +286,16 @@ h5 { font-size: 1.1em; color: var(--text-secondary); margin: 20px 0 10px 0; font
 
 
 /* ===== STYLE LOBBY ===== */
+/* ===== POPRAWKA PRZYCISKU "WYLOGUJ" ===== */
 #logout-btn {
-    position: absolute;
-    top: 25px;
-    left: 25px;
+    /* Usunięto 'position: absolute' */
     padding: 5px 15px;
     font-size: 0.9em;
+    /* Dodano margines, aby odsunąć go od reszty */
+    margin-top: 20px; 
 }
+/* ====================================== */
+
 
 #mode-selection,
 #solo-options,
