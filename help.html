@@ -7,16 +7,16 @@
     <meta name="description" content="Zasady gry Memorr. Dowiedz się, jak grać w trybie solo, klasycznym pojedynku multiplayer i trybie wyścigu.">
     
     <link rel="icon" type="image/png" href="favicon.png"> 
-<script>
-        // Ten skrypt musi być w <head>, aby zapobiec migotaniu
+    
+    <script>
         (function() {
             const theme = localStorage.getItem('memorr_theme');
             if (theme === 'dark') {
-                // Stosujemy klasę do <html> zamiast <body>
                 document.documentElement.classList.add('dark-mode');
             }
         })();
     </script>
+    
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-SFD8ETP2BN"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
@@ -25,6 +25,7 @@
     
       gtag('config', 'G-SFD8ETP2BN');
     </script>
+
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
@@ -41,29 +42,35 @@
             <h3>Tryby Gry</h3>
             
             <h4>Tryb Solo</h4>
-            <p>Zagraj sam i trenuj swoją pamięć! Wybierz jeden z trzech poziomów trudności (Łatwy 4x4, Średni 6x4, Trudny 6x6) i motyw kart. Twoim celem jest ukończenie gry w jak najkrótszym czasie i z jak najmniejszą liczbą ruchów. Gra zapamiętuje Twoje najlepsze wyniki i liczbę rozegranych gier dla każdego poziomu trudności i motywu.</p>
+            <p>Zagraj sam i trenuj swoją pamięć! Wybierz jeden z trzech poziomów trudności (Łatwy 4x4, Średni 6x4, Trudny 6x6) i motyw kart. Twoim celem jest ukończenie gry w jak najkrótszym czasie i z jak najmniejszą liczbą ruchów. Gra zapamiętuje Twoje najlepsze wyniki (dla gości) lub zapisuje je w chmurze (dla zalogowanych graczy).</p>
             
             <h4>Tryb Wieloosobowy</h4>
             <p>Zmierz się ze znajomymi w ekscytującym pojedynku pamięci! Po dołączeniu do pokoju, twórca gry wybiera jeden z dwóch trybów:</p>
             
             <h5>Tryb Klasyczny (Turowy)</h5>
-            <p>To klasyczne zasady Memory. Obaj gracze grają na **jednej, wspólnej planszy** i grają na zmianę.
+            <p>To klasyczne zasady Memory. Obaj gracze grają na <b>jednej, wspólnej planszy</b> i grają na zmianę.
             <ul>
-                <li>Jeśli znajdziesz parę, zdobywasz punkt i **masz kolejny ruch**.</li>
+                <li>Jeśli znajdziesz parę, zdobywasz punkt i <b>masz kolejny ruch</b>.</li>
                 <li>Jeśli spudłujesz, karty są zakrywane, a tura przechodzi na Twojego przeciwnika.</li>
             </ul>
-            Wygrywa gracz, który na koniec gry zbierze **więcej par** (punktów). W tym trybie liczy się strategia i zapamiętywanie ruchów przeciwnika!</p>
+            Wygrywa gracz, który na koniec gry zbierze <b>więcej par</b> (punktów). W tym trybie liczy się strategia i zapamiętywanie ruchów przeciwnika!</p>
 
             <h5>Tryb Wyścigu</h5>
-            <p>W tym trybie liczy się tylko **szybkość**. Obaj gracze otrzymują swoje **osobne, ale identycznie potasowane plansze**. Nie ma tur – obaj gracie w tym samym czasie.
+        <p>W tym trybie liczy się tylko <b>szybkość</b>. Obaj gracze otrzymują swoje <b>osobne, ale identycznie potasowane plansze</b>. Nie ma tur – obaj gracie w tym samym czasie.
             <ul>
                 <li>Widzisz postępy swojego przeciwnika (liczbę znalezionych par), ale nie widzisz jego planszy.</li>
                 <li>Twoim celem jest znalezienie wszystkich par szybciej niż on.</li>
             </ul>
-            Wygrywa gracz, który jako pierwszy **odkryje wszystkie pary** na swojej planszy.</p>
+        Wygrywa gracz, który jako pierwszy <b>odkryje wszystkie pary</b> na swojej planszy.</p>
 
+            <h3>Power-upy (Ułatwienia)</h3>
+    <p>Na największych i najtrudniejszych planszach (<B>tylko 6x6</B>) masz do dyspozycji dwa potężne ułatwienia. Każde z nich możesz użyć tylko <b>jeden raz</b> na grę!</p>
+            <ul>
+                <li><strong>Podgląd Planszy (👁️):</strong> Odkrywa wszystkie zakryte karty na planszy na 2 sekundy. Użyj go mądrze, aby zapamiętać kluczowe pozycje!</li>
+                <li><strong>Automatyczna Para (🎯):</strong> Natychmiast znajduje i odkrywa jedną, losową parę na planszy za Ciebie. Idealne, gdy utkniesz. (W trybie klasycznym dodatkowo przyznaje Ci punkt i pozwala kontynuować turę).</li>
+            </ul>
             <h3>Osiągnięcia</h3>
-            <p>W lobby znajdziesz ikonę 🏆, która otwiera panel Twoich Osiągnięć. Tam możesz sprawdzić, jakie wyzwania udało Ci się już odblokować i jakie jeszcze czekają!</p>
+            <p>W lobby znajdziesz ikonę 🏆, która otwiera panel Twoich Osiągnięć. Tam możesz sprawdzić, jakie wyzwania udało Ci się już odblokować i jakie jeszcze czekają! Osiągnięcia dla gości zapisywane są w przeglądarce, a dla zalogowanych użytkowników – w chmurze.</p>
 
             <button onclick="window.location.href='/'" class="btn purple">POWRÓT DO GRY</button>
         </div>
