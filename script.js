@@ -127,6 +127,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const bestScoreSpan = document.getElementById('best-score');
     const gamesPlayedContainer = document.getElementById('games-played-container');
     const gamesPlayedSpan = document.getElementById('games-played');
+    
+    const powerUpContainer = document.getElementById('powerup-container');
+    const powerUpPeekBtn = document.getElementById('powerup-peek');
+    const powerUpAutopairBtn = document.getElementById('powerup-autopair');
 
     // --- Pobranie elementów DOM (Modal) ---
     const winModal = document.getElementById('win-modal');
@@ -151,10 +155,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const themeToggleBtn = document.getElementById('theme-toggle-btn'); 
 
     // ================================================================
-    // ===== ZAKTUALIZOWANA LOGIKA TRYBU CIEMNEGO =====
+    // ===== LOGIKA TRYBU CIEMNEGO =====
     // ================================================================
     
-    // Funkcja do ustawiania ikony na podstawie stanu
     function updateThemeButtonIcon() {
         if (document.documentElement.classList.contains('dark-mode')) {
             themeToggleBtn.textContent = '☀️';
@@ -166,23 +169,16 @@ document.addEventListener('DOMContentLoaded', () => {
     // Ustaw poprawną ikonę przycisku przy ładowaniu
     updateThemeButtonIcon(); 
 
-    // Listener kliknięcia
     themeToggleBtn.addEventListener('click', () => {
-        // Przełącz klasę na <html>
         document.documentElement.classList.toggle('dark-mode'); 
         
-        // Zapisz wybór
         if (document.documentElement.classList.contains('dark-mode')) {
             localStorage.setItem('memorr_theme', 'dark');
         } else {
             localStorage.setItem('memorr_theme', 'light');
         }
-        
-        // Zaktualizuj ikonę
         updateThemeButtonIcon();
     });
-    // ================================================================
-
 
     // ================================================================
     // ===== LOGIKA AUTORYZACJI (LOGOWANIE/REJESTRACJA) ==========
@@ -203,16 +199,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Pokaż formularze logowania/rejestracji (z widoku gościa)
-    // Usunęliśmy ten przycisk, więc ta logika nie jest już potrzebna
-    // showAuthFormsBtn.addEventListener('click', (e) => { ... });
-
-    // Wróć do opcji gościa (z formularzy)
-    // Usunęliśmy ten przycisk, więc ta logika nie jest już potrzebna
-    // backToGuestBtn.addEventListener('click', (e) => { ... });
-
-
-    // Przełączanie zakładek
     loginTabBtn.addEventListener('click', () => {
         loginTabBtn.classList.add('active');
         registerTabBtn.classList.remove('active');
@@ -231,7 +217,6 @@ document.addEventListener('DOMContentLoaded', () => {
         authMessage.style.color = "var(--accent-red)";
     });
 
-    // Obsługa formularza rejestracji
     registerForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const username = document.getElementById('register-username').value;
@@ -253,14 +238,10 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const response = await fetch('/api/register', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ username, email, password }),
             });
-
             const data = await response.json();
-
             if (!response.ok) {
                 authMessage.style.color = "var(--accent-red)";
                 authMessage.textContent = data.message;
@@ -276,7 +257,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Logowanie
     loginForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         authMessage.textContent = 'Logowanie...';
@@ -288,14 +268,10 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const response = await fetch('/api/login', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ username, password }),
             });
-
             const data = await response.json();
-
             if (!response.ok) {
                 authMessage.style.color = "var(--accent-red)";
                 authMessage.textContent = data.message;
@@ -303,11 +279,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 currentUsername = data.user.username;
                 isGuest = false;
                 authToken = data.token;
-                
                 localStorage.setItem('memorr_token', data.token); 
-                
                 loadAchievements(data.user.achievements); 
-
                 authPanel.classList.add('hidden');
                 showLobbyUI(currentUsername, isGuest);
             }
@@ -318,7 +291,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Wylogowanie
     logoutBtn.addEventListener('click', () => {
         localStorage.removeItem('memorr_token');
         window.location.reload();
@@ -606,6 +578,15 @@ document.addEventListener('DOMContentLoaded', () => {
              setTimeout(showMultiOptions, 2000);
         }
     });
+    
+    socket.on('powerUp:peek', () => {
+        executePeek();
+    });
+
+    socket.on('powerUp:used', (powerUpType) => {
+        const btn = (powerUpType === 'peek') ? powerUpPeekBtn : powerUpAutopairBtn;
+        btn.disabled = true;
+    });
 
     // ================================================================
     // ===== LOGIKA OSIĄGNIĘĆ ========================================
@@ -704,6 +685,105 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ================================================================
+    // ===== LOGIKA POWER-UPÓW ========================================
+    // ================================================================
+    
+    powerUpPeekBtn.addEventListener('click', () => {
+        if (powerUps.peek === 0) return;
+        if (currentGameMode === 'classic' && !myTurn) return; 
+        
+        powerUps.peek--;
+        powerUpPeekBtn.disabled = true;
+        socket.emit('usePowerUp', 'peek');
+
+        if (isSoloMode || currentGameMode === 'race') {
+            executePeek();
+        }
+    });
+
+    powerUpAutopairBtn.addEventListener('click', () => {
+        if (powerUps.autoPair === 0) return;
+        if (currentGameMode === 'classic' && !myTurn) return;
+
+        powerUps.autoPair--;
+        powerUpAutopairBtn.disabled = true;
+        socket.emit('usePowerUp', 'autoPair');
+
+        if (isSoloMode || currentGameMode === 'race') {
+            executeAutoPair();
+        }
+    });
+
+    function executePeek() {
+        const allCards = document.querySelectorAll('.card');
+        const unmatchedCards = [...allCards].filter(card => !card.classList.contains('matched'));
+
+        lockBoard = true;
+        
+        unmatchedCards.forEach(card => {
+            if (!card.classList.contains('flipped')) {
+                card.classList.add('flipped');
+            }
+        });
+
+        setTimeout(() => {
+            unmatchedCards.forEach(card => {
+                card.classList.remove('flipped');
+            });
+            if (currentGameMode !== 'classic' || myTurn) {
+                lockBoard = false;
+            }
+        }, 2000); // Podgląd przez 2 sekundy
+    }
+    
+    // ===== POPRAWIONA LOGIKA AUTOPARY =====
+    function executeAutoPair() {
+        if (currentGameMode === 'classic') return;
+        
+        const allCards = [...document.querySelectorAll('.card')];
+        let card1 = null;
+        let card2 = null;
+
+        for (let i = 0; i < allCards.length; i++) {
+            if (allCards[i].classList.contains('matched') || allCards[i].classList.contains('flipped')) continue;
+            
+            for (let j = i + 1; j < allCards.length; j++) {
+                if (allCards[j].classList.contains('matched') || allCards[j].classList.contains('flipped')) continue;
+                
+                if (allCards[i].dataset.value === allCards[j].dataset.value) {
+                    card1 = allCards[i];
+                    card2 = allCards[j];
+                    break;
+                }
+            }
+            if (card1) break;
+        }
+
+        if (card1 && card2) {
+            lockBoard = true;
+            
+            card1.classList.add('flipped');
+            card2.classList.add('flipped');
+            
+            // Symuluj znalezienie pary (bez klikania)
+            firstCard = card1;
+            secondCard = card2;
+            moves++;
+            moveCounterSpan.textContent = moves;
+            
+            // Poczekaj chwilę, aby gracz zobaczył, co się stało
+            setTimeout(() => {
+                disableCards();
+            }, 500); 
+        } else {
+            // Nie ma już par (lub błąd), zwróć power-up
+            powerUps.autoPair++;
+            powerUpAutopairBtn.disabled = false;
+        }
+    }
+    // ======================================
+
+    // ================================================================
     // ===== LOGIKA GRY ===============================================
     // ================================================================
 
@@ -721,6 +801,10 @@ document.addEventListener('DOMContentLoaded', () => {
         turnInfo.classList.add('hidden');
         timerSpan.parentElement.classList.remove('hidden');
         moveCounterSpan.parentElement.classList.remove('hidden');
+
+        if (rows === 6 && cols === 6) {
+            powerUpContainer.classList.remove('hidden');
+        }
 
         totalPairsSpan.textContent = totalPairs;
         
@@ -744,6 +828,10 @@ document.addEventListener('DOMContentLoaded', () => {
         gameScreen.classList.remove('solo-mode');
         totalPairsSpan.textContent = totalPairs;
         opponentTotalPairsSpan.textContent = totalPairs;
+
+        if (data.rows === 6 && data.cols === 6) {
+            powerUpContainer.classList.remove('hidden');
+        }
 
         if (currentGameMode === 'classic') {
             timerSpan.parentElement.classList.add('hidden');
@@ -797,6 +885,11 @@ document.addEventListener('DOMContentLoaded', () => {
         myTurn = false;
         gameBoard.innerHTML = '';
         
+        powerUps = { peek: 1, autoPair: 1 };
+        powerUpPeekBtn.disabled = false;
+        powerUpAutopairBtn.disabled = false;
+        powerUpContainer.classList.add('hidden'); 
+
         if (timerSpan) timerSpan.parentElement.classList.remove('hidden');
         if (moveCounterSpan) moveCounterSpan.parentElement.classList.remove('hidden');
         if (turnInfo) turnInfo.classList.add('hidden');
@@ -1042,5 +1135,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Domyślnie pokaż lobby na starcie
     loadAchievements();
-    showLobbyUI("Gość", true); // Pokaż lobby gościa
+    // Pokaż lobby gościa
+    showLobbyUI("Gość", true);
 });

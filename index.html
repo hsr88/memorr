@@ -13,17 +13,17 @@
     <meta property="og:url" content="https://memorr.top">
 
     <link rel="icon" type="image/png" href="favicon.png"> 
+    
     <script>
-        // Ten skrypt musi być w <head>, aby zapobiec migotaniu
+        // Skrypt trybu ciemnego (musi być w <head>)
         (function() {
             const theme = localStorage.getItem('memorr_theme');
             if (theme === 'dark') {
-                // Stosujemy klasę do <html> zamiast <body>
                 document.documentElement.classList.add('dark-mode');
             }
         })();
     </script>
-    
+
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     <script src="/socket.io/socket.io.js"></script>
@@ -121,6 +121,12 @@
                 <h3 id="turn-info" class="hidden"></h3>
                 <button id="btn-restart" class="btn purple">POWRÓT DO LOBBY</button> 
             </div>
+            
+            <div id="powerup-container" class="hidden">
+                <button id="powerup-peek" class="powerup-btn" title="Podgląd (raz na grę)">👁️</button>
+                <button id="powerup-autopair" class="powerup-btn" title="Automatyczna para (raz na grę)">🎯</button>
+            </div>
+            
             <div class="all-info-container">
                 <div id="player-info" class="info-container panel">
                     <h3>GRACZ</h3>

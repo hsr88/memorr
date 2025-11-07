@@ -29,7 +29,6 @@ const UserSchema = new mongoose.Schema({
     achievements: { type: [String], default: [] }
 });
 const User = mongoose.model('User', UserSchema);
-// ============================================
 
 // 3. Ustaw Expressa
 app.use((req, res, next) => {
@@ -42,15 +41,13 @@ app.use((req, res, next) => {
 app.use(express.json());
 app.use(express.static(__dirname));
 
-// ===== API DO REJESTRACJI =====
+// ===== API (Rejestracja, Logowanie, Osiągnięcia) =====
 app.post('/api/register', async (req, res) => {
     try {
         const { username, email, password } = req.body;
-
         if (!username || !email || !password || password.length < 6 || username.length < 3) {
             return res.status(400).json({ message: 'Nieprawidłowe dane. Sprawdź pola formularza.' });
         }
-        
         const existingUser = await User.findOne({ username: username.toLowerCase() });
         if (existingUser) {
             return res.status(400).json({ message: 'Użytkownik o tej nazwie już istnieje.' });
@@ -59,58 +56,39 @@ app.post('/api/register', async (req, res) => {
         if (existingEmail) {
             return res.status(400).json({ message: 'Ten adres e-mail jest już zajęty.' });
         }
-
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
-
         const newUser = new User({
             username: username.toLowerCase(),
             email: email.toLowerCase(),
             password: hashedPassword
         });
-
         await newUser.save();
         res.status(201).json({ message: 'Rejestracja pomyślna! Możesz się teraz zalogować.' });
-
     } catch (error) {
         console.error('Błąd rejestracji:', error);
         res.status(500).json({ message: 'Wystąpił błąd serwera.' });
     }
 });
-
-// ===== API DO LOGOWANIA (POPRAWIONE) =====
 app.post('/api/login', async (req, res) => {
     try {
         const { username, password } = req.body;
-
         if (!username || !password) {
             return res.status(400).json({ message: 'Wprowadź nazwę użytkownika i hasło.' });
         }
-
-        // 1. Znajdź użytkownika
         const user = await User.findOne({ username: username.toLowerCase() });
-        
-        // POPRAWKA: Jeśli użytkownik NIE istnieje, 'user' będzie 'null'.
-        // Dalsza próba 'bcrypt.compare(password, user.password)' spowoduje błąd 500.
-        // Dlatego najpierw sprawdzamy, czy użytkownik istnieje.
         if (!user) {
             return res.status(400).json({ message: 'Nieprawidłowa nazwa użytkownika lub hasło.' });
         }
-
-        // 2. Porównaj hasła
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) {
             return res.status(400).json({ message: 'Nieprawidłowa nazwa użytkownika lub hasło.' });
         }
-
-        // 3. Stwórz Token (Bilet)
         const token = jwt.sign(
             { userId: user._id, username: user.username },
             JWT_SECRET,
             { expiresIn: '1d' } 
         );
-
-        // 4. Wyślij Token i dane użytkownika z powrotem
         res.status(200).json({
             message: 'Zalogowano pomyślnie!',
             token: token,
@@ -119,47 +97,38 @@ app.post('/api/login', async (req, res) => {
                 achievements: user.achievements
             }
         });
-
     } catch (error) {
         console.error('Błąd logowania:', error);
         res.status(500).json({ message: 'Wystąpił błąd serwera.' });
     }
 });
-// ===============================
-
-// ===== MIDDLEWARE: "Strażnik" do sprawdzania tokenu =====
 function authenticateToken(req, res, next) {
     const authHeader = req.headers['authorization'];
-    const token = authHeader && authHeader.split(' ')[1]; // "Bearer TOKEN"
-
+    const token = authHeader && authHeader.split(' ')[1];
     if (token == null) return res.sendStatus(401);
-
     jwt.verify(token, JWT_SECRET, (err, user) => {
         if (err) return res.sendStatus(403);
         req.user = user;
         next();
     });
 }
-
-// ===== API: Odblokowanie Osiągnięcia =====
 app.post('/api/unlock-achievement', authenticateToken, async (req, res) => {
     try {
         const { achievementId } = req.body;
         const userId = req.user.userId;
-
         await User.updateOne(
             { _id: userId },
             { $addToSet: { achievements: achievementId } }
         );
-        
         res.status(200).json({ message: 'Osiągnięcie zapisane.' });
     } catch (error) {
         console.error('Błąd zapisu osiągnięcia:', error);
         res.status(500).json({ message: 'Wystąpił błąd serwera.' });
     }
 });
+// ===================================
 
-// ===== LOGIKA GRY (Socket.IO) - BEZ ZMIAN =====
+// ===== LOGIKA GRY (Socket.IO) =====
 const themes = {
     default: ['💎', '🤖', '👽', '👻', '💀', '🎃', '🚀', '🍄', '🛸', '☄️', '🪐', '🕹️', '💾', '💿', '📼', '📞', '📺', '💰', '💣', '⚔️', '🛡️', '🔑', '🎁', '🧱', '🧭', '🔋', '🧪', '🧬', '🔭', '💡'],
     nature: ['🌳', '🌲', '🍁', '🍂', '🌿', '🌸', '🌻', '🌊', '⛰️', '🌋', '🌾', '🐚', '🕸️', '🐞', '🦋', '🏞️', '🌅', '🌌'],
@@ -170,50 +139,168 @@ function shuffle(array) { for (let i = array.length - 1; i > 0; i--) { const j =
 let games = {};
 io.on('connection', (socket) => {
     console.log(`Użytkownik połączony: ${socket.id}`);
+
     socket.on('createGame', (data) => {
         try {
             let gameID;
             do { gameID = Math.floor(1000 + Math.random() * 9000).toString(); } while (games[gameID]);
+            
             games[gameID] = {
-                players: [socket.id], rows: data.rows, cols: data.cols, theme: data.theme || 'default', gameMode: data.gameMode || 'race', board: null, rematch: [], turn: null, scores: {}, classicState: { firstCard: null, secondCard: null, lockBoard: false }
+                players: [socket.id],
+                rows: data.rows,
+                cols: data.cols,
+                theme: data.theme || 'default',
+                gameMode: data.gameMode || 'race',
+                board: null,
+                rematch: [],
+                turn: null, 
+                scores: {},
+                classicState: {
+                    firstCard: null,
+                    secondCard: null,
+                    lockBoard: false,
+                    matchedIndices: [] // Ważne dla auto-pary
+                },
+                powerUpsUsed: { // ===== NOWE: Śledzenie power-upów
+                    [socket.id]: []
+                }
             };
+
             socket.join(gameID);
             console.log(`Gracz ${socket.id} stworzył grę ${gameID} (Tryb: ${games[gameID].gameMode})`);
             socket.emit('gameCreated', { gameID });
+
         } catch (e) { console.error(e); socket.emit('error', 'Nie udało się stworzyć gry.'); }
     });
+
     socket.on('joinGame', (data) => {
         try {
             const gameID = data.gameID; const game = games[gameID];
             if (!game) { socket.emit('error', 'Gra o tym ID nie istnieje.'); return; }
             if (game.players.length >= 2) { socket.emit('error', 'Ten pokój jest już pełny.'); return; }
             socket.join(gameID); game.players.push(socket.id); console.log(`Gracz ${socket.id} dołączył do gry ${gameID}`);
+
             game.rematch = [];
+            // ===== NOWE: Zresetuj/dodaj power-upy dla obu graczy =====
+            game.powerUpsUsed = {
+                [game.players[0]]: [],
+                [game.players[1]]: []
+            };
+            // ======================================================
+            
             const { rows, cols, theme, gameMode } = game;
             const themeEmojis = themes[theme] || themes['default'];
             const totalPairs = (rows * cols) / 2;
             const emojisForGame = themeEmojis.slice(0, totalPairs);
+            
             const cardValues = [...emojisForGame, ...emojisForGame]; shuffle(cardValues); game.board = cardValues;
+
             if (gameMode === 'classic') {
                 game.turn = game.players[0]; game.scores = { [game.players[0]]: 0, [game.players[1]]: 0 };
-                game.classicState = { firstCard: null, secondCard: null, lockBoard: false };
+                game.classicState = { firstCard: null, secondCard: null, lockBoard: false, matchedIndices: [] };
                 io.to(gameID).emit('classic:scoreUpdate', game.scores);
             }
+
             io.to(gameID).emit('gameStarted', {
                 board: cardValues, rows: rows, cols: cols, totalPairs: totalPairs, gameMode: gameMode, turn: game.turn
             });
+
         } catch (e) { console.error(e); socket.emit('error', 'Nie udało się dołączyć do gry.'); }
     });
+
+    // ===== NOWA LOGIKA: Użycie Power-upów =====
+    socket.on('usePowerUp', (powerUpType) => {
+        const gameID = getGameIDBySocket(socket);
+        const game = games[gameID];
+        if (!game) return;
+
+        // Sprawdź, czy już użyto
+        if (game.powerUpsUsed[socket.id] && game.powerUpsUsed[socket.id].includes(powerUpType)) {
+            return; // Już użyto
+        }
+        
+        // Zaznacz jako użyty
+        if (!game.powerUpsUsed[socket.id]) game.powerUpsUsed[socket.id] = [];
+        game.powerUpsUsed[socket.id].push(powerUpType);
+        
+        // Poinformuj klienta, że zużył (aby wyłączyć przycisk)
+        socket.emit('powerUp:used', powerUpType);
+
+        // Logika serwera (tylko dla trybu klasycznego)
+        if (game.gameMode === 'classic') {
+            if (game.turn !== socket.id) return; // Nie twoja tura
+
+            if (powerUpType === 'peek') {
+                // Poinformuj obu graczy, aby zobaczyli planszę
+                io.to(gameID).emit('powerUp:peek');
+            } 
+            else if (powerUpType === 'autoPair') {
+                // Serwer musi znaleźć parę i przyznać punkt
+                let pairFound = false;
+                for (let i = 0; i < game.board.length; i++) {
+                    if (game.classicState.matchedIndices.includes(i)) continue;
+                    const val1 = game.board[i];
+                    
+                    for (let j = i + 1; j < game.board.length; j++) {
+                        if (game.classicState.matchedIndices.includes(j)) continue;
+                        const val2 = game.board[j];
+
+                        if (val1 === val2) {
+                            // ZNALEZIONO PARĘ (i, j)
+                            pairFound = true;
+                            game.classicState.matchedIndices.push(i, j);
+                            game.scores[socket.id]++;
+                            
+                            io.to(gameID).emit('classic:scoreUpdate', game.scores);
+                            io.to(gameID).emit('classic:boardUpdate', {
+                                type: 'match',
+                                cardIndex1: i,
+                                cardIndex2: j
+                            });
+                            
+                            // Sprawdź wygraną
+                            const totalScore = Object.values(game.scores).reduce((a, b) => a + b, 0);
+                            if (totalScore === game.board.length / 2) {
+                                // Logika końca gry
+                                const winner = game.scores[game.players[0]] > game.scores[game.players[1]] ? game.players[0] : game.players[1];
+                                const loser = winner === game.players[0] ? game.players[1] : game.players[0];
+                                if(game.scores[game.players[0]] === game.scores[game.players[1]]) {
+                                    io.to(gameID).emit('classic:gameTied');
+                                } else {
+                                    io.to(winner).emit('youWon');
+                                    io.to(loser).emit('youLost');
+                                }
+                                games[gameID].rematch = [];
+                            }
+                            
+                            socket.emit('classic:turnUpdate', true); // Gracz kontynuuje turę
+                            break;
+                        }
+                    }
+                    if (pairFound) break;
+                }
+            }
+        }
+    });
+    // ==========================================
+
+
     socket.on('foundMatch', () => {
         const gameID = getGameIDBySocket(socket);
-        if (gameID && games[gameID].gameMode === 'race') { socket.broadcast.to(gameID).emit('opponentFoundMatch'); }
+        if (gameID && games[gameID] && games[gameID].gameMode === 'race') {
+            socket.broadcast.to(gameID).emit('opponentFoundMatch');
+        }
     });
+
     socket.on('gameFinished', () => {
         const gameID = getGameIDBySocket(socket);
         if (gameID && games[gameID] && games[gameID].gameMode === 'race') {
-            games[gameID].rematch = []; socket.emit('youWon'); socket.broadcast.to(gameID).emit('youLost');
+            games[gameID].rematch = []; 
+            socket.emit('youWon');
+            socket.broadcast.to(gameID).emit('youLost');
         }
     });
+
     socket.on('classic:flip', (data) => {
         const gameID = getGameIDBySocket(socket); const game = games[gameID];
         if (!game || game.gameMode !== 'classic' || game.classicState.lockBoard) { return; }
@@ -225,8 +312,11 @@ io.on('connection', (socket) => {
         } else {
             state.secondCard = { index: cardIndex, value: game.board[cardIndex] }; state.lockBoard = true;
             if (state.firstCard.value === state.secondCard.value) {
-                game.scores[socket.id]++; io.to(gameID).emit('classic:scoreUpdate', game.scores);
+                game.scores[socket.id]++; 
+                game.classicState.matchedIndices.push(state.firstCard.index, state.secondCard.index); // Śledź dopasowane
+                io.to(gameID).emit('classic:scoreUpdate', game.scores);
                 io.to(gameID).emit('classic:boardUpdate', { type: 'match', cardIndex1: state.firstCard.index, cardIndex2: state.secondCard.index });
+                
                 const totalScore = Object.values(game.scores).reduce((a, b) => a + b, 0);
                 if (totalScore === game.board.length / 2) {
                     const winner = game.scores[game.players[0]] > game.scores[game.players[1]] ? game.players[0] : game.players[1];
@@ -247,6 +337,7 @@ io.on('connection', (socket) => {
             }
         }
     });
+
     socket.on('requestRematch', () => {
         const gameID = getGameIDBySocket(socket); if (!gameID || !games[gameID]) return;
         const game = games[gameID];
@@ -259,9 +350,16 @@ io.on('connection', (socket) => {
             const totalPairs = (rows * cols) / 2;
             const emojisForGame = themeEmojis.slice(0, totalPairs);
             const cardValues = [...emojisForGame, ...emojisForGame]; shuffle(cardValues); game.board = cardValues;
+            
+            // Zresetuj power-upy
+            game.powerUpsUsed = {
+                [game.players[0]]: [],
+                [game.players[1]]: []
+            };
+
             if (gameMode === 'classic') {
                 game.turn = game.players[0]; game.scores = { [game.players[0]]: 0, [game.players[1]]: 0 };
-                game.classicState = { firstCard: null, secondCard: null, lockBoard: false };
+                game.classicState = { firstCard: null, secondCard: null, lockBoard: false, matchedIndices: [] };
                 io.to(gameID).emit('classic:scoreUpdate', game.scores);
             }
             io.to(gameID).emit('gameStarted', {
@@ -269,6 +367,7 @@ io.on('connection', (socket) => {
             });
         }
     });
+
     socket.on('disconnect', () => {
         console.log(`Użytkownik rozłączony: ${socket.id}`);
         const gameID = getGameIDBySocket(socket);
