@@ -728,15 +728,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
         setTimeout(() => {
             unmatchedCards.forEach(card => {
-                card.classList.remove('flipped');
+                if (!firstCard || card !== firstCard) {
+                    card.classList.remove('flipped');
+                }
             });
             if (currentGameMode !== 'classic' || myTurn) {
                 lockBoard = false;
             }
-        }, 2000); // Podgląd przez 2 sekundy
+        }, 2000);
     }
     
-    // ===== POPRAWIONA LOGIKA AUTOPARY =====
     function executeAutoPair() {
         if (currentGameMode === 'classic') return;
         
@@ -763,25 +764,23 @@ document.addEventListener('DOMContentLoaded', () => {
             lockBoard = true;
             
             card1.classList.add('flipped');
-            card2.classList.add('flipped');
-            
-            // Symuluj znalezienie pary (bez klikania)
             firstCard = card1;
-            secondCard = card2;
-            moves++;
-            moveCounterSpan.textContent = moves;
             
-            // Poczekaj chwilę, aby gracz zobaczył, co się stało
             setTimeout(() => {
-                disableCards();
-            }, 500); 
+                card2.classList.add('flipped');
+                secondCard = card2;
+                moves++;
+                moveCounterSpan.textContent = moves;
+                
+                setTimeout(() => {
+                    disableCards();
+                }, 500); 
+            }, 300);
         } else {
-            // Nie ma już par (lub błąd), zwróć power-up
             powerUps.autoPair++;
             powerUpAutopairBtn.disabled = false;
         }
     }
-    // ======================================
 
     // ================================================================
     // ===== LOGIKA GRY ===============================================
@@ -1133,8 +1132,49 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // ===== NOWA FUNKCJA SPRAWDZAJĄCA TOKEN =====
+    async function checkTokenOnLoad() {
+        const token = localStorage.getItem('memorr_token');
+        if (!token) {
+            // Brak tokena, załaduj jako gość
+            loadAchievements(); // Domyślnie (dla gościa)
+            showLobbyUI("Gość", true);
+            return;
+        }
+
+        // Mamy token, spróbujmy go zweryfikować
+        try {
+            const response = await fetch('/api/verify-token', {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                // Token jest nieważny lub wygasł
+                localStorage.removeItem('memorr_token');
+                loadAchievements();
+                showLobbyUI("Gość", true);
+            } else {
+                // SUKCES: Token jest ważny
+                currentUsername = data.user.username;
+                isGuest = false;
+                authToken = token;
+                loadAchievements(data.user.achievements); // Załaduj osiągnięcia z chmury
+                showLobbyUI(currentUsername, isGuest); // Pokaż zalogowane lobby
+            }
+        } catch (error) {
+            // Błąd serwera/sieci
+            console.error('Błąd weryfikacji tokenu:', error);
+            localStorage.removeItem('memorr_token');
+            loadAchievements();
+            showLobbyUI("Gość", true);
+        }
+    }
+
     // Domyślnie pokaż lobby na starcie
-    loadAchievements();
-    // Pokaż lobby gościa
-    showLobbyUI("Gość", true);
+    checkTokenOnLoad();
 });
