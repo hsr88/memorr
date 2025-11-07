@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reset Hasła - Memorr</title>
+    <link rel="icon" type="image/png" href="favicon.png"> 
+    
+    <script>
+        (function() {
+            const theme = localStorage.getItem('memorr_theme');
+            if (theme === 'dark') {
+                document.documentElement.classList.add('dark-mode');
+            }
+        })();
+    </script>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <main>
+        <h1>Memo<span class="rr">rr</span></h1>
+
+        <div class="panel">
+            <form id="reset-password-form" class="auth-form">
+                <h2>Ustaw nowe hasło</h2>
+                <p class="auth-subtext">Wprowadź swoje nowe hasło. Musi mieć co najmniej 6 znaków.</p>
+                <input type="password" id="reset-new-password" class="input-field" placeholder="Nowe hasło" required>
+                <input type="password" id="reset-confirm-password" class="input-field" placeholder="Potwierdź hasło" required>
+                <button type="submit" class="btn blue">Zapisz nowe hasło</button>
+            </form>
+            <p id="reset-message" class="error-text"></p>
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            &copy; memorr.top | <a href="help.html">Pomoc</a> | <a href="contact.html">Kontakt</a>
+        </div>
+    </footer>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const resetForm = document.getElementById('reset-password-form');
+            const newPassword = document.getElementById('reset-new-password');
+            const confirmPassword = document.getElementById('reset-confirm-password');
+            const message = document.getElementById('reset-message');
+
+            // Pobierz token z adresu URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const token = urlParams.get('token');
+
+            if (!token) {
+                message.textContent = 'Brak tokena. Link jest nieprawidłowy lub wygasł.';
+                resetForm.classList.add('hidden');
+            }
+
+            resetForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                message.style.color = "var(--accent-red)"; // Domyślnie błąd
+
+                if (newPassword.value.length < 6) {
+                    message.textContent = 'Hasło musi mieć co najmniej 6 znaków.';
+                    return;
+                }
+                if (newPassword.value !== confirmPassword.value) {
+                    message.textContent = 'Hasła nie są takie same.';
+                    return;
+                }
+                
+                message.style.color = "var(--text-secondary)";
+                message.textContent = 'Przetwarzanie...';
+
+                try {
+                    const response = await fetch('/api/reset-password', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            token: token,
+                            newPassword: newPassword.value
+                        })
+                    });
+
+                    const data = await response.json();
+
+                    if (!response.ok) {
+                        message.style.color = "var(--accent-red)";
+                        message.textContent = data.message;
+                    } else {
+                        message.style.color = "var(--accent-blue)";
+                        message.textContent = data.message + " Możesz teraz zamknąć to okno i zalogować się ponownie.";
+                        resetForm.classList.add('hidden');
+                    }
+                } catch (error) {
+                    message.style.color = "var(--accent-red)";
+                    message.textContent = 'Błąd połączenia z serwerem.';
+                }
+            });
+        });
+    </script>
+
+</body>
+</html>
