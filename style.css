@@ -2,11 +2,13 @@
 @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&display=swap');
 
 :root {
-    /* Paleta kolorów */
+    /* Paleta kolorów (TRYB JASNY - DOMYŚLNY) */
     --bg-light: #F6F6F6;
     --bg-white: #FFFFFF;
     --text-primary: #212121;
     --text-secondary: #708993;
+    --input-bg: #F0F0F0;
+    --input-focus-ring: rgba(109, 152, 134, 0.4);
     
     --accent-green: #D9CAB3;
     --accent-blue: #6D9886;
@@ -18,6 +20,19 @@
     
     --shadow-soft: 0 4px 12px rgba(0, 0, 0, 0.05);
     --shadow-medium: 0 6px 16px rgba(0, 0, 0, 0.08);
+}
+
+/* ===== STYL TRYBU CIEMNEGO ===== */
+html.dark-mode {
+    --bg-light: #212121;
+    --bg-white: #2C2C2C;
+    --text-primary: #F6F6F6;
+    --text-secondary: #708993;
+    --input-bg: #333333;
+    --input-focus-ring: rgba(109, 152, 134, 0.4);
+    
+    --shadow-soft: 0 4px 12px rgba(0, 0, 0, 0.2);
+    --shadow-medium: 0 6px 16px rgba(0, 0, 0, 0.3);
 }
 
 body {
@@ -32,6 +47,30 @@ body {
     padding: 20px 15px;
     box-sizing: border-box;
     cursor: default;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+/* Przycisk Trybu Ciemnego */
+#theme-toggle-btn {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1001;
+    background: var(--bg-white);
+    border: none;
+    border-radius: 50%;
+    width: 45px;
+    height: 45px;
+    font-size: 1.5em;
+    cursor: pointer;
+    box-shadow: var(--shadow-medium);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.3s, transform 0.3s ease;
+}
+#theme-toggle-btn:hover {
+    transform: scale(1.1);
 }
 
 main {
@@ -107,17 +146,15 @@ h5 { font-size: 1.1em; color: var(--text-secondary); margin: 20px 0 10px 0; font
 }
 .btn.purple:hover { box-shadow: 0 6px 12px rgba(112, 137, 147, 0.4); }
 
-/* NOWY STYL DLA PRZYCISKU WYLOGOWANIA */
 .btn.red {
     background-color: var(--accent-red);
     color: var(--bg-white);
     box-shadow: 0 4px 10px rgba(220, 53, 69, 0.3);
 }
 .btn.red:hover { 
-    background-color: #E74C3C;
+    background-color: #c82333; /* Ciemniejsza czerwień */
     box-shadow: 0 6px 12px rgba(220, 53, 69, 0.4); 
 }
-
 
 /* Mniejszy wariant przycisku */
 .btn.small {
@@ -135,7 +172,7 @@ h5 { font-size: 1.1em; color: var(--text-secondary); margin: 20px 0 10px 0; font
     font-size: 1.1em;
     border: none;
     border-radius: 50px;
-    background-color: #F0F0F0;
+    background-color: var(--input-bg);
     color: var(--text-primary);
     outline: none;
     margin-right: 0;
@@ -144,10 +181,10 @@ h5 { font-size: 1.1em; color: var(--text-secondary); margin: 20px 0 10px 0; font
     box-sizing: border-box;
     text-align: center;
     box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
-    transition: box-shadow 0.3s, border 0.3s;
+    transition: box-shadow 0.3s, border 0.3s, background-color 0.3s;
 }
 .input-field:focus {
-    box-shadow: inset 0 2px 4px rgba(0,0,0,0.05), 0 0 0 3px rgba(109, 152, 134, 0.4);
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.05), 0 0 0 3px var(--input-focus-ring);
 }
 
 /* Panele */
@@ -162,6 +199,7 @@ h5 { font-size: 1.1em; color: var(--text-secondary); margin: 20px 0 10px 0; font
     margin-bottom: 40px;
     box-sizing: border-box;
     position: relative;
+    transition: background-color 0.3s, box-shadow 0.3s;
 }
 
 /* ===== KLASA DO UKRYWANIA ===== */
@@ -184,7 +222,7 @@ h5 { font-size: 1.1em; color: var(--text-secondary); margin: 20px 0 10px 0; font
     width: 100%;
     margin-top: 30px;
     padding-top: 20px;
-    border-top: 1px solid #E9ECEF;
+    border-top: 1px solid var(--input-bg);
 }
 #theme-selection h4 {
     font-size: 1em;
@@ -197,7 +235,7 @@ h5 { font-size: 1.1em; color: var(--text-secondary); margin: 20px 0 10px 0; font
     font-size: 1.5em;
     border: 3px solid transparent;
     border-radius: 10px;
-    background-color: #F0F0F0;
+    background-color: var(--input-bg);
     color: var(--text-primary);
     cursor: pointer;
     padding: 4px;
@@ -206,8 +244,7 @@ h5 { font-size: 1.1em; color: var(--text-secondary); margin: 20px 0 10px 0; font
     transition: all 0.2s ease;
 }
 .theme-btn:hover {
-    background-color: #E9ECEF;
-    border-color: #DEE2E6;
+    border-color: var(--text-secondary);
 }
 .theme-btn.selected {
     border-color: var(--accent-blue);
@@ -215,7 +252,7 @@ h5 { font-size: 1.1em; color: var(--text-secondary); margin: 20px 0 10px 0; font
     box-shadow: 0 0 10px rgba(109, 152, 134, 0.3);
 }
 
-/* ===== STYLE LOGOWANIA/REJESTRACJI (ZAKTUALIZOWANE) ===== */
+/* ===== STYLE LOGOWANIA/REJESTRACJI ===== */
 .auth-link {
     font-size: 0.9em;
     font-weight: 700;
@@ -231,7 +268,7 @@ h5 { font-size: 1.1em; color: var(--text-secondary); margin: 20px 0 10px 0; font
 .auth-tabs {
     display: flex;
     justify-content: center;
-    border-bottom: 2px solid var(--bg-light);
+    border-bottom: 2px solid var(--input-bg);
     margin-bottom: 30px;
 }
 .auth-tab {
@@ -264,7 +301,6 @@ h5 { font-size: 1.1em; color: var(--text-secondary); margin: 20px 0 10px 0; font
     font-size: 1em;
 }
 
-/* Przycisk zamknięcia modala (X) */
 .auth-close-btn {
     position: absolute;
     top: 15px;
@@ -282,20 +318,14 @@ h5 { font-size: 1.1em; color: var(--text-secondary); margin: 20px 0 10px 0; font
     opacity: 1;
     transform: scale(1.1);
 }
-/* ========================================= */
-
 
 /* ===== STYLE LOBBY ===== */
-/* ===== POPRAWKA PRZYCISKU "WYLOGUJ" ===== */
+/* Zaktualizowany styl przycisku Wyloguj */
 #logout-btn {
-    /* Usunięto 'position: absolute' */
     padding: 5px 15px;
     font-size: 0.9em;
-    /* Dodano margines, aby odsunąć go od reszty */
-    margin-top: 20px; 
+    margin-top: 20px; /* Odsunięcie od reszty */
 }
-/* ====================================== */
-
 
 #mode-selection,
 #solo-options,
@@ -319,7 +349,7 @@ h5 { font-size: 1.1em; color: var(--text-secondary); margin: 20px 0 10px 0; font
     margin-top: 20px;
     padding-top: 20px;
     width: 100%;
-    border-top: 1px solid #E9ECEF;
+    border-top: 1px solid var(--input-bg);
 }
 
 .difficulty-select {
@@ -389,7 +419,7 @@ h5 { font-size: 1.1em; color: var(--text-secondary); margin: 20px 0 10px 0; font
 }
 
 .copy-btn {
-    background: #E9ECEF;
+    background: var(--input-bg); /* Zmienione na zmienną */
     border: none;
     cursor: pointer;
     width: 36px;
@@ -407,9 +437,21 @@ h5 { font-size: 1.1em; color: var(--text-secondary); margin: 20px 0 10px 0; font
 .copy-btn:hover {
     background-color: #DEE2E6;
 }
+body.dark-mode .copy-btn:hover {
+    background-color: #444;
+}
+
 .copy-btn.copied {
     background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 0 24 24" width="20px" fill="%232ECC71"><path d="M0 0h24v24H0z" fill="none"/><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>');
 }
+/* Poprawka dla trybu ciemnego */
+body.dark-mode .copy-btn {
+    filter: invert(1);
+}
+body.dark-mode .copy-btn.copied {
+    filter: none;
+}
+
 
 .error-text {
     color: var(--accent-red);
@@ -468,7 +510,7 @@ h5 { font-size: 1.1em; color: var(--text-secondary); margin: 20px 0 10px 0; font
     max-width: 300px;
     border-radius: 12px;
     border: 4px solid transparent;
-    transition: border-color 0.3s ease;
+    transition: border-color 0.3s ease, background-color 0.3s, box-shadow 0.3s;
 }
 
 .info-container.active-turn {
@@ -769,6 +811,10 @@ footer {
     opacity: 1;
     background: #fff;
     border: 2px solid var(--accent-green);
+}
+/* Poprawka trybu ciemnego */
+body.dark-mode .achievement-item.unlocked {
+    background: var(--bg-white);
 }
 
 .achievement-icon {

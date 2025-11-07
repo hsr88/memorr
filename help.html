@@ -7,7 +7,16 @@
     <meta name="description" content="Zasady gry Memorr. Dowiedz się, jak grać w trybie solo, klasycznym pojedynku multiplayer i trybie wyścigu.">
     
     <link rel="icon" type="image/png" href="favicon.png"> 
-
+<script>
+        // Ten skrypt musi być w <head>, aby zapobiec migotaniu
+        (function() {
+            const theme = localStorage.getItem('memorr_theme');
+            if (theme === 'dark') {
+                // Stosujemy klasę do <html> zamiast <body>
+                document.documentElement.classList.add('dark-mode');
+            }
+        })();
+    </script>
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-SFD8ETP2BN"></script>
     <script>
       window.dataLayer = window.dataLayer || [];

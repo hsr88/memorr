@@ -13,11 +13,24 @@
     <meta property="og:url" content="https://memorr.top">
 
     <link rel="icon" type="image/png" href="favicon.png"> 
+    <script>
+        // Ten skrypt musi być w <head>, aby zapobiec migotaniu
+        (function() {
+            const theme = localStorage.getItem('memorr_theme');
+            if (theme === 'dark') {
+                // Stosujemy klasę do <html> zamiast <body>
+                document.documentElement.classList.add('dark-mode');
+            }
+        })();
+    </script>
+    
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     <script src="/socket.io/socket.io.js"></script>
 </head>
 <body>
+
+    <button id="theme-toggle-btn" title="Zmień motyw">🌙</button>
 
     <main>
         <h1>Memo<span class="rr">rr</span></h1>

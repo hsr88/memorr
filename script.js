@@ -142,34 +142,75 @@ document.addEventListener('DOMContentLoaded', () => {
     const soloModalRecordMessage = document.getElementById('solo-modal-record-message');
     const soloModalPlayAgainBtn = document.getElementById('solo-modal-play-again');
 
-    // --- Pobranie elementów DOM (Osiągnięcia) ---
+    // --- Pobranie elementów DOM (Osiągnięcia i Motyw) ---
     const achievementsBtn = document.getElementById('achievements-btn');
     const achievementsModal = document.getElementById('achievements-modal');
     const achievementsList = document.getElementById('achievements-list');
     const achievementsCloseBtn = document.getElementById('achievements-close-btn');
     const toastNotification = document.getElementById('toast-notification');
+    const themeToggleBtn = document.getElementById('theme-toggle-btn'); 
+
+    // ================================================================
+    // ===== ZAKTUALIZOWANA LOGIKA TRYBU CIEMNEGO =====
+    // ================================================================
+    
+    // Funkcja do ustawiania ikony na podstawie stanu
+    function updateThemeButtonIcon() {
+        if (document.documentElement.classList.contains('dark-mode')) {
+            themeToggleBtn.textContent = '☀️';
+        } else {
+            themeToggleBtn.textContent = '🌙';
+        }
+    }
+    
+    // Ustaw poprawną ikonę przycisku przy ładowaniu
+    updateThemeButtonIcon(); 
+
+    // Listener kliknięcia
+    themeToggleBtn.addEventListener('click', () => {
+        // Przełącz klasę na <html>
+        document.documentElement.classList.toggle('dark-mode'); 
+        
+        // Zapisz wybór
+        if (document.documentElement.classList.contains('dark-mode')) {
+            localStorage.setItem('memorr_theme', 'dark');
+        } else {
+            localStorage.setItem('memorr_theme', 'light');
+        }
+        
+        // Zaktualizuj ikonę
+        updateThemeButtonIcon();
+    });
+    // ================================================================
+
 
     // ================================================================
     // ===== LOGIKA AUTORYZACJI (LOGOWANIE/REJESTRACJA) ==========
     // ================================================================
     
-    // Otwórz modal logowania z lobby
     authBtn.addEventListener('click', () => {
         authPanel.classList.remove('hidden');
         loginTabBtn.click();
     });
 
-    // Zamknij modal logowania (przycisk X)
     authCloseBtn.addEventListener('click', () => {
         authPanel.classList.add('hidden');
     });
 
-    // Zamknij modal logowania (kliknięcie tła)
     authPanel.addEventListener('click', (e) => {
         if (e.target === authPanel) {
             authPanel.classList.add('hidden');
         }
     });
+
+    // Pokaż formularze logowania/rejestracji (z widoku gościa)
+    // Usunęliśmy ten przycisk, więc ta logika nie jest już potrzebna
+    // showAuthFormsBtn.addEventListener('click', (e) => { ... });
+
+    // Wróć do opcji gościa (z formularzy)
+    // Usunęliśmy ten przycisk, więc ta logika nie jest już potrzebna
+    // backToGuestBtn.addEventListener('click', (e) => { ... });
+
 
     // Przełączanie zakładek
     loginTabBtn.addEventListener('click', () => {
@@ -891,7 +932,6 @@ document.addEventListener('DOMContentLoaded', () => {
         return `memoryGamesPlayed_${keyPrefix}_${currentTheme}_${currentRows}x${currentCols}`;
     }
     function loadSoloStats() {
-        // TODO: Zalogowani gracze będą mieli statystyki wczytywane z chmury
         if (!isGuest) {
             bestScoreContainer.classList.add('hidden');
             gamesPlayedContainer.classList.add('hidden');
@@ -919,7 +959,6 @@ document.addEventListener('DOMContentLoaded', () => {
     function updateSoloStats() {
         // TODO: Dodać wysyłanie statystyk do chmury dla zalogowanych
         
-        // Na razie zapisujemy lokalnie dla wszystkich (dla gości i zalogowanych)
         const timeKey = getTimeStorageKey();
         const statsKey = getStatsStorageKey();
         if (!timeKey || !statsKey) return { newRecord: false, gamesPlayed: 0 };
@@ -1003,6 +1042,5 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Domyślnie pokaż lobby na starcie
     loadAchievements();
-    // Pokaż lobby gościa
-    showLobbyUI("Gość", true);
+    showLobbyUI("Gość", true); // Pokaż lobby gościa
 });
