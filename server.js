@@ -32,7 +32,7 @@ const UserSchema = new mongoose.Schema({
     resetPasswordToken: { type: String },
     resetPasswordExpires: { type: Date },
     totalGamesPlayed: { type: Number, default: 0 },
-    totalWins: { type: Number, default: 0 },
+    totalWins: { type: Number, default: 0 }, // Będziemy to śledzić
     soloBestTimeEasy: { type: Number, default: 9999 },
     soloBestTimeMedium: { type: Number, default: 9999 },
     soloBestTimeHard: { type: Number, default: 9999 }
@@ -106,6 +106,7 @@ app.post('/api/login', async (req, res) => {
                 username: user.username,
                 achievements: user.achievements,
                 totalGamesPlayed: user.totalGamesPlayed,
+                totalWins: user.totalWins,
                 soloBestTimeEasy: user.soloBestTimeEasy,
                 soloBestTimeMedium: user.soloBestTimeMedium,
                 soloBestTimeHard: user.soloBestTimeHard
@@ -142,6 +143,7 @@ app.get('/api/verify-token', authenticateToken, async (req, res) => {
                 username: user.username,
                 achievements: user.achievements,
                 totalGamesPlayed: user.totalGamesPlayed,
+                totalWins: user.totalWins,
                 soloBestTimeEasy: user.soloBestTimeEasy,
                 soloBestTimeMedium: user.soloBestTimeMedium,
                 soloBestTimeHard: user.soloBestTimeHard
@@ -267,6 +269,7 @@ app.post('/api/save-solo-stats', authenticateToken, async (req, res) => {
             newRecord: newRecord,
             updatedStats: {
                 totalGamesPlayed: updatedUser.totalGamesPlayed,
+                totalWins: updatedUser.totalWins,
                 soloBestTimeEasy: updatedUser.soloBestTimeEasy,
                 soloBestTimeMedium: updatedUser.soloBestTimeMedium,
                 soloBestTimeHard: updatedUser.soloBestTimeHard
@@ -279,26 +282,70 @@ app.post('/api/save-solo-stats', authenticateToken, async (req, res) => {
 });
 
 
-// ===== TUTAJ BYŁ BŁĄD: BRAKUJĄCA FUNKCJA =====
-app.get('/api/leaderboard', async (req, res) => {
+// ===== API: POBIERANIE RANKINGU (CZAS) =====
+app.get('/api/leaderboard-time', async (req, res) => {
     try {
-        // Znajdź 10 graczy z najlepszym czasem (poniżej 9999)
-        // Sortuj rosnąco (najpierw najszybsi)
         const topPlayers = await User.find({ soloBestTimeHard: { $lt: 9999 } })
-            .sort({ soloBestTimeHard: 1 }) // 1 = rosnąco
+            .sort({ soloBestTimeHard: 1 })
             .limit(10)
-            .select('username soloBestTimeHard'); // Pobierz tylko te pola
+            .select('username soloBestTimeHard');
+        res.status(200).json(topPlayers);
+    } catch (error) {
+        console.error('Błąd pobierania rankingu (czas):', error);
+        res.status(500).json({ message: 'Wystąpił błąd serwera.' });
+    }
+});
+
+// ===== NOWE API: POBIERANIE RANKINGU (WYGRANE) =====
+app.get('/api/leaderboard-wins', async (req, res) => {
+    try {
+        const topPlayers = await User.find({ totalWins: { $gt: 0 } })
+            .sort({ totalWins: -1 }) // -1 = malejąco
+            .limit(10)
+            .select('username totalWins');
 
         res.status(200).json(topPlayers);
     } catch (error) {
-        console.error('Błąd pobierania rankingu:', error);
+        console.error('Błąd pobierania rankingu (wygrane):', error);
         res.status(500).json({ message: 'Wystąpił błąd serwera.' });
     }
 });
 // ===================================
 
 
-// ===== LOGIKA GRY (Socket.IO) - BEZ ZMIAN =====
+// ===== LOGIKA GRY (Socket.IO) =====
+
+// NOWA FUNKCJA POMOCNICZA DO PRZYZNAWANIA WYGRANYCH
+async function awardWin(userId) {
+    if (!userId) return; // Nie nagradzaj gości
+    try {
+        await User.updateOne({ _id: userId }, { $inc: { totalWins: 1, totalGamesPlayed: 1 } });
+        console.log(`Przyznano wygraną dla użytkownika: ${userId}`);
+    } catch (error) {
+        console.error('Błąd przyznawania wygranej:', error);
+    }
+}
+async function awardLoss(userId) {
+    if (!userId) return; // Goście nie zapisują przegranych
+    try {
+        await User.updateOne({ _id: userId }, { $inc: { totalGamesPlayed: 1 } });
+        console.log(`Zapisano grę dla użytkownika: ${userId}`);
+    } catch (error) {
+        console.error('Błąd zapisywania gry:', error);
+    }
+}
+
+// Funkcja do weryfikacji tokenu JWT wysłanego przez socket
+function getUserIdFromToken(token) {
+    if (!token) return null;
+    try {
+        const decoded = jwt.verify(token, JWT_SECRET);
+        return decoded.userId;
+    } catch (error) {
+        return null;
+    }
+}
+
 const themes = {
     default: ['💎', '🤖', '👽', '👻', '💀', '🎃', '🚀', '🍄', '🛸', '☄️', '🪐', '🕹️', '💾', '💿', '📼', '📞', '📺', '💰', '💣', '⚔️', '🛡️', '🔑', '🎁', '🧱', '🧭', '🔋', '🧪', '🧬', '🔭', '💡'],
     nature: ['🌳', '🌲', '🍁', '🍂', '🌿', '🌸', '🌻', '🌊', '⛰️', '🌋', '🌾', '🐚', '🕸️', '🐞', '🦋', '🏞️', '🌅', '🌌'],
@@ -307,35 +354,59 @@ const themes = {
 };
 function shuffle(array) { for (let i = array.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [array[i], array[j]] = [array[j], array[i]]; } }
 let games = {};
+
 io.on('connection', (socket) => {
     console.log(`Użytkownik połączony: ${socket.id}`);
+
     socket.on('createGame', (data) => {
         try {
             let gameID;
             do { gameID = Math.floor(1000 + Math.random() * 9000).toString(); } while (games[gameID]);
+            
+            const userId = getUserIdFromToken(data.token);
+            
             games[gameID] = {
-                players: [socket.id], rows: data.rows, cols: data.cols, theme: data.theme || 'default', gameMode: data.gameMode || 'race', board: null, rematch: [], turn: null, scores: {}, classicState: { firstCard: null, secondCard: null, lockBoard: false, matchedIndices: [] }, powerUpsUsed: { [socket.id]: [] }
+                players: [{ socketId: socket.id, userId: userId }],
+                rows: data.rows, cols: data.cols, theme: data.theme || 'default', gameMode: data.gameMode || 'race', board: null, rematch: [], turn: null, scores: {}, classicState: { firstCard: null, secondCard: null, lockBoard: false, matchedIndices: [] }, powerUpsUsed: { [socket.id]: [] }
             };
+
             socket.join(gameID);
-            console.log(`Gracz ${socket.id} stworzył grę ${gameID} (Tryb: ${games[gameID].gameMode})`);
+            console.log(`Gracz ${socket.id} (User: ${userId}) stworzył grę ${gameID}`);
             socket.emit('gameCreated', { gameID });
+
         } catch (e) { console.error(e); socket.emit('error', 'Nie udało się stworzyć gry.'); }
     });
+
     socket.on('joinGame', (data) => {
         try {
             const gameID = data.gameID; const game = games[gameID];
             if (!game) { socket.emit('error', 'Gra o tym ID nie istnieje.'); return; }
             if (game.players.length >= 2) { socket.emit('error', 'Ten pokój jest już pełny.'); return; }
-            socket.join(gameID); game.players.push(socket.id); console.log(`Gracz ${socket.id} dołączył do gry ${gameID}`);
+            
+            const userId = getUserIdFromToken(data.token);
+            
+            socket.join(gameID); 
+            game.players.push({ socketId: socket.id, userId: userId });
+            console.log(`Gracz ${socket.id} (User: ${userId}) dołączył do gry ${gameID}`);
+
             game.rematch = [];
-            game.powerUpsUsed = { [game.players[0]]: [], [game.players[1]]: [] };
+            game.powerUpsUsed = {
+                [game.players[0].socketId]: [],
+                [game.players[1].socketId]: []
+            };
+            
             const { rows, cols, theme, gameMode } = game;
             const themeEmojis = themes[theme] || themes['default'];
             const totalPairs = (rows * cols) / 2;
             const emojisForGame = themeEmojis.slice(0, totalPairs);
             const cardValues = [...emojisForGame, ...emojisForGame]; shuffle(cardValues); game.board = cardValues;
+
             if (gameMode === 'classic') {
-                game.turn = game.players[0]; game.scores = { [game.players[0]]: 0, [game.players[1]]: 0 };
+                game.turn = game.players[0].socketId;
+                game.scores = {
+                    [game.players[0].socketId]: 0,
+                    [game.players[1].socketId]: 0
+                };
                 game.classicState = { firstCard: null, secondCard: null, lockBoard: false, matchedIndices: [] };
                 io.to(gameID).emit('classic:scoreUpdate', game.scores);
             }
@@ -344,6 +415,7 @@ io.on('connection', (socket) => {
             });
         } catch (e) { console.error(e); socket.emit('error', 'Nie udało się dołączyć do gry.'); }
     });
+
     socket.on('usePowerUp', (powerUpType) => {
         const gameID = getGameIDBySocket(socket); const game = games[gameID]; if (!game) return;
         if (game.powerUpsUsed[socket.id] && game.powerUpsUsed[socket.id].includes(powerUpType)) { return; }
@@ -366,11 +438,17 @@ io.on('connection', (socket) => {
                             io.to(gameID).emit('classic:boardUpdate', { type: 'match', cardIndex1: i, cardIndex2: j });
                             const totalScore = Object.values(game.scores).reduce((a, b) => a + b, 0);
                             if (totalScore === game.board.length / 2) {
-                                const winner = game.scores[game.players[0]] > game.scores[game.players[1]] ? game.players[0] : game.players[1];
-                                const loser = winner === game.players[0] ? game.players[1] : game.players[0];
-                                if(game.scores[game.players[0]] === game.scores[game.players[1]]) {
+                                const p1 = game.players[0]; const p2 = game.players[1];
+                                if(game.scores[p1.socketId] === game.scores[p2.socketId]) {
                                     io.to(gameID).emit('classic:gameTied');
-                                } else { io.to(winner).emit('youWon'); io.to(loser).emit('youLost'); }
+                                    awardLoss(p1.userId); awardLoss(p2.userId); // Remis liczy się jako rozegrana gra
+                                } else if (game.scores[p1.socketId] > game.scores[p2.socketId]) {
+                                    io.to(p1.socketId).emit('youWon'); io.to(p2.socketId).emit('youLost');
+                                    awardWin(p1.userId); awardLoss(p2.userId);
+                                } else {
+                                    io.to(p2.socketId).emit('youWon'); io.to(p1.socketId).emit('youLost');
+                                    awardWin(p2.userId); awardLoss(p1.userId);
+                                }
                                 games[gameID].rematch = [];
                             }
                             socket.emit('classic:turnUpdate', true); break;
@@ -380,16 +458,28 @@ io.on('connection', (socket) => {
             }
         }
     });
+    
     socket.on('foundMatch', () => {
         const gameID = getGameIDBySocket(socket);
-        if (gameID && games[gameID] && games[gameID].gameMode === 'race') { socket.broadcast.to(gameID).emit('opponentFoundMatch'); }
+        if (gameID && games[gameID] && games[gameID].gameMode === 'race') {
+            socket.broadcast.to(gameID).emit('opponentFoundMatch');
+        }
     });
+
     socket.on('gameFinished', () => {
         const gameID = getGameIDBySocket(socket);
         if (gameID && games[gameID] && games[gameID].gameMode === 'race') {
-            games[gameID].rematch = []; socket.emit('youWon'); socket.broadcast.to(gameID).emit('youLost');
+            games[gameID].rematch = []; 
+            socket.emit('youWon');
+            socket.broadcast.to(gameID).emit('youLost');
+            
+            const winner = game.players.find(p => p.socketId === socket.id);
+            const loser = game.players.find(p => p.socketId !== socket.id);
+            if (winner) awardWin(winner.userId);
+            if (loser) awardLoss(loser.userId);
         }
     });
+
     socket.on('classic:flip', (data) => {
         const gameID = getGameIDBySocket(socket); const game = games[gameID];
         if (!game || game.gameMode !== 'classic' || game.classicState.lockBoard) { return; }
@@ -404,18 +494,26 @@ io.on('connection', (socket) => {
                 game.scores[socket.id]++; game.classicState.matchedIndices.push(state.firstCard.index, state.secondCard.index);
                 io.to(gameID).emit('classic:scoreUpdate', game.scores);
                 io.to(gameID).emit('classic:boardUpdate', { type: 'match', cardIndex1: state.firstCard.index, cardIndex2: state.secondCard.index });
+                
                 const totalScore = Object.values(game.scores).reduce((a, b) => a + b, 0);
                 if (totalScore === game.board.length / 2) {
-                    const winner = game.scores[game.players[0]] > game.scores[game.players[1]] ? game.players[0] : game.players[1];
-                    const loser = winner === game.players[0] ? game.players[1] : game.players[0];
-                    if(game.scores[game.players[0]] === game.scores[game.players[1]]) {
+                    const p1 = game.players[0]; const p2 = game.players[1];
+                    if(game.scores[p1.socketId] === game.scores[p2.socketId]) {
                         io.to(gameID).emit('classic:gameTied');
-                    } else { io.to(winner).emit('youWon'); io.to(loser).emit('youLost'); }
+                        awardLoss(p1.userId); awardLoss(p2.userId);
+                    } else if (game.scores[p1.socketId] > game.scores[p2.socketId]) {
+                        io.to(p1.socketId).emit('youWon'); io.to(p2.socketId).emit('youLost');
+                        awardWin(p1.userId); awardLoss(p2.userId);
+                    } else {
+                        io.to(p2.socketId).emit('youWon'); io.to(p1.socketId).emit('youLost');
+                        awardWin(p2.userId); awardLoss(p1.userId);
+                    }
                     games[gameID].rematch = [];
                 }
                 state.firstCard = null; state.secondCard = null; state.lockBoard = false; socket.emit('classic:turnUpdate', true);
             } else {
-                const otherPlayer = game.players.find(id => id !== socket.id); game.turn = otherPlayer;
+                const otherPlayer = game.players.find(p => p.socketId !== socket.id).socketId;
+                game.turn = otherPlayer;
                 setTimeout(() => {
                     io.to(gameID).emit('classic:boardUpdate', { type: 'unflip', cardIndex1: state.firstCard.index, cardIndex2: state.secondCard.index });
                     state.firstCard = null; state.secondCard = null; state.lockBoard = false;
@@ -424,6 +522,7 @@ io.on('connection', (socket) => {
             }
         }
     });
+    
     socket.on('requestRematch', () => {
         const gameID = getGameIDBySocket(socket); if (!gameID || !games[gameID]) return;
         const game = games[gameID];
@@ -436,9 +535,18 @@ io.on('connection', (socket) => {
             const totalPairs = (rows * cols) / 2;
             const emojisForGame = themeEmojis.slice(0, totalPairs);
             const cardValues = [...emojisForGame, ...emojisForGame]; shuffle(cardValues); game.board = cardValues;
-            game.powerUpsUsed = { [game.players[0]]: [], [game.players[1]]: [] };
+            
+            game.powerUpsUsed = {
+                [game.players[0].socketId]: [],
+                [game.players[1].socketId]: []
+            };
+
             if (gameMode === 'classic') {
-                game.turn = game.players[0]; game.scores = { [game.players[0]]: 0, [game.players[1]]: 0 };
+                game.turn = game.players[0].socketId;
+                game.scores = {
+                    [game.players[0].socketId]: 0,
+                    [game.players[1].socketId]: 0
+                };
                 game.classicState = { firstCard: null, secondCard: null, lockBoard: false, matchedIndices: [] };
                 io.to(gameID).emit('classic:scoreUpdate', game.scores);
             }
@@ -447,16 +555,30 @@ io.on('connection', (socket) => {
             });
         }
     });
+
     socket.on('disconnect', () => {
         console.log(`Użytkownik rozłączony: ${socket.id}`);
         const gameID = getGameIDBySocket(socket);
+        
         if (gameID && games[gameID]) {
-            socket.broadcast.to(gameID).emit('opponentDisconnected'); delete games[gameID]; console.log(`Gra ${gameID} została usunięta.`);
+            const remainingPlayer = games[gameID].players.find(p => p.socketId !== socket.id);
+            if (remainingPlayer) {
+                awardWin(remainingPlayer.userId); // Przyznaj wygraną
+                io.to(remainingPlayer.socketId).emit('opponentDisconnected');
+            }
+            delete games[gameID];
+            console.log(`Gra ${gameID} została usunięta.`);
         }
     });
 });
+
 function getGameIDBySocket(socket) {
-    for (const gameID in games) { if (games[gameID].players.includes(socket.id)) { return gameID; } } return null;
+    for (const gameID in games) {
+        if (games[gameID].players.some(p => p.socketId === socket.id)) {
+            return gameID;
+        }
+    }
+    return null;
 }
 // ============================================
 

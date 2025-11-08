@@ -329,10 +329,9 @@ h5 { font-size: 1.1em; color: var(--text-secondary); margin: 20px 0 10px 0; font
 
 /* ===== STYLE LOBBY ===== */
 #logout-btn {
-    /* Usunięto 'position: absolute' */
     padding: 5px 15px;
     font-size: 0.9em;
-    margin-top: 20px; /* Odsunięcie od reszty */
+    margin-top: 20px; 
 }
 
 #mode-selection,
@@ -721,6 +720,10 @@ html.dark-mode .copy-btn.copied {
     margin-bottom: 20px;
     font-weight: 800;
 }
+/* Poprawka dla modala rankingu */
+#leaderboard-modal .modal-content h4 {
+    margin-top: -15px;
+}
 
 .modal-content p {
     font-size: 1.1em;
@@ -829,7 +832,8 @@ footer {
 #leaderboard-btn {
     position: absolute;
     bottom: 20px;
-    right: 80px; /* Obok przycisku osiągnięć */
+    /* Przesunięcie, aby zrobić miejsce dla ikony 👤 */
+    right: 80px; 
     background: none;
     border: none;
     font-size: 2em;
@@ -854,7 +858,7 @@ footer {
 }
 
 /* NOWA LISTA RANKINGU */
-#leaderboard-list {
+.leaderboard-list { /* Użyj klasy zamiast ID */
     list-style: none;
     padding: 0;
     margin: 20px 0;
@@ -863,7 +867,7 @@ footer {
     text-align: left;
     font-size: 1.1em;
 }
-#leaderboard-list li {
+.leaderboard-list li {
     display: flex;
     justify-content: space-between;
     padding: 10px;
@@ -871,35 +875,35 @@ footer {
     margin-bottom: 8px;
     background: var(--bg-light);
 }
-#leaderboard-list li:nth-child(1) {
+.leaderboard-list li:nth-child(1) {
     background: #fffbe6; /* Złoty */
     border: 2px solid #ffe58f;
     font-weight: 800;
 }
-#leaderboard-list li:nth-child(2) {
+.leaderboard-list li:nth-child(2) {
     background: #f0f0f0; /* Srebrny */
 }
-#leaderboard-list li:nth-child(3) {
+.leaderboard-list li:nth-child(3) {
     background: #fff0e6; /* Brązowy */
 }
-html.dark-mode #leaderboard-list li {
+html.dark-mode .leaderboard-list li {
     background: var(--input-bg);
 }
-html.dark-mode #leaderboard-list li:nth-child(1) {
+html.dark-mode .leaderboard-list li:nth-child(1) {
     background: #4d442a;
     border-color: #a78d4d;
 }
-html.dark-mode #leaderboard-list li:nth-child(2) {
+html.dark-mode .leaderboard-list li:nth-child(2) {
     background: #444;
 }
-html.dark-mode #leaderboard-list li:nth-child(3) {
+html.dark-mode .leaderboard-list li:nth-child(3) {
     background: #4f3b2e;
 }
 
-#leaderboard-list .rank-name {
+.leaderboard-list .rank-name {
     font-weight: 700;
 }
-#leaderboard-list .rank-score {
+.leaderboard-list .rank-score {
     font-weight: 800;
     color: var(--accent-blue);
 }

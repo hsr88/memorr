@@ -58,6 +58,7 @@ document.addEventListener('DOMContentLoaded', () => {
         username: "Gość",
         achievements: [],
         totalGamesPlayed: 0,
+        totalWins: 0,
         soloBestTimeEasy: 9999,
         soloBestTimeMedium: 9999,
         soloBestTimeHard: 9999
@@ -158,8 +159,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // ===== NOWE ELEMENTY RANKINGU =====
     const leaderboardBtn = document.getElementById('leaderboard-btn');
     const leaderboardModal = document.getElementById('leaderboard-modal');
-    const leaderboardList = document.getElementById('leaderboard-list');
     const leaderboardCloseBtn = document.getElementById('leaderboard-close-btn');
+    const leaderboardTabTime = document.getElementById('leaderboard-tab-time');
+    const leaderboardTabWins = document.getElementById('leaderboard-tab-wins');
+    const leaderboardListTime = document.getElementById('leaderboard-list-time');
+    const leaderboardListWins = document.getElementById('leaderboard-list-wins');
     // ==================================
 
     // ================================================================
@@ -421,15 +425,21 @@ document.addEventListener('DOMContentLoaded', () => {
     btnMultiEasy.addEventListener('click', () => createMultiGame(4, 4));
     btnMultiMedium.addEventListener('click', () => createMultiGame(6, 4));
     btnMultiHard.addEventListener('click', () => createMultiGame(6, 6));
+    
+    // ZAKTUALIZOWANO: Wysyła token przy dołączaniu
     btnJoinGame.addEventListener('click', () => {
         const gameID = gameIdInput.value.trim();
         if (gameID) {
-            socket.emit('joinGame', { gameID });
+            socket.emit('joinGame', { 
+                gameID,
+                token: localStorage.getItem('memorr_token')
+            });
             lobbyMessage.textContent = 'Próbuję dołączyć do gry...';
         } else {
             lobbyMessage.textContent = 'Proszę wpisać ID gry.';
         }
     });
+    
     copyGameIdBtn.addEventListener('click', () => {
         const gameID = gameIdDisplay.textContent;
         navigator.clipboard.writeText(gameID).then(() => {
@@ -455,11 +465,18 @@ document.addEventListener('DOMContentLoaded', () => {
         modalRematchBtn.classList.add('hidden');
     });
 
+    // ZAKTUALIZOWANO: Wysyła token przy tworzeniu gry
     function createMultiGame(rows, cols) {
         lobbyMessage.textContent = 'Tworzenie gry...';
         const selectedMode = document.querySelector('input[name="gameMode"]:checked').value;
         currentGameMode = selectedMode;
-        socket.emit('createGame', { rows, cols, theme: currentTheme, gameMode: currentGameMode });
+        socket.emit('createGame', { 
+            rows, 
+            cols, 
+            theme: currentTheme, 
+            gameMode: currentGameMode,
+            token: localStorage.getItem('memorr_token') // Wyślij token
+        });
     }
 
     function showLobbyUI(username, isGuest = true) {
@@ -468,7 +485,6 @@ document.addEventListener('DOMContentLoaded', () => {
         
         welcomeMessage.textContent = `Witaj, ${username}!`;
         
-        // ZAWSZE POKAZUJ RANKING
         leaderboardBtn.classList.remove('hidden');
         
         if (isGuest) {
@@ -692,53 +708,94 @@ document.addEventListener('DOMContentLoaded', () => {
     // ===== NOWA LOGIKA RANKINGU =====================================
     // ================================================================
 
-    async function loadLeaderboard() {
-        leaderboardList.innerHTML = '<li>Ładowanie...</li>';
+    async function loadLeaderboardTime() {
+        leaderboardListTime.innerHTML = '<li>Ładowanie...</li>';
+        leaderboardListWins.innerHTML = '<li></li>'; // Wyczyść drugą na wszelki wypadek
         try {
-            const response = await fetch('/api/leaderboard');
+            const response = await fetch('/api/leaderboard-time'); // Zmieniony endpoint
             if (!response.ok) {
-                leaderboardList.innerHTML = '<li>Nie udało się wczytać rankingu.</li>';
+                leaderboardListTime.innerHTML = '<li>Nie udało się wczytać rankingu.</li>';
                 return;
             }
             const data = await response.json();
             
             if (data.length === 0) {
-                leaderboardList.innerHTML = '<li>Nikt jeszcze nie ukończył gry na poziomie Trudnym! Bądź pierwszy.</li>';
+                leaderboardListTime.innerHTML = '<li>Nikt jeszcze nie ukończył gry na poziomie Trudnym! Bądź pierwszy.</li>';
                 return;
             }
 
-            leaderboardList.innerHTML = ''; // Wyczyść listę
+            leaderboardListTime.innerHTML = '';
             data.forEach((player, index) => {
                 const li = document.createElement('li');
                 li.innerHTML = `
                     <span>${index + 1}. <span class="rank-name">${player.username}</span></span>
                     <span class="rank-score">${player.soloBestTimeHard}s</span>
                 `;
-                leaderboardList.appendChild(li);
+                leaderboardListTime.appendChild(li);
             });
-
         } catch (error) {
-            console.error('Błąd wczytywania rankingu:', error);
-            leaderboardList.innerHTML = '<li>Błąd połączenia z serwerem.</li>';
+            console.error('Błąd wczytywania rankingu (czas):', error);
+            leaderboardListTime.innerHTML = '<li>Błąd połączenia z serwerem.</li>';
+        }
+    }
+    
+    async function loadLeaderboardWins() {
+        leaderboardListWins.innerHTML = '<li>Ładowanie...</li>';
+        leaderboardListTime.innerHTML = '<li></li>'; // Wyczyść drugą
+        try {
+            const response = await fetch('/api/leaderboard-wins'); // Nowy endpoint
+            if (!response.ok) {
+                leaderboardListWins.innerHTML = '<li>Nie udało się wczytać rankingu.</li>';
+                return;
+            }
+            const data = await response.json();
+            
+            if (data.length === 0) {
+                leaderboardListWins.innerHTML = '<li>Nikt jeszcze nie wygrał meczu multiplayer!</li>';
+                return;
+            }
+
+            leaderboardListWins.innerHTML = '';
+            data.forEach((player, index) => {
+                const li = document.createElement('li');
+                li.innerHTML = `
+                    <span>${index + 1}. <span class="rank-name">${player.username}</span></span>
+                    <span class="rank-score">${player.totalWins} wygrane</span>
+                `;
+                leaderboardListWins.appendChild(li);
+            });
+        } catch (error) {
+            console.error('Błąd wczytywania rankingu (wygrane):', error);
+            leaderboardListWins.innerHTML = '<li>Błąd połączenia z serwerem.</li>';
         }
     }
 
-    if (leaderboardBtn) {
-        leaderboardBtn.addEventListener('click', () => {
-            leaderboardModal.classList.remove('hidden');
-            loadLeaderboard(); // Wczytaj dane po otwarciu
-        });
-    }
-    if (leaderboardCloseBtn) {
-        leaderboardCloseBtn.addEventListener('click', () => leaderboardModal.classList.add('hidden'));
-    }
-    if (leaderboardModal) {
-        leaderboardModal.addEventListener('click', (e) => {
-            if (e.target === leaderboardModal) {
-                leaderboardModal.classList.add('hidden');
-            }
-        });
-    }
+    leaderboardBtn.addEventListener('click', () => {
+        leaderboardModal.classList.remove('hidden');
+        leaderboardTabTime.click(); // Domyślnie pokaż ranking czasu
+    });
+    leaderboardCloseBtn.addEventListener('click', () => leaderboardModal.classList.add('hidden'));
+    leaderboardModal.addEventListener('click', (e) => {
+        if (e.target === leaderboardModal) {
+            leaderboardModal.classList.add('hidden');
+        }
+    });
+    
+    leaderboardTabTime.addEventListener('click', () => {
+        leaderboardTabTime.classList.add('active');
+        leaderboardTabWins.classList.remove('active');
+        leaderboardListTime.classList.remove('hidden');
+        leaderboardListWins.classList.add('hidden');
+        loadLeaderboardTime();
+    });
+
+    leaderboardTabWins.addEventListener('click', () => {
+        leaderboardTabTime.classList.remove('active');
+        leaderboardTabWins.classList.add('active');
+        leaderboardListTime.classList.add('hidden');
+        leaderboardListWins.classList.remove('hidden');
+        loadLeaderboardWins();
+    });
 
     // ================================================================
     // ===== LOGIKA POWER-UPÓW ========================================

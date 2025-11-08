@@ -50,6 +50,7 @@
             <button id="auth-btn" title="Logowanie / Rejestracja">👤</button>
             
             <h2 id="welcome-message">Witaj, Gościu!</h2>
+
             <div id="mode-selection">
                 <button id="btn-select-solo" class="btn green">GRA SOLO</button>
                 <button id="btn-select-multi" class="btn blue">GRA WIELOOSOBOWA</button>
@@ -112,7 +113,7 @@
             </div>
             
             <p id="lobby-message" class="error-text"></p>
-
+            
             <button id="logout-btn" class="btn red hidden">Wyloguj</button>
         </div>
 
@@ -226,10 +227,19 @@
     <div id="leaderboard-modal" class="modal-overlay hidden">
         <div class="modal-content panel">
             <h2>Ranking Graczy</h2>
-            <h4>Najlepszy czas - Poziom Trudny (6x6)</h4>
-            <ol id="leaderboard-list">
+            
+            <div class="auth-tabs">
+                <button id="leaderboard-tab-time" class="auth-tab active" data-list="leaderboard-list-time">Najlepszy Czas (6x6)</button>
+                <button id="leaderboard-tab-wins" class="auth-tab" data-list="leaderboard-list-wins">Wygrane Mecze</button>
+            </div>
+
+            <ol id="leaderboard-list-time" class="leaderboard-list">
                 <li>Ładowanie...</li>
             </ol>
+            <ol id="leaderboard-list-wins" class="leaderboard-list hidden">
+                <li>Ładowanie...</li>
+            </ol>
+
             <button id="leaderboard-close-btn" class="btn purple">ZAMKNIJ</button>
         </div>
     </div>
