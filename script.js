@@ -126,13 +126,19 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnRestart = document.getElementById('btn-restart');
     const opponentPairsSpan = document.getElementById('opponent-pairs-found');
     const opponentTotalPairsSpan = document.getElementById('opponent-total-pairs');
-    const bestScoreContainer = document.getElementById('best-score-container');
-    const bestScoreSpan = document.getElementById('best-score');
-    const gamesPlayedContainer = document.getElementById('games-played-container');
-    const gamesPlayedSpan = document.getElementById('games-played');
     const powerUpContainer = document.getElementById('powerup-container');
     const powerUpPeekBtn = document.getElementById('powerup-peek');
     const powerUpAutopairBtn = document.getElementById('powerup-autopair');
+
+    // ZMIENIONE STATYSTYKI
+    const stat1Container = document.getElementById('stat1-container');
+    const stat1Label = document.getElementById('stat1-label');
+    const stat1Value = document.getElementById('stat1-value');
+    const stat1Unit = document.getElementById('stat1-unit'); // Jednostka (np. "s" dla sekund)
+    const stat2Container = document.getElementById('stat2-container');
+    const stat2Label = document.getElementById('stat2-label');
+    const stat2Value = document.getElementById('stat2-value');
+    // ==================
 
     // --- Pobranie elementów DOM (Modal) ---
     const winModal = document.getElementById('win-modal');
@@ -158,7 +164,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const toastNotification = document.getElementById('toast-notification');
     const themeToggleBtn = document.getElementById('theme-toggle-btn'); 
 
-    // ===== ELEMENTY RANKINGU =====
+    // ===== NOWE ELEMENTY RANKINGU =====
     const leaderboardBtn = document.getElementById('leaderboard-btn');
     const leaderboardModal = document.getElementById('leaderboard-modal');
     const leaderboardCloseBtn = document.getElementById('leaderboard-close-btn');
@@ -911,12 +917,19 @@ document.addEventListener('DOMContentLoaded', () => {
         totalPairs = (rows * cols) / 2;
         
         resetGameState();
-        loadSoloStats();
         
         gameScreen.classList.add('solo-mode');
         turnInfo.classList.add('hidden');
         timerSpan.parentElement.classList.remove('hidden');
         moveCounterSpan.parentElement.classList.remove('hidden');
+
+        // ZAKTUALIZOWANE: Ustaw etykiety statystyk
+        stat1Container.classList.remove('hidden');
+        stat2Container.classList.remove('hidden');
+        stat1Label.textContent = "Rekord:";
+        stat1Unit.textContent = "s";
+        stat2Label.textContent = "Gry:";
+        loadSoloStats(); // Wczytaj statystyki solo
 
         if (rows === 6 && cols === 6) {
             powerUpContainer.classList.remove('hidden');
@@ -944,6 +957,14 @@ document.addEventListener('DOMContentLoaded', () => {
         gameScreen.classList.remove('solo-mode');
         totalPairsSpan.textContent = totalPairs;
         opponentTotalPairsSpan.textContent = totalPairs;
+
+        // ZAKTUALIZOWANE: Ustaw etykiety statystyk
+        stat1Container.classList.remove('hidden');
+        stat2Container.classList.remove('hidden');
+        stat1Label.textContent = "Wygrane:";
+        stat1Unit.textContent = ""; // Brak jednostki
+        stat2Label.textContent = "Gry Ogółem:";
+        loadMultiStats(); // Wczytaj statystyki multi
 
         if (data.rows === 6 && data.cols === 6) {
             powerUpContainer.classList.remove('hidden');
@@ -1017,8 +1038,11 @@ document.addEventListener('DOMContentLoaded', () => {
         if (moveCounterSpan) moveCounterSpan.textContent = '0';
         if (pairsFoundSpan) pairsFoundSpan.textContent = '0';
         if (opponentPairsSpan) opponentPairsSpan.textContent = '0';
-        if (bestScoreSpan) bestScoreSpan.textContent = '--';
-        if (gamesPlayedSpan) gamesPlayedSpan.textContent = '0';
+        
+        // Zresetuj dynamiczne statystyki
+        if (stat1Value) stat1Value.textContent = '--';
+        if (stat1Unit) stat1Unit.textContent = '';
+        if (stat2Value) stat2Value.textContent = '0';
     }
     
     function startTimer() {
@@ -1155,9 +1179,26 @@ document.addEventListener('DOMContentLoaded', () => {
         return null;
     }
 
+    // ===== NOWA FUNKCJA: Ładuje statystyki MULTI =====
+    function loadMultiStats() {
+        stat1Container.classList.remove('hidden');
+        stat2Container.classList.remove('hidden');
+        stat1Unit.textContent = ''; // Ukryj "s"
+        
+        if (isGuest) {
+            stat1Value.textContent = "0"; // Goście nie mają śledzonych wygranych
+            stat2Value.textContent = "0"; // Goście nie mają śledzonych gier
+        } else {
+            stat1Value.textContent = currentUser.totalWins.toString();
+            stat2Value.textContent = currentUser.totalGamesPlayed.toString();
+        }
+    }
+
+    // ZAKTUALIZOWANE: Wczytuje staty SOLO (z chmury lub local)
     function loadSoloStats() {
-        bestScoreContainer.classList.remove('hidden');
-        gamesPlayedContainer.classList.remove('hidden');
+        stat1Container.classList.remove('hidden');
+        stat2Container.classList.remove('hidden');
+        stat1Unit.textContent = "s"; // Pokaż "s"
         
         let bestTime = 9999;
         let gamesPlayed = 0;
@@ -1173,13 +1214,14 @@ document.addEventListener('DOMContentLoaded', () => {
             if (difficulty === 'easy') bestTime = currentUser.soloBestTimeEasy;
             if (difficulty === 'medium') bestTime = currentUser.soloBestTimeMedium;
             if (difficulty === 'hard') bestTime = currentUser.soloBestTimeHard;
-            gamesPlayed = currentUser.totalGamesPlayed;
+            gamesPlayed = currentUser.totalGamesPlayed; // Pokazuje wszystkie gry
         }
 
-        bestScoreSpan.textContent = (bestTime >= 9999) ? '--' : `${bestTime}s`;
-        gamesPlayedSpan.textContent = gamesPlayed.toString();
+        stat1Value.textContent = (bestTime >= 9999) ? '--' : bestTime;
+        stat2Value.textContent = gamesPlayed.toString();
     }
     
+    // ZAKTUALIZOWANE: Wysyła do chmury lub zapisuje lokalnie
     async function updateSoloStats() {
         const difficulty = getDifficultyKey();
         let newRecord = false;
@@ -1192,12 +1234,12 @@ document.addEventListener('DOMContentLoaded', () => {
             
             gamesPlayed = parseInt(localStorage.getItem(statsKey) || '0') + 1;
             localStorage.setItem(statsKey, gamesPlayed.toString());
-            if (gamesPlayedSpan) gamesPlayedSpan.textContent = gamesPlayed.toString();
+            if (stat2Value) stat2Value.textContent = gamesPlayed.toString();
 
             const bestTime = localStorage.getItem(timeKey) || 9999;
             if (seconds < bestTime) {
                 localStorage.setItem(timeKey, seconds);
-                if (bestScoreSpan) bestScoreSpan.textContent = `${seconds}s`;
+                if (stat1Value) stat1Value.textContent = seconds;
                 newRecord = true;
             }
             return { newRecord, gamesPlayed };
@@ -1218,7 +1260,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 newRecord = data.newRecord;
                 gamesPlayed = currentUser.totalGamesPlayed;
                 
-                loadSoloStats();
+                loadSoloStats(); // Odśwież UI
 
                 return { newRecord, gamesPlayed };
 
@@ -1249,11 +1291,10 @@ document.addEventListener('DOMContentLoaded', () => {
     function showSoloWinModal(isNewRecord) {
         soloModalMessage.textContent = `Ukończyłeś grę w ${seconds}s i ${moves} ruchach!`;
         
-        // Zdecyduj, czy pokazać przycisk "Wyższy Poziom"
         if (currentRows === 4 || (currentRows === 6 && currentCols === 4)) {
             soloModalNextLevelBtn.classList.remove('hidden');
         } else {
-            soloModalNextLevelBtn.classList.add('hidden'); // Ukryj na 6x6
+            soloModalNextLevelBtn.classList.add('hidden');
         }
 
         if (isNewRecord) {
@@ -1270,7 +1311,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Modal tylko dla MULTI
     function showWinModal(didPlayerWin, soloMode, isTie = false) {
         
-        modalPlayAgainBtn.classList.remove('hidden'); // POPRAWKA: Pokaż "Powrót do Lobby"
+        modalPlayAgainBtn.classList.remove('hidden'); // Pokaż "Powrót do Lobby"
         modalRematchBtn.classList.add('hidden');
         modalRematchStatus.textContent = '';
         modalRecordMessage.classList.add('hidden');
@@ -1278,7 +1319,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (soloMode) {
             showSoloWinModal(isTie); 
         } else {
-            modalRematchBtn.classList.remove('hidden');
+            modalRematchBtn.classList.remove('hidden'); // Pokaż "Rewanż"
             
             if (isTie) {
                 modalTitle.textContent = 'Remis!';
