@@ -88,10 +88,27 @@ h1, h2, h3, h4 {
     margin-top: 0;
     margin-bottom: 25px;
 }
-h1 { font-size: 3em; color: var(--text-primary); }
+h1 { font-size: 3em; 
+    color: var(--text-primary); 
+    /* NOWE STYLE DLA H1, ABY ZAWIERAŁ LOGO */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap; /* Na wypadek bardzo małych ekranów */
+     /* Odstęp między tekstem a logo */
+ }
 h1 .rr {
     color: var(--accent-blue);
 }
+h1 img.logo {gap: 10px;
+    height: 1em; /* Dopasuj wysokość logo do wysokości czcionki */
+    width: auto;
+    /* Poprawka dla trybu ciemnego, jeśli logo ma przezroczystość */
+    html.dark-mode & {
+        filter: brightness(1.2);
+    }
+}
+
 h2 { font-size: 2em; }
 h3 { font-size: 1.5em; }
 h4 { font-size: 1.2em; color: var(--text-secondary); }
