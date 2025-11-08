@@ -7,7 +7,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const nodemailer = require('nodemailer');
-const path = require('path'); // <--- NOWY MODUŁ
+const path = require('path');
 require('dotenv').config();
 
 // 2. Skonfiguruj serwer
@@ -54,31 +54,23 @@ app.use((req, res, next) => {
     next();
 });
 
-// ===== NOWA TRASA DLA ARTYKUŁÓW BLOGA (SEO) =====
-// Musi być PRZED app.use(express.static(...))
+// Trasa dla artykułów bloga (SEO)
 app.get('/blog/:slug', (req, res, next) => {
     const slug = req.params.slug;
-
-    // Proste zabezpieczenie przed atakami (np. ../../itp.)
     if (!slug || slug.includes('..') || slug.includes('/')) {
-        return next(); // Przekaż do 404
+        return next(); 
     }
-    
     const filePath = path.join(__dirname, 'blog', `${slug}.html`);
-    
-    // Sprawdź, czy plik istnieje i wyślij go
     res.sendFile(filePath, (err) => {
         if (err) {
-            // Plik nie istnieje, przekaż do standardowej obsługi 404
             console.warn(`Nie znaleziono pliku dla sluga: ${slug}`);
-            next();
+            next(); // Przekaż do obsługi 404
         }
     });
 });
-// =================================================
 
 app.use(express.json());
-app.use(express.static(__dirname)); // To nadal obsługuje /blog/ (dla index.html) oraz CSS/JS
+app.use(express.static(__dirname)); // Serwowanie plików statycznych (jak /blog/index.html)
 
 // ===== API (Rejestracja, Logowanie...) =====
 // ... (Wszystkie app.post i app.get dla /api/... pozostają bez zmian) ...
@@ -320,8 +312,9 @@ app.get('/api/leaderboard-wins', async (req, res) => {
     }
 });
 
+
 // ===== LOGIKA GRY (Socket.IO) =====
-// ... (Reszta pliku server.js pozostaje bez zmian) ...
+// ... (CAŁA LOGIKA SOCKET.IO POZOSTAJE BEZ ZMIAN) ...
 const themes = {
     default: ['💎', '🤖', '👽', '👻', '💀', '🎃', '🚀', '🍄', '🛸', '☄️', '🪐', '🕹️', '💾', '💿', '📼', '📞', '📺', '💰', '💣', '⚔️', '🛡️', '🔑', '🎁', '🧱', '🧭', '🔋', '🧪', '🧬', '🔭', '💡'],
     nature: ['🌳', '🌲', '🍁', '🍂', '🌿', '🌸', '🌻', '🌊', '⛰️', '🌋', '🌾', '🐚', '🕸️', '🐞', '🦋', '🏞️', '🌅', '🌌'],
@@ -330,6 +323,33 @@ const themes = {
 };
 function shuffle(array) { for (let i = array.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [array[i], array[j]] = [array[j], array[i]]; } }
 let games = {};
+async function awardWin(userId) {
+    if (!userId) return; 
+    try {
+        await User.updateOne({ _id: userId }, { $inc: { totalWins: 1, totalGamesPlayed: 1 } });
+        console.log(`Przyznano wygraną dla użytkownika: ${userId}`);
+    } catch (error) {
+        console.error('Błąd przyznawania wygranej:', error);
+    }
+}
+async function awardLoss(userId) {
+    if (!userId) return;
+    try {
+        await User.updateOne({ _id: userId }, { $inc: { totalGamesPlayed: 1 } });
+        console.log(`Zapisano grę dla użytkownika: ${userId}`);
+    } catch (error) {
+        console.error('Błąd zapisywania gry:', error);
+    }
+}
+function getUserIdFromToken(token) {
+    if (!token) return null;
+    try {
+        const decoded = jwt.verify(token, JWT_SECRET);
+        return decoded.userId;
+    } catch (error) {
+        return null;
+    }
+}
 io.on('connection', (socket) => {
     console.log(`Użytkownik połączony: ${socket.id}`);
     socket.on('createGame', (data) => {
@@ -530,6 +550,12 @@ function getGameIDBySocket(socket) {
     }
     return null;
 }
+// ============================================
+
+// 4. OBSŁUGA BŁĘDÓW 404
+app.use((req, res) => {
+    res.status(404).sendFile(path.join(__dirname, '404.html'));
+});
 // ============================================
 
 // 5. Uruchom serwer

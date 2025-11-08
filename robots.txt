@@ -1,0 +1,13 @@
+# Plik robots.txt dla memorr.top
+
+User-agent: *
+# Zezwól na wszystko
+Disallow:
+
+# Zablokuj strony, które nie powinny pojawić się w Google
+Disallow: /reset.html
+Disallow: /404.html
+Disallow: /api/
+
+# Wskaż robotom, gdzie jest nasza mapa strony
+Sitemap: https://memorr.top/sitemap.xml
