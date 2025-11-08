@@ -23,6 +23,15 @@
             }
         })();
     </script>
+    
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-SFD8ETP2BN"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+    
+      gtag('config', 'G-SFD8ETP2BN');
+    </script>
 
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
@@ -199,6 +208,15 @@
                 <input type="password" id="register-password" class="input-field" placeholder="Hasło (min. 6 znaków)" required>
                 <button type="submit" class="btn green">Zarejestruj się</button>
             </form>
+
+            <form id="forgot-password-form" class="auth-form hidden">
+                <h2>Zresetuj hasło</h2>
+                <p class="auth-subtext">Podaj swój e-mail, a wyślemy Ci link do resetu hasła.</p>
+                <input type="email" id="forgot-email" class="input-field" placeholder="Twój e-mail" required>
+                <button type="submit" class="btn purple">Wyślij link</button>
+                <a href="#" id="back-to-login-link" class="auth-link">Wróć do logowania</a>
+            </form>
+
             <p id="auth-message" class="error-text"></p>
             <button id="auth-close-btn" class="auth-close-btn" title="Zamknij">✖</button>
         </div>

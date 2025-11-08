@@ -5,6 +5,8 @@ const { Server } = require("socket.io");
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
+const nodemailer = require('nodemailer'); // Upewnij się, że jest zainstalowane
 require('dotenv').config();
 
 // 2. Skonfiguruj serwer
@@ -26,10 +28,11 @@ const UserSchema = new mongoose.Schema({
     username: { type: String, required: true, unique: true, minlength: 3, lowercase: true },
     email: { type: String, required: true, unique: true, lowercase: true },
     password: { type: String, required: true, minlength: 6 },
-    achievements: { type: [String], default: [] }
+    achievements: { type: [String], default: [] },
+    resetPasswordToken: { type: String },
+    resetPasswordExpires: { type: Date }
 });
 const User = mongoose.model('User', UserSchema);
-// ============================================
 
 // 3. Ustaw Expressa
 app.use((req, res, next) => {
@@ -42,7 +45,7 @@ app.use((req, res, next) => {
 app.use(express.json());
 app.use(express.static(__dirname));
 
-// ===== API DO REJESTRACJI =====
+// ===== API (Rejestracja, Logowanie, Osiągnięcia) =====
 app.post('/api/register', async (req, res) => {
     try {
         const { username, email, password } = req.body;
@@ -71,8 +74,6 @@ app.post('/api/register', async (req, res) => {
         res.status(500).json({ message: 'Wystąpił błąd serwera.' });
     }
 });
-
-// ===== API DO LOGOWANIA =====
 app.post('/api/login', async (req, res) => {
     try {
         const { username, password } = req.body;
@@ -105,29 +106,22 @@ app.post('/api/login', async (req, res) => {
         res.status(500).json({ message: 'Wystąpił błąd serwera.' });
     }
 });
-
-// ===== MIDDLEWARE: "Strażnik" do sprawdzania tokenu =====
 function authenticateToken(req, res, next) {
     const authHeader = req.headers['authorization'];
-    const token = authHeader && authHeader.split(' ')[1]; // "Bearer TOKEN"
-    if (token == null) return res.sendStatus(401); // Brak tokena
+    const token = authHeader && authHeader.split(' ')[1];
+    if (token == null) return res.sendStatus(401);
     jwt.verify(token, JWT_SECRET, (err, user) => {
-        if (err) return res.sendStatus(403); // Nieważny token
+        if (err) return res.sendStatus(403);
         req.user = user;
         next();
     });
 }
-
-// ===== NOWE API: Weryfikacja tokenu przy ładowaniu strony =====
 app.get('/api/verify-token', authenticateToken, async (req, res) => {
     try {
-        // Jeśli middleware 'authenticateToken' przeszedł, 'req.user' istnieje
-        // Wystarczy odesłać dane użytkownika (bez hasła)
         const user = await User.findById(req.user.userId).select('-password');
         if (!user) {
             return res.status(404).json({ message: 'Nie znaleziono użytkownika.' });
         }
-        
         res.status(200).json({
             message: 'Token jest ważny.',
             user: {
@@ -140,9 +134,6 @@ app.get('/api/verify-token', authenticateToken, async (req, res) => {
         res.status(500).json({ message: 'Wystąpił błąd serwera.' });
     }
 });
-// ========================================================
-
-// ===== API: Odblokowanie Osiągnięcia =====
 app.post('/api/unlock-achievement', authenticateToken, async (req, res) => {
     try {
         const { achievementId } = req.body;
@@ -158,8 +149,94 @@ app.post('/api/unlock-achievement', authenticateToken, async (req, res) => {
     }
 });
 
+// ===== API: RESETOWANIE HASŁA (ZAKTUALIZOWANE) =====
+
+// Krok 1: Konfiguracja Nodemailer
+const transporter = nodemailer.createTransport({
+    host: process.env.BREVO_HOST,
+    port: process.env.BREVO_PORT,
+    secure: false, 
+    auth: {
+        user: process.env.BREVO_LOGIN, // <-- POPRAWKA: Użyj loginu SMTP
+        pass: process.env.BREVO_PASS,  // <-- Użyj klucza API
+    },
+});
+
+// Krok 2: API do wysyłania linku
+app.post('/api/forgot-password', async (req, res) => {
+    try {
+        const { email } = req.body;
+        const user = await User.findOne({ email: email.toLowerCase() });
+
+        if (!user) {
+            return res.status(200).json({ message: 'Jeśli ten e-mail istnieje w naszej bazie, wysłaliśmy na niego link.' });
+        }
+
+        const token = crypto.randomBytes(20).toString('hex');
+        
+        user.resetPasswordToken = token;
+        user.resetPasswordExpires = Date.now() + 3600000; // 1 godzina
+        await user.save();
+
+        // WAŻNE: Użyj adresu swojej publicznej strony!
+        const resetLink = `https://memorr.top/reset.html?token=${token}`;
+
+        const mailOptions = {
+            from: `"Memorr" <${process.env.BREVO_SENDER}>`, // <-- POPRAWKA: Użyj zweryfikowanego nadawcy
+            to: user.email,
+            subject: 'Memorr - Reset hasła',
+            html: `<p>Witaj,</p>
+                   <p>Otrzymaliśmy prośbę o zresetowanie hasła do Twojego konta w grze Memorr.</p>
+                   <p>Kliknij w poniższy link, aby ustawić nowe hasło:</p>
+                   <a href="${resetLink}" style="padding: 10px 15px; background-color: #6D9886; color: white; text-decoration: none; border-radius: 5px;">Resetuj Hasło</a>
+                   <p>Jeśli to nie Ty prosiłeś o reset, zignoruj tę wiadomość.</p>
+                   <p>Link wygaśnie za 1 godzinę.</p>`
+        };
+
+        await transporter.sendMail(mailOptions);
+        res.status(200).json({ message: 'Jeśli ten e-mail istnieje w naszej bazie, wysłaliśmy na niego link.' });
+
+    } catch (error) {
+        console.error("Błąd /api/forgot-password:", error);
+        res.status(500).json({ message: 'Wystąpił błąd serwera.' });
+    }
+});
+
+// Krok 3: API do ustawiania nowego hasła
+app.post('/api/reset-password', async (req, res) => {
+    try {
+        const { token, newPassword } = req.body;
+
+        if (!token || !newPassword || newPassword.length < 6) {
+            return res.status(400).json({ message: 'Nieprawidłowe dane lub hasło jest za krótkie.' });
+        }
+
+        const user = await User.findOne({
+            resetPasswordToken: token,
+            resetPasswordExpires: { $gt: Date.now() }
+        });
+
+        if (!user) {
+            return res.status(400).json({ message: 'Token jest nieprawidłowy lub wygasł. Spróbuj ponownie.' });
+        }
+
+        const salt = await bcrypt.genSalt(10);
+        user.password = await bcrypt.hash(newPassword, salt);
+        user.resetPasswordToken = undefined;
+        user.resetPasswordExpires = undefined;
+
+        await user.save();
+        res.status(200).json({ message: 'Hasło zostało pomyślnie zresetowane!' });
+
+    } catch (error) {
+        console.error("Błąd /api/reset-password:", error);
+        res.status(500).json({ message: 'Wystąpił błąd serwera.' });
+    }
+});
+// ===================================
+
+
 // ===== LOGIKA GRY (Socket.IO) - BEZ ZMIAN =====
-// ... (Wklejam resztę, aby mieć pewność, że plik jest kompletny)
 const themes = {
     default: ['💎', '🤖', '👽', '👻', '💀', '🎃', '🚀', '🍄', '🛸', '☄️', '🪐', '🕹️', '💾', '💿', '📼', '📞', '📺', '💰', '💣', '⚔️', '🛡️', '🔑', '🎁', '🧱', '🧭', '🔋', '🧪', '🧬', '🔭', '💡'],
     nature: ['🌳', '🌲', '🍁', '🍂', '🌿', '🌸', '🌻', '🌊', '⛰️', '🌋', '🌾', '🐚', '🕸️', '🐞', '🦋', '🏞️', '🌅', '🌌'],
@@ -175,7 +252,7 @@ io.on('connection', (socket) => {
             let gameID;
             do { gameID = Math.floor(1000 + Math.random() * 9000).toString(); } while (games[gameID]);
             games[gameID] = {
-                players: [socket.id], rows: data.rows, cols: data.cols, theme: data.theme || 'default', gameMode: data.gameMode || 'race', board: null, rematch: [], turn: null, scores: {}, classicState: { firstCard: null, secondCard: null, lockBoard: false }
+                players: [socket.id], rows: data.rows, cols: data.cols, theme: data.theme || 'default', gameMode: data.gameMode || 'race', board: null, rematch: [], turn: null, scores: {}, classicState: { firstCard: null, secondCard: null, lockBoard: false, matchedIndices: [] }, powerUpsUsed: { [socket.id]: [] }
             };
             socket.join(gameID);
             console.log(`Gracz ${socket.id} stworzył grę ${gameID} (Tryb: ${games[gameID].gameMode})`);
@@ -189,6 +266,7 @@ io.on('connection', (socket) => {
             if (game.players.length >= 2) { socket.emit('error', 'Ten pokój jest już pełny.'); return; }
             socket.join(gameID); game.players.push(socket.id); console.log(`Gracz ${socket.id} dołączył do gry ${gameID}`);
             game.rematch = [];
+            game.powerUpsUsed = { [game.players[0]]: [], [game.players[1]]: [] };
             const { rows, cols, theme, gameMode } = game;
             const themeEmojis = themes[theme] || themes['default'];
             const totalPairs = (rows * cols) / 2;
@@ -204,8 +282,6 @@ io.on('connection', (socket) => {
             });
         } catch (e) { console.error(e); socket.emit('error', 'Nie udało się dołączyć do gry.'); }
     });
-    socket.on('powerUp:peek', () => { executePeek(); });
-    socket.on('powerUp:used', (powerUpType) => { const btn = (powerUpType === 'peek') ? powerUpPeekBtn : powerUpAutopairBtn; btn.disabled = true; });
     socket.on('usePowerUp', (powerUpType) => {
         const gameID = getGameIDBySocket(socket); const game = games[gameID]; if (!game) return;
         if (game.powerUpsUsed[socket.id] && game.powerUpsUsed[socket.id].includes(powerUpType)) { return; }

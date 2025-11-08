@@ -68,6 +68,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const logoutBtn = document.getElementById('logout-btn');
     const welcomeMessage = document.getElementById('welcome-message');
 
+    // NOWE ELEMENTY FORMULARZA RESETOWANIA
+    const forgotPasswordForm = document.getElementById('forgot-password-form');
+    const forgotPasswordLink = document.getElementById('forgot-password-link');
+    const backToLoginLink = document.getElementById('back-to-login-link');
+
     // --- Pobranie elementów DOM (Lobby) ---
     const lobbyScreen = document.getElementById('lobby-screen');
     const gameScreen = document.getElementById('game-screen');
@@ -166,7 +171,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
     
-    // Ustaw poprawną ikonę przycisku przy ładowaniu
     updateThemeButtonIcon(); 
 
     themeToggleBtn.addEventListener('click', () => {
@@ -204,6 +208,7 @@ document.addEventListener('DOMContentLoaded', () => {
         registerTabBtn.classList.remove('active');
         loginForm.classList.remove('hidden');
         registerForm.classList.add('hidden');
+        forgotPasswordForm.classList.add('hidden');
         authMessage.textContent = '';
         authMessage.style.color = "var(--accent-red)";
     });
@@ -213,9 +218,52 @@ document.addEventListener('DOMContentLoaded', () => {
         registerTabBtn.classList.add('active');
         loginForm.classList.add('hidden');
         registerForm.classList.remove('hidden');
+        forgotPasswordForm.classList.add('hidden');
         authMessage.textContent = '';
         authMessage.style.color = "var(--accent-red)";
     });
+
+    // ===== POPRAWIONE LISTENERY RESETOWANIA HASŁA =====
+    forgotPasswordLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        loginForm.classList.add('hidden');
+        registerForm.classList.add('hidden');
+        forgotPasswordForm.classList.remove('hidden');
+        authMessage.textContent = '';
+    });
+    
+    backToLoginLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        loginTabBtn.click();
+    });
+    
+    forgotPasswordForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = document.getElementById('forgot-email').value;
+        authMessage.textContent = 'Przetwarzanie...';
+        authMessage.style.color = "var(--text-secondary)";
+
+        try {
+            const response = await fetch('/api/forgot-password', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email })
+            });
+            const data = await response.json();
+            
+            if (!response.ok) {
+                authMessage.style.color = "var(--accent-red)";
+                authMessage.textContent = data.message;
+            } else {
+                authMessage.style.color = "var(--accent-blue)";
+                authMessage.textContent = data.message;
+            }
+        } catch (error) {
+            authMessage.style.color = "var(--accent-red)";
+            authMessage.textContent = 'Błąd połączenia. Sprawdź serwer.';
+        }
+    });
+    // ================================================
 
     registerForm.addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -1132,17 +1180,15 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // ===== NOWA FUNKCJA SPRAWDZAJĄCA TOKEN =====
+    // ===== FUNKCJA SPRAWDZAJĄCA TOKEN =====
     async function checkTokenOnLoad() {
         const token = localStorage.getItem('memorr_token');
         if (!token) {
-            // Brak tokena, załaduj jako gość
-            loadAchievements(); // Domyślnie (dla gościa)
+            loadAchievements(); 
             showLobbyUI("Gość", true);
             return;
         }
 
-        // Mamy token, spróbujmy go zweryfikować
         try {
             const response = await fetch('/api/verify-token', {
                 method: 'GET',
@@ -1154,20 +1200,17 @@ document.addEventListener('DOMContentLoaded', () => {
             const data = await response.json();
 
             if (!response.ok) {
-                // Token jest nieważny lub wygasł
                 localStorage.removeItem('memorr_token');
                 loadAchievements();
                 showLobbyUI("Gość", true);
             } else {
-                // SUKCES: Token jest ważny
                 currentUsername = data.user.username;
                 isGuest = false;
                 authToken = token;
-                loadAchievements(data.user.achievements); // Załaduj osiągnięcia z chmury
-                showLobbyUI(currentUsername, isGuest); // Pokaż zalogowane lobby
+                loadAchievements(data.user.achievements); 
+                showLobbyUI(currentUsername, isGuest); 
             }
         } catch (error) {
-            // Błąd serwera/sieci
             console.error('Błąd weryfikacji tokenu:', error);
             localStorage.removeItem('memorr_token');
             loadAchievements();

@@ -23,7 +23,7 @@
 }
 
 /* ===== STYL TRYBU CIEMNEGO ===== */
-html.dark-mode { /* Poprawka: <html> zamiast <body> */
+html.dark-mode {
     --bg-light: #212121;
     --bg-white: #2C2C2C;
     --text-primary: #F6F6F6;
@@ -264,6 +264,16 @@ h5 { font-size: 1.1em; color: var(--text-secondary); margin: 20px 0 10px 0; font
     color: var(--accent-blue);
 }
 
+/* Nowy tekst pod "Zresetuj hasło" */
+.auth-subtext {
+    font-size: 1em;
+    color: var(--text-secondary);
+    line-height: 1.5;
+    margin-top: -10px;
+    margin-bottom: 10px;
+    max-width: 350px;
+}
+
 .auth-tabs {
     display: flex;
     justify-content: center;
@@ -320,9 +330,10 @@ h5 { font-size: 1.1em; color: var(--text-secondary); margin: 20px 0 10px 0; font
 
 /* ===== STYLE LOBBY ===== */
 #logout-btn {
+    /* Usunięto 'position: absolute' */
     padding: 5px 15px;
     font-size: 0.9em;
-    margin-top: 20px; 
+    margin-top: 20px; /* Dodano margines */
 }
 
 #mode-selection,
@@ -435,17 +446,17 @@ h5 { font-size: 1.1em; color: var(--text-secondary); margin: 20px 0 10px 0; font
 .copy-btn:hover {
     background-color: #DEE2E6;
 }
-body.dark-mode .copy-btn:hover {
+html.dark-mode .copy-btn:hover {
     background-color: #444;
 }
 
 .copy-btn.copied {
     background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 0 24 24" width="20px" fill="%232ECC71"><path d="M0 0h24v24H0z" fill="none"/><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>');
 }
-body.dark-mode .copy-btn {
+html.dark-mode .copy-btn {
     filter: invert(1);
 }
-body.dark-mode .copy-btn.copied {
+html.dark-mode .copy-btn.copied {
     filter: none;
 }
 
@@ -606,8 +617,6 @@ body.dark-mode .copy-btn.copied {
     box-shadow: none;
     transform: none;
 }
-/* ================================== */
-
 
 /* ===== STYLE PLANSZY I KART ===== */
 #game-board {
