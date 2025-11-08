@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Polityka Prywatności - Memorr</title>
+    <meta name="description" content="Polityka Prywatności serwisu memorr.top">
+    
+    <link rel="icon" type="image/png" href="favicon.png"> 
+    
+    <script>
+        // Skrypt trybu ciemnego (musi być w <head>)
+        (function() {
+            const theme = localStorage.getItem('memorr_theme');
+            if (theme === 'dark') {
+                document.documentElement.classList.add('dark-mode');
+            }
+        })();
+    </script>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css"> </head>
+<body>
+    <main>
+        <h1>Memo<span class="rr">rr</span></h1>
+
+        <div class="panel page-content">
+            <h2>Polityka Prywatności</h2>
+            <p class="article-meta">Ostatnia aktualizacja: 8 listopada 2025</p>
+            
+            <p>Niniejsza Polityka Prywatności opisuje, jakie dane zbieramy w serwisie memorr.top i w jaki sposób je wykorzystujemy.</p>
+
+            <h3>1. Jakie dane gromadzimy?</h3>
+            <p>Zbieramy dane, które nam podajesz oraz te, które zbieramy automatycznie.</p>
+            <ul>
+                <li><strong>Dane podawane przez użytkownika:</strong> Podczas rejestracji konta prosimy o podanie nazwy użytkownika, adresu e-mail oraz hasła (Twoje hasło jest przechowywane w formie zaszyfrowanej - "hash" - i nikt nie ma do niego dostępu).</li>
+                <li><strong>Dane zbierane automatycznie:</strong> Kiedy grasz w naszą grę, zapisujemy Twoje postępy (osiągnięcia, najlepsze czasy solo, liczbę wygranych), aby powiązać je z Twoim kontem i umożliwić Ci udział w rankingach.</li>
+                <li><strong>Dane techniczne (localStorage):</strong> Używamy pamięci lokalnej Twojej przeglądarki (`localStorage`) do przechowywania Twojego tokena sesji (abyś pozostał zalogowany), Twojego wyboru motywu (jasny/ciemny) oraz postępów w grze, jeśli grasz jako "Gość".</li>
+            </ul>
+
+            <h3>2. Jak wykorzystujemy Twoje dane?</h3>
+            <p>Twoje dane wykorzystujemy wyłącznie w celu świadczenia usług w ramach gry Memorr:</p>
+            <ul>
+                <li>Do logowania Cię na Twoje konto.</li>
+                <li>Do zapisywania Twoich postępów w grze (osiągnięcia, statystyki) i synchronizowania ich między urządzeniami.</li>
+                <li>Do umożliwienia Ci udziału w globalnych rankingach.</li>
+                <li>Do obsługi procesu resetowania hasła (wysyłania e-maila z linkiem).</li>
+            </ul>
+            <p>Nigdy nie udostępniamy Twojego adresu e-mail ani innych danych osobowych stronom trzecim w celach marketingowych.</p>
+
+            <h3>3. Pliki Cookie i Reklamy (Google AdSense)</h3>
+            <p>Planujemy wyświetlać reklamy za pośrednictwem programu Google AdSense. W związku z tym:</p>
+            <ul>
+                <li>Google, jako dostawca zewnętrzny, używa plików cookie do wyświetlania reklam w naszym serwisie.</li>
+                <li>Google używa plików cookie DART, co umożliwia wyświetlanie użytkownikom reklam na podstawie ich wizyt w naszej witrynie oraz innych witrynach w Internecie.</li>
+                <li>Użytkownicy mogą zrezygnować z używania plików cookie DART, odwiedzając stronę <a href="https://policies.google.com/technologies/ads" target="_blank" rel="noopener noreferrer">polityki prywatności reklam Google</a>.</li>
+            </ul>
+            <p>Nie mamy dostępu ani kontroli nad plikami cookie używanymi przez zewnętrznych reklamodawców (Google).</p>
+
+            <h3>4. Kontakt</h3>
+            <p>Jeśli masz jakiekolwiek pytania dotyczące tej polityki prywatności, skontaktuj się z nami za pośrednictwem strony <a href="/contact.html">Kontakt</a>.</p>
+            
+            <button onclick="window.location.href='/'" class="btn purple">POWRÓT DO GRY</button>
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            &copy; memorr.top | <a href="/help.html">Pomoc</a> | <a href="/contact.html">Kontakt</a> | <a href="/blog">Blog</a> | <a href="/privacy-policy.html">Polityka Prywatności</a>
+        </div>
+    </footer>
+</body>
+</html>
