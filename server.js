@@ -7,6 +7,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const nodemailer = require('nodemailer');
+const path = require('path'); // <--- NOWY MODUŁ
 require('dotenv').config();
 
 // 2. Skonfiguruj serwer
@@ -32,7 +33,7 @@ const UserSchema = new mongoose.Schema({
     resetPasswordToken: { type: String },
     resetPasswordExpires: { type: Date },
     totalGamesPlayed: { type: Number, default: 0 },
-    totalWins: { type: Number, default: 0 }, // Będziemy to śledzić
+    totalWins: { type: Number, default: 0 },
     soloBestTimeEasy: { type: Number, default: 9999 },
     soloBestTimeMedium: { type: Number, default: 9999 },
     soloBestTimeHard: { type: Number, default: 9999 }
@@ -42,22 +43,45 @@ const User = mongoose.model('User', UserSchema);
 
 // 3. Ustaw Expressa
 app.use((req, res, next) => {
-    // Przekieruj /blog na /blog/ (aby poprawnie załadować index.html z folderu)
     if (req.url === '/blog') {
         res.redirect(301, '/blog/');
         return;
     }
-    // Przekieruj /index.html na /
     if (req.url === '/index.html') {
         res.redirect(301, '/');
         return;
     }
     next();
 });
-app.use(express.json());
-app.use(express.static(__dirname)); // To automatycznie obsługuje folder /blog
 
-// ===== API (Rejestracja, Logowanie) =====
+// ===== NOWA TRASA DLA ARTYKUŁÓW BLOGA (SEO) =====
+// Musi być PRZED app.use(express.static(...))
+app.get('/blog/:slug', (req, res, next) => {
+    const slug = req.params.slug;
+
+    // Proste zabezpieczenie przed atakami (np. ../../itp.)
+    if (!slug || slug.includes('..') || slug.includes('/')) {
+        return next(); // Przekaż do 404
+    }
+    
+    const filePath = path.join(__dirname, 'blog', `${slug}.html`);
+    
+    // Sprawdź, czy plik istnieje i wyślij go
+    res.sendFile(filePath, (err) => {
+        if (err) {
+            // Plik nie istnieje, przekaż do standardowej obsługi 404
+            console.warn(`Nie znaleziono pliku dla sluga: ${slug}`);
+            next();
+        }
+    });
+});
+// =================================================
+
+app.use(express.json());
+app.use(express.static(__dirname)); // To nadal obsługuje /blog/ (dla index.html) oraz CSS/JS
+
+// ===== API (Rejestracja, Logowanie...) =====
+// ... (Wszystkie app.post i app.get dla /api/... pozostają bez zmian) ...
 app.post('/api/register', async (req, res) => {
     try {
         const { username, email, password } = req.body;
@@ -123,8 +147,6 @@ app.post('/api/login', async (req, res) => {
         res.status(500).json({ message: 'Wystąpił błąd serwera.' });
     }
 });
-
-// "Strażnik"
 function authenticateToken(req, res, next) {
     const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.split(' ')[1];
@@ -135,8 +157,6 @@ function authenticateToken(req, res, next) {
         next();
     });
 }
-
-// API Weryfikacji
 app.get('/api/verify-token', authenticateToken, async (req, res) => {
     try {
         const user = await User.findById(req.user.userId).select('-password');
@@ -160,8 +180,6 @@ app.get('/api/verify-token', authenticateToken, async (req, res) => {
         res.status(500).json({ message: 'Wystąpił błąd serwera.' });
     }
 });
-
-// API Osiągnięć
 app.post('/api/unlock-achievement', authenticateToken, async (req, res) => {
     try {
         const { achievementId } = req.body;
@@ -176,8 +194,6 @@ app.post('/api/unlock-achievement', authenticateToken, async (req, res) => {
         res.status(500).json({ message: 'Wystąpił błąd serwera.' });
     }
 });
-
-// API Resetowania Hasła
 const transporter = nodemailer.createTransport({
     host: process.env.BREVO_HOST,
     port: process.env.BREVO_PORT,
@@ -241,8 +257,6 @@ app.post('/api/reset-password', async (req, res) => {
         res.status(500).json({ message: 'Wystąpił błąd serwera.' });
     }
 });
-
-// API Zapisywania Statystyk Solo
 app.post('/api/save-solo-stats', authenticateToken, async (req, res) => {
     try {
         const { difficulty, time } = req.body;
@@ -251,10 +265,8 @@ app.post('/api/save-solo-stats', authenticateToken, async (req, res) => {
         if (!user) {
             return res.status(404).json({ message: 'Nie znaleziono użytkownika.' });
         }
-
         let updateQuery = { $inc: { totalGamesPlayed: 1 } };
         let newRecord = false;
-
         if (difficulty === 'easy' && time < user.soloBestTimeEasy) {
             updateQuery.soloBestTimeEasy = time;
             newRecord = true;
@@ -265,11 +277,8 @@ app.post('/api/save-solo-stats', authenticateToken, async (req, res) => {
             updateQuery.soloBestTimeHard = time;
             newRecord = true;
         }
-
         await User.updateOne({ _id: userId }, updateQuery);
-        
         const updatedUser = await User.findById(userId);
-
         res.status(200).json({ 
             message: 'Statystyki zapisane.', 
             newRecord: newRecord,
@@ -286,9 +295,6 @@ app.post('/api/save-solo-stats', authenticateToken, async (req, res) => {
         res.status(500).json({ message: 'Wystąpił błąd serwera.' });
     }
 });
-
-
-// ===== API: POBIERANIE RANKINGU (CZAS) =====
 app.get('/api/leaderboard-time', async (req, res) => {
     try {
         const topPlayers = await User.find({ soloBestTimeHard: { $lt: 9999 } })
@@ -301,57 +307,21 @@ app.get('/api/leaderboard-time', async (req, res) => {
         res.status(500).json({ message: 'Wystąpił błąd serwera.' });
     }
 });
-
-// ===== NOWE API: POBIERANIE RANKINGU (WYGRANE) =====
 app.get('/api/leaderboard-wins', async (req, res) => {
     try {
         const topPlayers = await User.find({ totalWins: { $gt: 0 } })
-            .sort({ totalWins: -1 }) // -1 = malejąco
+            .sort({ totalWins: -1 })
             .limit(10)
             .select('username totalWins');
-
         res.status(200).json(topPlayers);
     } catch (error) {
         console.error('Błąd pobierania rankingu (wygrane):', error);
         res.status(500).json({ message: 'Wystąpił błąd serwera.' });
     }
 });
-// ===================================
-
 
 // ===== LOGIKA GRY (Socket.IO) =====
-
-// NOWA FUNKCJA POMOCNICZA DO PRZYZNAWANIA WYGRANYCH
-async function awardWin(userId) {
-    if (!userId) return; // Nie nagradzaj gości
-    try {
-        await User.updateOne({ _id: userId }, { $inc: { totalWins: 1, totalGamesPlayed: 1 } });
-        console.log(`Przyznano wygraną dla użytkownika: ${userId}`);
-    } catch (error) {
-        console.error('Błąd przyznawania wygranej:', error);
-    }
-}
-async function awardLoss(userId) {
-    if (!userId) return; // Goście nie zapisują przegranych
-    try {
-        await User.updateOne({ _id: userId }, { $inc: { totalGamesPlayed: 1 } });
-        console.log(`Zapisano grę dla użytkownika: ${userId}`);
-    } catch (error) {
-        console.error('Błąd zapisywania gry:', error);
-    }
-}
-
-// Funkcja do weryfikacji tokenu JWT wysłanego przez socket
-function getUserIdFromToken(token) {
-    if (!token) return null;
-    try {
-        const decoded = jwt.verify(token, JWT_SECRET);
-        return decoded.userId;
-    } catch (error) {
-        return null;
-    }
-}
-
+// ... (Reszta pliku server.js pozostaje bez zmian) ...
 const themes = {
     default: ['💎', '🤖', '👽', '👻', '💀', '🎃', '🚀', '🍄', '🛸', '☄️', '🪐', '🕹️', '💾', '💿', '📼', '📞', '📺', '💰', '💣', '⚔️', '🛡️', '🔑', '🎁', '🧱', '🧭', '🔋', '🧪', '🧬', '🔭', '💡'],
     nature: ['🌳', '🌲', '🍁', '🍂', '🌿', '🌸', '🌻', '🌊', '⛰️', '🌋', '🌾', '🐚', '🕸️', '🐞', '🦋', '🏞️', '🌅', '🌌'],
@@ -360,53 +330,41 @@ const themes = {
 };
 function shuffle(array) { for (let i = array.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [array[i], array[j]] = [array[j], array[i]]; } }
 let games = {};
-
 io.on('connection', (socket) => {
     console.log(`Użytkownik połączony: ${socket.id}`);
-
     socket.on('createGame', (data) => {
         try {
             let gameID;
             do { gameID = Math.floor(1000 + Math.random() * 9000).toString(); } while (games[gameID]);
-            
             const userId = getUserIdFromToken(data.token);
-            
             games[gameID] = {
                 players: [{ socketId: socket.id, userId: userId }],
                 rows: data.rows, cols: data.cols, theme: data.theme || 'default', gameMode: data.gameMode || 'race', board: null, rematch: [], turn: null, scores: {}, classicState: { firstCard: null, secondCard: null, lockBoard: false, matchedIndices: [] }, powerUpsUsed: { [socket.id]: [] }
             };
-
             socket.join(gameID);
             console.log(`Gracz ${socket.id} (User: ${userId}) stworzył grę ${gameID}`);
             socket.emit('gameCreated', { gameID });
-
         } catch (e) { console.error(e); socket.emit('error', 'Nie udało się stworzyć gry.'); }
     });
-
     socket.on('joinGame', (data) => {
         try {
             const gameID = data.gameID; const game = games[gameID];
             if (!game) { socket.emit('error', 'Gra o tym ID nie istnieje.'); return; }
             if (game.players.length >= 2) { socket.emit('error', 'Ten pokój jest już pełny.'); return; }
-            
             const userId = getUserIdFromToken(data.token);
-            
             socket.join(gameID); 
             game.players.push({ socketId: socket.id, userId: userId });
             console.log(`Gracz ${socket.id} (User: ${userId}) dołączył do gry ${gameID}`);
-
             game.rematch = [];
             game.powerUpsUsed = {
                 [game.players[0].socketId]: [],
                 [game.players[1].socketId]: []
             };
-            
             const { rows, cols, theme, gameMode } = game;
             const themeEmojis = themes[theme] || themes['default'];
             const totalPairs = (rows * cols) / 2;
             const emojisForGame = themeEmojis.slice(0, totalPairs);
             const cardValues = [...emojisForGame, ...emojisForGame]; shuffle(cardValues); game.board = cardValues;
-
             if (gameMode === 'classic') {
                 game.turn = game.players[0].socketId;
                 game.scores = {
@@ -421,7 +379,6 @@ io.on('connection', (socket) => {
             });
         } catch (e) { console.error(e); socket.emit('error', 'Nie udało się dołączyć do gry.'); }
     });
-
     socket.on('usePowerUp', (powerUpType) => {
         const gameID = getGameIDBySocket(socket); const game = games[gameID]; if (!game) return;
         if (game.powerUpsUsed[socket.id] && game.powerUpsUsed[socket.id].includes(powerUpType)) { return; }
@@ -447,7 +404,7 @@ io.on('connection', (socket) => {
                                 const p1 = game.players[0]; const p2 = game.players[1];
                                 if(game.scores[p1.socketId] === game.scores[p2.socketId]) {
                                     io.to(gameID).emit('classic:gameTied');
-                                    awardLoss(p1.userId); awardLoss(p2.userId); // Remis liczy się jako rozegrana gra
+                                    awardLoss(p1.userId); awardLoss(p2.userId);
                                 } else if (game.scores[p1.socketId] > game.scores[p2.socketId]) {
                                     io.to(p1.socketId).emit('youWon'); io.to(p2.socketId).emit('youLost');
                                     awardWin(p1.userId); awardLoss(p2.userId);
@@ -464,28 +421,22 @@ io.on('connection', (socket) => {
             }
         }
     });
-    
     socket.on('foundMatch', () => {
         const gameID = getGameIDBySocket(socket);
-        if (gameID && games[gameID] && games[gameID].gameMode === 'race') {
-            socket.broadcast.to(gameID).emit('opponentFoundMatch');
-        }
+        if (gameID && games[gameID] && games[gameID].gameMode === 'race') { socket.broadcast.to(gameID).emit('opponentFoundMatch'); }
     });
-
     socket.on('gameFinished', () => {
         const gameID = getGameIDBySocket(socket);
         if (gameID && games[gameID] && games[gameID].gameMode === 'race') {
             games[gameID].rematch = []; 
             socket.emit('youWon');
             socket.broadcast.to(gameID).emit('youLost');
-            
             const winner = game.players.find(p => p.socketId === socket.id);
             const loser = game.players.find(p => p.socketId !== socket.id);
             if (winner) awardWin(winner.userId);
             if (loser) awardLoss(loser.userId);
         }
     });
-
     socket.on('classic:flip', (data) => {
         const gameID = getGameIDBySocket(socket); const game = games[gameID];
         if (!game || game.gameMode !== 'classic' || game.classicState.lockBoard) { return; }
@@ -500,7 +451,6 @@ io.on('connection', (socket) => {
                 game.scores[socket.id]++; game.classicState.matchedIndices.push(state.firstCard.index, state.secondCard.index);
                 io.to(gameID).emit('classic:scoreUpdate', game.scores);
                 io.to(gameID).emit('classic:boardUpdate', { type: 'match', cardIndex1: state.firstCard.index, cardIndex2: state.secondCard.index });
-                
                 const totalScore = Object.values(game.scores).reduce((a, b) => a + b, 0);
                 if (totalScore === game.board.length / 2) {
                     const p1 = game.players[0]; const p2 = game.players[1];
@@ -528,7 +478,6 @@ io.on('connection', (socket) => {
             }
         }
     });
-    
     socket.on('requestRematch', () => {
         const gameID = getGameIDBySocket(socket); if (!gameID || !games[gameID]) return;
         const game = games[gameID];
@@ -541,12 +490,10 @@ io.on('connection', (socket) => {
             const totalPairs = (rows * cols) / 2;
             const emojisForGame = themeEmojis.slice(0, totalPairs);
             const cardValues = [...emojisForGame, ...emojisForGame]; shuffle(cardValues); game.board = cardValues;
-            
             game.powerUpsUsed = {
                 [game.players[0].socketId]: [],
                 [game.players[1].socketId]: []
             };
-
             if (gameMode === 'classic') {
                 game.turn = game.players[0].socketId;
                 game.scores = {
@@ -561,15 +508,13 @@ io.on('connection', (socket) => {
             });
         }
     });
-
     socket.on('disconnect', () => {
         console.log(`Użytkownik rozłączony: ${socket.id}`);
         const gameID = getGameIDBySocket(socket);
-        
         if (gameID && games[gameID]) {
             const remainingPlayer = games[gameID].players.find(p => p.socketId !== socket.id);
             if (remainingPlayer) {
-                awardWin(remainingPlayer.userId); // Przyznaj wygraną
+                awardWin(remainingPlayer.userId);
                 io.to(remainingPlayer.socketId).emit('opponentDisconnected');
             }
             delete games[gameID];
@@ -577,7 +522,6 @@ io.on('connection', (socket) => {
         }
     });
 });
-
 function getGameIDBySocket(socket) {
     for (const gameID in games) {
         if (games[gameID].players.some(p => p.socketId === socket.id)) {
