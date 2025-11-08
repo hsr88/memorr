@@ -158,7 +158,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const toastNotification = document.getElementById('toast-notification');
     const themeToggleBtn = document.getElementById('theme-toggle-btn'); 
 
-    // ===== NOWE ELEMENTY RANKINGU =====
+    // ===== ELEMENTY RANKINGU =====
     const leaderboardBtn = document.getElementById('leaderboard-btn');
     const leaderboardModal = document.getElementById('leaderboard-modal');
     const leaderboardCloseBtn = document.getElementById('leaderboard-close-btn');
@@ -474,7 +474,7 @@ document.addEventListener('DOMContentLoaded', () => {
             startSoloGame(6, 6);
         }
     });
-
+    
     modalRematchBtn.addEventListener('click', () => {
         socket.emit('requestRematch');
         modalRematchStatus.textContent = 'Wysłano prośbę o rewanż... Czekam...';
@@ -1270,7 +1270,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Modal tylko dla MULTI
     function showWinModal(didPlayerWin, soloMode, isTie = false) {
         
-        modalPlayAgainBtn.classList.remove('hidden'); // POPRAWKA: Pokaż przycisk "Powrót do Lobby"
+        modalPlayAgainBtn.classList.remove('hidden'); // POPRAWKA: Pokaż "Powrót do Lobby"
         modalRematchBtn.classList.add('hidden');
         modalRematchStatus.textContent = '';
         modalRecordMessage.classList.add('hidden');
