@@ -15,11 +15,29 @@
     <link rel="icon" type="image/png" href="favicon.png"> 
     
     <script>
-        // Skrypt trybu ciemnego (musi być w <head>)
         (function() {
+            // 1. Logika trybu ciemnego
             const theme = localStorage.getItem('memorr_theme');
             if (theme === 'dark') {
                 document.documentElement.classList.add('dark-mode');
+            }
+
+            // 2. Logika banera cookie
+            const consent = localStorage.getItem('memorr_consent');
+            if (!consent) {
+                // Pokaż baner dopiero po załadowaniu reszty strony
+                document.addEventListener('DOMContentLoaded', () => {
+                    const banner = document.getElementById('cookie-consent-banner');
+                    const consentBtn = document.getElementById('cookie-consent-btn');
+                    
+                    if (banner && consentBtn) {
+                        banner.classList.remove('hidden');
+                        consentBtn.addEventListener('click', () => {
+                            localStorage.setItem('memorr_consent', 'true');
+                            banner.classList.add('hidden');
+                        });
+                    }
+                });
             }
         })();
     </script>
@@ -257,7 +275,10 @@
             <span class="toast-message">Dobra robota!</span>
         </div>
     </div>
-
+<div id="cookie-consent-banner" class="panel hidden">
+        <p>Używamy plików cookie (i `localStorage`), aby ulepszyć grę, zapisać Twój motyw i obsługiwać reklamy. Korzystając ze strony, zgadzasz się na naszą <a href="/privacy-policy.html">Politykę Prywatności</a>.</p>
+        <button id="cookie-consent-btn" class="btn small green">Rozumiem</button>
+    </div>
     <footer>
         <div class="footer-content">
             &copy; memorr.top | <a href="/help.html">Pomoc</a> | <a href="/contact.html">Kontakt</a> | <a href="/blog">Blog</a> | <a href="/privacy-policy.html">Polityka Prywatności</a>

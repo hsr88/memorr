@@ -1065,3 +1065,45 @@ html.dark-mode .achievement-item.unlocked {
     color: var(--text-secondary) !important;
     margin-top: -20px;
 }
+/* ===== STYLE BANERA COOKIE ===== */
+#cookie-consent-banner {
+    position: fixed; /* Przyklejony */
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    max-width: 90%;
+    width: 600px;
+    z-index: 2000; /* Nad wszystkim innym */
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+}
+#cookie-consent-banner p {
+    font-size: 0.9em;
+    color: var(--text-secondary);
+    text-align: left;
+    margin: 0;
+    line-height: 1.5;
+}
+#cookie-consent-banner p a {
+    color: var(--accent-blue);
+    font-weight: 700;
+}
+#cookie-consent-banner .btn {
+    flex-shrink: 0; /* Zapobiegaj zmniejszaniu się przycisku */
+}
+
+/* Dostosowanie do małych ekranów */
+@media (max-width: 700px) {
+    #cookie-consent-banner {
+        flex-direction: column;
+        bottom: 10px;
+        max-width: calc(100% - 20px);
+    }
+    #cookie-consent-banner p {
+        text-align: center;
+        margin-bottom: 10px;
+    }
+}
