@@ -146,7 +146,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const soloModalTitle = document.getElementById('solo-modal-title');
     const soloModalMessage = document.getElementById('solo-modal-message');
     const soloModalRecordMessage = document.getElementById('solo-modal-record-message');
-    const soloModalPlayAgainBtn = document.getElementById('solo-modal-play-again');
+    const soloModalPlayAgainBtn = document.getElementById('solo-modal-play-again'); 
+    const soloModalReplayBtn = document.getElementById('solo-modal-replay');
+    const soloModalNextLevelBtn = document.getElementById('solo-modal-next-level');
 
     // --- Pobranie elementów DOM (Osiągnięcia i Motyw) ---
     const achievementsBtn = document.getElementById('achievements-btn');
@@ -426,7 +428,6 @@ document.addEventListener('DOMContentLoaded', () => {
     btnMultiMedium.addEventListener('click', () => createMultiGame(6, 4));
     btnMultiHard.addEventListener('click', () => createMultiGame(6, 6));
     
-    // ZAKTUALIZOWANO: Wysyła token przy dołączaniu
     btnJoinGame.addEventListener('click', () => {
         const gameID = gameIdInput.value.trim();
         if (gameID) {
@@ -459,13 +460,27 @@ document.addEventListener('DOMContentLoaded', () => {
     btnRestart.addEventListener('click', () => showLobbyUI(currentUser.username, isGuest));
     modalPlayAgainBtn.addEventListener('click', () => showLobbyUI(currentUser.username, isGuest));
     soloModalPlayAgainBtn.addEventListener('click', () => showLobbyUI(currentUser.username, isGuest));
+    
+    soloModalReplayBtn.addEventListener('click', () => {
+        soloWinModal.classList.add('hidden');
+        startSoloGame(currentRows, currentCols);
+    });
+
+    soloModalNextLevelBtn.addEventListener('click', () => {
+        soloWinModal.classList.add('hidden');
+        if (currentRows === 4 && currentCols === 4) {
+            startSoloGame(6, 4);
+        } else if (currentRows === 6 && currentCols === 4) {
+            startSoloGame(6, 6);
+        }
+    });
+
     modalRematchBtn.addEventListener('click', () => {
         socket.emit('requestRematch');
         modalRematchStatus.textContent = 'Wysłano prośbę o rewanż... Czekam...';
         modalRematchBtn.classList.add('hidden');
     });
 
-    // ZAKTUALIZOWANO: Wysyła token przy tworzeniu gry
     function createMultiGame(rows, cols) {
         lobbyMessage.textContent = 'Tworzenie gry...';
         const selectedMode = document.querySelector('input[name="gameMode"]:checked').value;
@@ -475,7 +490,7 @@ document.addEventListener('DOMContentLoaded', () => {
             cols, 
             theme: currentTheme, 
             gameMode: currentGameMode,
-            token: localStorage.getItem('memorr_token') // Wyślij token
+            token: localStorage.getItem('memorr_token')
         });
     }
 
@@ -705,14 +720,14 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ================================================================
-    // ===== NOWA LOGIKA RANKINGU =====================================
+    // ===== LOGIKA RANKINGU =====================================
     // ================================================================
 
     async function loadLeaderboardTime() {
         leaderboardListTime.innerHTML = '<li>Ładowanie...</li>';
-        leaderboardListWins.innerHTML = '<li></li>'; // Wyczyść drugą na wszelki wypadek
+        leaderboardListWins.innerHTML = '';
         try {
-            const response = await fetch('/api/leaderboard-time'); // Zmieniony endpoint
+            const response = await fetch('/api/leaderboard-time');
             if (!response.ok) {
                 leaderboardListTime.innerHTML = '<li>Nie udało się wczytać rankingu.</li>';
                 return;
@@ -741,9 +756,9 @@ document.addEventListener('DOMContentLoaded', () => {
     
     async function loadLeaderboardWins() {
         leaderboardListWins.innerHTML = '<li>Ładowanie...</li>';
-        leaderboardListTime.innerHTML = '<li></li>'; // Wyczyść drugą
+        leaderboardListTime.innerHTML = '';
         try {
-            const response = await fetch('/api/leaderboard-wins'); // Nowy endpoint
+            const response = await fetch('/api/leaderboard-wins');
             if (!response.ok) {
                 leaderboardListWins.innerHTML = '<li>Nie udało się wczytać rankingu.</li>';
                 return;
@@ -760,7 +775,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const li = document.createElement('li');
                 li.innerHTML = `
                     <span>${index + 1}. <span class="rank-name">${player.username}</span></span>
-                    <span class="rank-score">${player.totalWins} wygrane</span>
+                    <span class="rank-score">${player.totalWins} ${player.totalWins === 1 ? 'wygrana' : (player.totalWins > 1 && player.totalWins < 5 ? 'wygrane' : 'wygranych')}</span>
                 `;
                 leaderboardListWins.appendChild(li);
             });
@@ -772,7 +787,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     leaderboardBtn.addEventListener('click', () => {
         leaderboardModal.classList.remove('hidden');
-        leaderboardTabTime.click(); // Domyślnie pokaż ranking czasu
+        leaderboardTabTime.click();
     });
     leaderboardCloseBtn.addEventListener('click', () => leaderboardModal.classList.add('hidden'));
     leaderboardModal.addEventListener('click', (e) => {
@@ -1234,6 +1249,13 @@ document.addEventListener('DOMContentLoaded', () => {
     function showSoloWinModal(isNewRecord) {
         soloModalMessage.textContent = `Ukończyłeś grę w ${seconds}s i ${moves} ruchach!`;
         
+        // Zdecyduj, czy pokazać przycisk "Wyższy Poziom"
+        if (currentRows === 4 || (currentRows === 6 && currentCols === 4)) {
+            soloModalNextLevelBtn.classList.remove('hidden');
+        } else {
+            soloModalNextLevelBtn.classList.add('hidden'); // Ukryj na 6x6
+        }
+
         if (isNewRecord) {
             soloModalRecordMessage.classList.remove('hidden');
         } else {
@@ -1248,7 +1270,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Modal tylko dla MULTI
     function showWinModal(didPlayerWin, soloMode, isTie = false) {
         
-        modalPlayAgainBtn.classList.add('hidden');
+        modalPlayAgainBtn.classList.remove('hidden'); // POPRAWKA: Pokaż przycisk "Powrót do Lobby"
         modalRematchBtn.classList.add('hidden');
         modalRematchStatus.textContent = '';
         modalRecordMessage.classList.add('hidden');

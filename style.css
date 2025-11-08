@@ -767,7 +767,19 @@ html.dark-mode .copy-btn.copied {
     padding: 12px 20px;
     font-size: 1.1em;
 }
-
+/* ===== DODAJ TEN NOWY BLOK PONIŻEJ ===== */
+.modal-button-container {
+    display: flex;
+    flex-wrap: wrap; /* Na wypadek małych ekranów */
+    justify-content: center;
+    gap: 15px;
+    margin-top: 25px;
+}
+.modal-button-container .btn {
+    font-size: 1em;
+    padding: 10px 20px;
+}
+/* ================================== */
 /* ===== STOPKA ===== */
 footer {
     width: 100%;
