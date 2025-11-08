@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog - Memorr</title>
+    <meta name="description" content="Blog o grach pamięciowych, treningu mózgu i nowościach w grze Memorr.">
+    
+    <link rel="icon" type="image/png" href="../favicon.png"> 
+    
+    <script>
+        (function() {
+            const theme = localStorage.getItem('memorr_theme');
+            if (theme === 'dark') {
+                document.documentElement.classList.add('dark-mode');
+            }
+        })();
+    </script>
+    
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-SFD8ETP2BN"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+    
+      gtag('config', 'G-SFD8ETP2BN');
+    </script>
+
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../style.css"> </head>
+<body>
+    <main>
+        <h1>Memo<span class="rr">rr</span></h1>
+
+        <div class="panel page-content">
+            <h2>Blog Memorr</h2>
+            <p>Witaj na naszym blogu! Znajdziesz tu porady, strategie i wiadomości o rozwoju gry.</p>
+
+            <hr>
+
+            <div class="article-link">
+                <h3><a href="artykul3.html">Co Dalej z Memorr? Plany na Przyszłość!</a></h3>
+                <p>Co dalej z Memorr? Plany rozwoju, aplikacja mobilna, konta premium i nowe rankingi.</p>
+            </div>
+
+            <div class="article-link">
+                <h3><a href="artykul2.html">Wielka Aktualizacja: Konta Graczy, Rankingi i Tryb Ciemny!</a></h3>
+                <p>Poznaj najnowsze funkcje w Memorr! Dodaliśmy rankingi, konta graczy, tryb ciemny i wiele więcej.</p>
+            </div>
+            
+            <div class="article-link">
+                <h3><a href="artykul1.html">Jak poprawić pamięć? 5 prostych ćwiczeń</a></h3>
+                <p>Odkryj 5 naukowo popartych metod na poprawę pamięci krótkotrwałej. Jedną z nich jest regularne granie w gry typu memory...</p>
+            </div>
+            
+            <button onclick="window.location.href='/'" class="btn purple">POWRÓT DO GRY</button>
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            &copy; memorr.top | <a href="../help.html">Pomoc</a> | <a href="../contact.html">Kontakt</a> | <a href="/blog">Blog</a>
+        </div>
+    </footer>
+</body>
+</html>

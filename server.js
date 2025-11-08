@@ -42,14 +42,20 @@ const User = mongoose.model('User', UserSchema);
 
 // 3. Ustaw Expressa
 app.use((req, res, next) => {
+    // Przekieruj /blog na /blog/ (aby poprawnie załadować index.html z folderu)
+    if (req.url === '/blog') {
+        res.redirect(301, '/blog/');
+        return;
+    }
+    // Przekieruj /index.html na /
     if (req.url === '/index.html') {
         res.redirect(301, '/');
-    } else {
-        next();
+        return;
     }
+    next();
 });
 app.use(express.json());
-app.use(express.static(__dirname));
+app.use(express.static(__dirname)); // To automatycznie obsługuje folder /blog
 
 // ===== API (Rejestracja, Logowanie) =====
 app.post('/api/register', async (req, res) => {

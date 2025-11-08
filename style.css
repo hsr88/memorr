@@ -997,3 +997,59 @@ html.dark-mode .achievement-item.unlocked {
     font-weight: 400;
     color: var(--text-secondary);
 }
+/* ===== NOWE STYLE DLA STRON TEKSTOWYCH (POMOC, BLOG) ===== */
+.page-content {
+    text-align: left; /* Wyrównaj tekst do lewej */
+    max-width: 700px; /* Szerszy panel dla tekstu */
+}
+
+.page-content h3 {
+    margin-top: 30px;
+    color: var(--accent-blue);
+}
+
+.page-content p, .page-content li {
+    font-size: 1.1em;
+    line-height: 1.7; /* Lepsza czytelność */
+    color: var(--text-primary);
+}
+
+.page-content ul, .page-content ol {
+    margin-left: 20px;
+}
+
+.page-content .btn {
+    margin-top: 20px;
+    display: inline-block; /* Aby przycisk nie był na całą szerokość */
+}
+
+/* Styl dla listy artykułów na /blog/index.html */
+.article-link {
+    border-bottom: 2px solid var(--input-bg);
+    padding-bottom: 15px;
+    margin-bottom: 15px;
+}
+.article-link h3 {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+.article-link h3 a {
+    text-decoration: none;
+    color: var(--accent-blue);
+}
+.article-link h3 a:hover {
+    text-decoration: underline;
+}
+.article-link p {
+    font-size: 1em;
+    color: var(--text-secondary);
+    margin-bottom: 0;
+}
+
+/* Metadane artykułu (data) */
+.article-meta {
+    font-size: 0.9em !important;
+    font-weight: 700;
+    color: var(--text-secondary) !important;
+    margin-top: -20px;
+}
