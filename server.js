@@ -6,7 +6,7 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
-const nodemailer = require('nodemailer'); // Upewnij się, że jest zainstalowane
+const nodemailer = require('nodemailer');
 require('dotenv').config();
 
 // 2. Skonfiguruj serwer
@@ -30,9 +30,15 @@ const UserSchema = new mongoose.Schema({
     password: { type: String, required: true, minlength: 6 },
     achievements: { type: [String], default: [] },
     resetPasswordToken: { type: String },
-    resetPasswordExpires: { type: Date }
+    resetPasswordExpires: { type: Date },
+    totalGamesPlayed: { type: Number, default: 0 },
+    totalWins: { type: Number, default: 0 },
+    soloBestTimeEasy: { type: Number, default: 9999 },
+    soloBestTimeMedium: { type: Number, default: 9999 },
+    soloBestTimeHard: { type: Number, default: 9999 }
 });
 const User = mongoose.model('User', UserSchema);
+// ============================================
 
 // 3. Ustaw Expressa
 app.use((req, res, next) => {
@@ -45,7 +51,7 @@ app.use((req, res, next) => {
 app.use(express.json());
 app.use(express.static(__dirname));
 
-// ===== API (Rejestracja, Logowanie, Osiągnięcia) =====
+// ===== API (Rejestracja, Logowanie) =====
 app.post('/api/register', async (req, res) => {
     try {
         const { username, email, password } = req.body;
@@ -98,7 +104,11 @@ app.post('/api/login', async (req, res) => {
             token: token,
             user: {
                 username: user.username,
-                achievements: user.achievements
+                achievements: user.achievements,
+                totalGamesPlayed: user.totalGamesPlayed,
+                soloBestTimeEasy: user.soloBestTimeEasy,
+                soloBestTimeMedium: user.soloBestTimeMedium,
+                soloBestTimeHard: user.soloBestTimeHard
             }
         });
     } catch (error) {
@@ -106,6 +116,8 @@ app.post('/api/login', async (req, res) => {
         res.status(500).json({ message: 'Wystąpił błąd serwera.' });
     }
 });
+
+// "Strażnik"
 function authenticateToken(req, res, next) {
     const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.split(' ')[1];
@@ -116,6 +128,8 @@ function authenticateToken(req, res, next) {
         next();
     });
 }
+
+// API Weryfikacji
 app.get('/api/verify-token', authenticateToken, async (req, res) => {
     try {
         const user = await User.findById(req.user.userId).select('-password');
@@ -126,7 +140,11 @@ app.get('/api/verify-token', authenticateToken, async (req, res) => {
             message: 'Token jest ważny.',
             user: {
                 username: user.username,
-                achievements: user.achievements
+                achievements: user.achievements,
+                totalGamesPlayed: user.totalGamesPlayed,
+                soloBestTimeEasy: user.soloBestTimeEasy,
+                soloBestTimeMedium: user.soloBestTimeMedium,
+                soloBestTimeHard: user.soloBestTimeHard
             }
         });
     } catch (error) {
@@ -134,6 +152,8 @@ app.get('/api/verify-token', authenticateToken, async (req, res) => {
         res.status(500).json({ message: 'Wystąpił błąd serwera.' });
     }
 });
+
+// API Osiągnięć
 app.post('/api/unlock-achievement', authenticateToken, async (req, res) => {
     try {
         const { achievementId } = req.body;
@@ -149,40 +169,30 @@ app.post('/api/unlock-achievement', authenticateToken, async (req, res) => {
     }
 });
 
-// ===== API: RESETOWANIE HASŁA (ZAKTUALIZOWANE) =====
-
-// Krok 1: Konfiguracja Nodemailer
+// API Resetowania Hasła
 const transporter = nodemailer.createTransport({
     host: process.env.BREVO_HOST,
     port: process.env.BREVO_PORT,
     secure: false, 
     auth: {
-        user: process.env.BREVO_LOGIN, // <-- POPRAWKA: Użyj loginu SMTP
-        pass: process.env.BREVO_PASS,  // <-- Użyj klucza API
+        user: process.env.BREVO_LOGIN, 
+        pass: process.env.BREVO_PASS, 
     },
 });
-
-// Krok 2: API do wysyłania linku
 app.post('/api/forgot-password', async (req, res) => {
     try {
         const { email } = req.body;
         const user = await User.findOne({ email: email.toLowerCase() });
-
         if (!user) {
             return res.status(200).json({ message: 'Jeśli ten e-mail istnieje w naszej bazie, wysłaliśmy na niego link.' });
         }
-
         const token = crypto.randomBytes(20).toString('hex');
-        
         user.resetPasswordToken = token;
-        user.resetPasswordExpires = Date.now() + 3600000; // 1 godzina
+        user.resetPasswordExpires = Date.now() + 3600000;
         await user.save();
-
-        // WAŻNE: Użyj adresu swojej publicznej strony!
         const resetLink = `https://memorr.top/reset.html?token=${token}`;
-
         const mailOptions = {
-            from: `"Memorr" <${process.env.BREVO_SENDER}>`, // <-- POPRAWKA: Użyj zweryfikowanego nadawcy
+            from: `"Memorr" <${process.env.BREVO_SENDER}>`,
             to: user.email,
             subject: 'Memorr - Reset hasła',
             html: `<p>Witaj,</p>
@@ -192,44 +202,96 @@ app.post('/api/forgot-password', async (req, res) => {
                    <p>Jeśli to nie Ty prosiłeś o reset, zignoruj tę wiadomość.</p>
                    <p>Link wygaśnie za 1 godzinę.</p>`
         };
-
         await transporter.sendMail(mailOptions);
         res.status(200).json({ message: 'Jeśli ten e-mail istnieje w naszej bazie, wysłaliśmy na niego link.' });
-
     } catch (error) {
         console.error("Błąd /api/forgot-password:", error);
         res.status(500).json({ message: 'Wystąpił błąd serwera.' });
     }
 });
-
-// Krok 3: API do ustawiania nowego hasła
 app.post('/api/reset-password', async (req, res) => {
     try {
         const { token, newPassword } = req.body;
-
         if (!token || !newPassword || newPassword.length < 6) {
             return res.status(400).json({ message: 'Nieprawidłowe dane lub hasło jest za krótkie.' });
         }
-
         const user = await User.findOne({
             resetPasswordToken: token,
             resetPasswordExpires: { $gt: Date.now() }
         });
-
         if (!user) {
             return res.status(400).json({ message: 'Token jest nieprawidłowy lub wygasł. Spróbuj ponownie.' });
         }
-
         const salt = await bcrypt.genSalt(10);
         user.password = await bcrypt.hash(newPassword, salt);
         user.resetPasswordToken = undefined;
         user.resetPasswordExpires = undefined;
-
         await user.save();
         res.status(200).json({ message: 'Hasło zostało pomyślnie zresetowane!' });
-
     } catch (error) {
         console.error("Błąd /api/reset-password:", error);
+        res.status(500).json({ message: 'Wystąpił błąd serwera.' });
+    }
+});
+
+// API Zapisywania Statystyk Solo
+app.post('/api/save-solo-stats', authenticateToken, async (req, res) => {
+    try {
+        const { difficulty, time } = req.body;
+        const userId = req.user.userId;
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ message: 'Nie znaleziono użytkownika.' });
+        }
+
+        let updateQuery = { $inc: { totalGamesPlayed: 1 } };
+        let newRecord = false;
+
+        if (difficulty === 'easy' && time < user.soloBestTimeEasy) {
+            updateQuery.soloBestTimeEasy = time;
+            newRecord = true;
+        } else if (difficulty === 'medium' && time < user.soloBestTimeMedium) {
+            updateQuery.soloBestTimeMedium = time;
+            newRecord = true;
+        } else if (difficulty === 'hard' && time < user.soloBestTimeHard) {
+            updateQuery.soloBestTimeHard = time;
+            newRecord = true;
+        }
+
+        await User.updateOne({ _id: userId }, updateQuery);
+        
+        const updatedUser = await User.findById(userId);
+
+        res.status(200).json({ 
+            message: 'Statystyki zapisane.', 
+            newRecord: newRecord,
+            updatedStats: {
+                totalGamesPlayed: updatedUser.totalGamesPlayed,
+                soloBestTimeEasy: updatedUser.soloBestTimeEasy,
+                soloBestTimeMedium: updatedUser.soloBestTimeMedium,
+                soloBestTimeHard: updatedUser.soloBestTimeHard
+            }
+        });
+    } catch (error) {
+        console.error('Błąd zapisu statystyk solo:', error);
+        res.status(500).json({ message: 'Wystąpił błąd serwera.' });
+    }
+});
+
+
+// ===== TUTAJ BYŁ BŁĄD: BRAKUJĄCA FUNKCJA =====
+app.get('/api/leaderboard', async (req, res) => {
+    try {
+        // Znajdź 10 graczy z najlepszym czasem (poniżej 9999)
+        // Sortuj rosnąco (najpierw najszybsi)
+        const topPlayers = await User.find({ soloBestTimeHard: { $lt: 9999 } })
+            .sort({ soloBestTimeHard: 1 }) // 1 = rosnąco
+            .limit(10)
+            .select('username soloBestTimeHard'); // Pobierz tylko te pola
+
+        res.status(200).json(topPlayers);
+    } catch (error) {
+        console.error('Błąd pobierania rankingu:', error);
         res.status(500).json({ message: 'Wystąpił błąd serwera.' });
     }
 });
