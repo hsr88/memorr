@@ -24,7 +24,7 @@ mongoose.connect(dbUrl)
     .then(() => console.log('Połączono z bazą danych MongoDB Atlas!'))
     .catch((err) => console.error('BŁĄD POŁĄCZENIA Z BAZĄ DANYCH:', err));
 
-// ===== MODEL (SCHEMAT) UŻYTKOWNIKA =====
+// ===== MODEL (SCHEMAT) UŻYTKOWNIKA (ZAKTUALIZOWANY) =====
 const UserSchema = new mongoose.Schema({
     username: { type: String, required: true, unique: true, minlength: 3, lowercase: true },
     email: { type: String, required: true, unique: true, lowercase: true },
@@ -36,7 +36,11 @@ const UserSchema = new mongoose.Schema({
     totalWins: { type: Number, default: 0 },
     soloBestTimeEasy: { type: Number, default: 9999 },
     soloBestTimeMedium: { type: Number, default: 9999 },
-    soloBestTimeHard: { type: Number, default: 9999 }
+    soloBestTimeHard: { type: Number, default: 9999 },
+    
+    // NOWE POLA DO OSIĄGNIĘĆ
+    winStreak: { type: Number, default: 0 }, // Seria wygranych
+    themesPlayed: { type: [String], default: [] } // Użyte motywy
 });
 const User = mongoose.model('User', UserSchema);
 // ============================================
@@ -53,8 +57,6 @@ app.use((req, res, next) => {
     }
     next();
 });
-
-// Trasa dla artykułów bloga (SEO)
 app.get('/blog/:slug', (req, res, next) => {
     const slug = req.params.slug;
     if (!slug || slug.includes('..') || slug.includes('/')) {
@@ -64,16 +66,14 @@ app.get('/blog/:slug', (req, res, next) => {
     res.sendFile(filePath, (err) => {
         if (err) {
             console.warn(`Nie znaleziono pliku dla sluga: ${slug}`);
-            next(); // Przekaż do obsługi 404
+            next();
         }
     });
 });
-
 app.use(express.json());
-app.use(express.static(__dirname)); // Serwowanie plików statycznych (jak /blog/index.html)
+app.use(express.static(__dirname));
 
-// ===== API (Rejestracja, Logowanie...) =====
-// ... (Wszystkie app.post i app.get dla /api/... pozostają bez zmian) ...
+// ===== API (Rejestracja, Logowanie) =====
 app.post('/api/register', async (req, res) => {
     try {
         const { username, email, password } = req.body;
@@ -131,7 +131,9 @@ app.post('/api/login', async (req, res) => {
                 totalWins: user.totalWins,
                 soloBestTimeEasy: user.soloBestTimeEasy,
                 soloBestTimeMedium: user.soloBestTimeMedium,
-                soloBestTimeHard: user.soloBestTimeHard
+                soloBestTimeHard: user.soloBestTimeHard,
+                winStreak: user.winStreak, // Zwróć serię wygranych
+                themesPlayed: user.themesPlayed // Zwróć użyte motywy
             }
         });
     } catch (error) {
@@ -164,7 +166,9 @@ app.get('/api/verify-token', authenticateToken, async (req, res) => {
                 totalWins: user.totalWins,
                 soloBestTimeEasy: user.soloBestTimeEasy,
                 soloBestTimeMedium: user.soloBestTimeMedium,
-                soloBestTimeHard: user.soloBestTimeHard
+                soloBestTimeHard: user.soloBestTimeHard,
+                winStreak: user.winStreak,
+                themesPlayed: user.themesPlayed
             }
         });
     } catch (error) {
@@ -251,14 +255,19 @@ app.post('/api/reset-password', async (req, res) => {
 });
 app.post('/api/save-solo-stats', authenticateToken, async (req, res) => {
     try {
-        const { difficulty, time } = req.body;
+        const { difficulty, time, theme } = req.body; // Dodano theme
         const userId = req.user.userId;
         const user = await User.findById(userId);
         if (!user) {
             return res.status(404).json({ message: 'Nie znaleziono użytkownika.' });
         }
-        let updateQuery = { $inc: { totalGamesPlayed: 1 } };
+
+        let updateQuery = { 
+            $inc: { totalGamesPlayed: 1 },
+            $addToSet: { themesPlayed: theme } // Dodaj motyw do listy
+        };
         let newRecord = false;
+
         if (difficulty === 'easy' && time < user.soloBestTimeEasy) {
             updateQuery.soloBestTimeEasy = time;
             newRecord = true;
@@ -269,8 +278,11 @@ app.post('/api/save-solo-stats', authenticateToken, async (req, res) => {
             updateQuery.soloBestTimeHard = time;
             newRecord = true;
         }
+
         await User.updateOne({ _id: userId }, updateQuery);
+        
         const updatedUser = await User.findById(userId);
+
         res.status(200).json({ 
             message: 'Statystyki zapisane.', 
             newRecord: newRecord,
@@ -279,7 +291,9 @@ app.post('/api/save-solo-stats', authenticateToken, async (req, res) => {
                 totalWins: updatedUser.totalWins,
                 soloBestTimeEasy: updatedUser.soloBestTimeEasy,
                 soloBestTimeMedium: updatedUser.soloBestTimeMedium,
-                soloBestTimeHard: updatedUser.soloBestTimeHard
+                soloBestTimeHard: updatedUser.soloBestTimeHard,
+                winStreak: updatedUser.winStreak,
+                themesPlayed: updatedUser.themesPlayed
             }
         });
     } catch (error) {
@@ -314,19 +328,13 @@ app.get('/api/leaderboard-wins', async (req, res) => {
 
 
 // ===== LOGIKA GRY (Socket.IO) =====
-// ... (CAŁA LOGIKA SOCKET.IO POZOSTAJE BEZ ZMIAN) ...
-const themes = {
-    default: ['💎', '🤖', '👽', '👻', '💀', '🎃', '🚀', '🍄', '🛸', '☄️', '🪐', '🕹️', '💾', '💿', '📼', '📞', '📺', '💰', '💣', '⚔️', '🛡️', '🔑', '🎁', '🧱', '🧭', '🔋', '🧪', '🧬', '🔭', '💡'],
-    nature: ['🌳', '🌲', '🍁', '🍂', '🌿', '🌸', '🌻', '🌊', '⛰️', '🌋', '🌾', '🐚', '🕸️', '🐞', '🦋', '🏞️', '🌅', '🌌'],
-    food: ['🍕', '🍔', '🍟', '🌭', '🍿', '🥐', '🍞', '🥨', '🧀', '🥞', '🧇', '🍗', '🍣', '🍤', '🍩', '🍪', '🍰', '🧁'],
-    animals: ['🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼', '🐨', '🐯', '🦁', '🐮', '🐷', '🐸', '🐵', '🐔', '🐧', '🐦']
-};
-function shuffle(array) { for (let i = array.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [array[i], array[j]] = [array[j], array[i]]; } }
-let games = {};
+
+// ZAKTUALIZOWANE FUNKCJE POMOCNICZE
 async function awardWin(userId) {
-    if (!userId) return; 
+    if (!userId) return;
     try {
-        await User.updateOne({ _id: userId }, { $inc: { totalWins: 1, totalGamesPlayed: 1 } });
+        // $inc zwiększa o 1, $set ustawia na 0
+        await User.updateOne({ _id: userId }, { $inc: { totalWins: 1, totalGamesPlayed: 1, winStreak: 1 } });
         console.log(`Przyznano wygraną dla użytkownika: ${userId}`);
     } catch (error) {
         console.error('Błąd przyznawania wygranej:', error);
@@ -335,12 +343,15 @@ async function awardWin(userId) {
 async function awardLoss(userId) {
     if (!userId) return;
     try {
-        await User.updateOne({ _id: userId }, { $inc: { totalGamesPlayed: 1 } });
-        console.log(`Zapisano grę dla użytkownika: ${userId}`);
+        // Przegrana zeruje winStreak
+        await User.updateOne({ _id: userId }, { $inc: { totalGamesPlayed: 1 }, $set: { winStreak: 0 } });
+        console.log(`Zapisano grę (i zresetowano serię) dla użytkownika: ${userId}`);
     } catch (error) {
         console.error('Błąd zapisywania gry:', error);
     }
 }
+// ===================================
+
 function getUserIdFromToken(token) {
     if (!token) return null;
     try {
@@ -350,8 +361,19 @@ function getUserIdFromToken(token) {
         return null;
     }
 }
+
+const themes = {
+    default: ['💎', '🤖', '👽', '👻', '💀', '🎃', '🚀', '🍄', '🛸', '☄️', '🪐', '🕹️', '💾', '💿', '📼', '📞', '📺', '💰', '💣', '⚔️', '🛡️', '🔑', '🎁', '🧱', '🧭', '🔋', '🧪', '🧬', '🔭', '💡'],
+    nature: ['🌳', '🌲', '🍁', '🍂', '🌿', '🌸', '🌻', '🌊', '⛰️', '🌋', '🌾', '🐚', '🕸️', '🐞', '🦋', '🏞️', '🌅', '🌌'],
+    food: ['🍕', '🍔', '🍟', '🌭', '🍿', '🥐', '🍞', '🥨', '🧀', '🥞', '🧇', '🍗', '🍣', '🍤', '🍩', '🍪', '🍰', '🧁'],
+    animals: ['🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼', '🐨', '🐯', '🦁', '🐮', '🐷', '🐸', '🐵', '🐔', '🐧', '🐦']
+};
+function shuffle(array) { for (let i = array.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [array[i], array[j]] = [array[j], array[i]]; } }
+let games = {};
+
 io.on('connection', (socket) => {
     console.log(`Użytkownik połączony: ${socket.id}`);
+    
     socket.on('createGame', (data) => {
         try {
             let gameID;
@@ -366,6 +388,7 @@ io.on('connection', (socket) => {
             socket.emit('gameCreated', { gameID });
         } catch (e) { console.error(e); socket.emit('error', 'Nie udało się stworzyć gry.'); }
     });
+    
     socket.on('joinGame', (data) => {
         try {
             const gameID = data.gameID; const game = games[gameID];
@@ -385,6 +408,14 @@ io.on('connection', (socket) => {
             const totalPairs = (rows * cols) / 2;
             const emojisForGame = themeEmojis.slice(0, totalPairs);
             const cardValues = [...emojisForGame, ...emojisForGame]; shuffle(cardValues); game.board = cardValues;
+            
+            // ZAKTUALIZOWANE: Zapisz motyw w profilu graczy
+            game.players.forEach(p => {
+                if (p.userId) {
+                    User.updateOne({ _id: p.userId }, { $addToSet: { themesPlayed: theme } }).catch(err => console.error(err));
+                }
+            });
+
             if (gameMode === 'classic') {
                 game.turn = game.players[0].socketId;
                 game.scores = {
@@ -399,6 +430,7 @@ io.on('connection', (socket) => {
             });
         } catch (e) { console.error(e); socket.emit('error', 'Nie udało się dołączyć do gry.'); }
     });
+    
     socket.on('usePowerUp', (powerUpType) => {
         const gameID = getGameIDBySocket(socket); const game = games[gameID]; if (!game) return;
         if (game.powerUpsUsed[socket.id] && game.powerUpsUsed[socket.id].includes(powerUpType)) { return; }
@@ -441,10 +473,12 @@ io.on('connection', (socket) => {
             }
         }
     });
+    
     socket.on('foundMatch', () => {
         const gameID = getGameIDBySocket(socket);
         if (gameID && games[gameID] && games[gameID].gameMode === 'race') { socket.broadcast.to(gameID).emit('opponentFoundMatch'); }
     });
+
     socket.on('gameFinished', () => {
         const gameID = getGameIDBySocket(socket);
         if (gameID && games[gameID] && games[gameID].gameMode === 'race') {
@@ -457,6 +491,7 @@ io.on('connection', (socket) => {
             if (loser) awardLoss(loser.userId);
         }
     });
+
     socket.on('classic:flip', (data) => {
         const gameID = getGameIDBySocket(socket); const game = games[gameID];
         if (!game || game.gameMode !== 'classic' || game.classicState.lockBoard) { return; }
@@ -498,6 +533,7 @@ io.on('connection', (socket) => {
             }
         }
     });
+    
     socket.on('requestRematch', () => {
         const gameID = getGameIDBySocket(socket); if (!gameID || !games[gameID]) return;
         const game = games[gameID];
@@ -510,10 +546,12 @@ io.on('connection', (socket) => {
             const totalPairs = (rows * cols) / 2;
             const emojisForGame = themeEmojis.slice(0, totalPairs);
             const cardValues = [...emojisForGame, ...emojisForGame]; shuffle(cardValues); game.board = cardValues;
+            
             game.powerUpsUsed = {
                 [game.players[0].socketId]: [],
                 [game.players[1].socketId]: []
             };
+
             if (gameMode === 'classic') {
                 game.turn = game.players[0].socketId;
                 game.scores = {
@@ -528,9 +566,11 @@ io.on('connection', (socket) => {
             });
         }
     });
+
     socket.on('disconnect', () => {
         console.log(`Użytkownik rozłączony: ${socket.id}`);
         const gameID = getGameIDBySocket(socket);
+        
         if (gameID && games[gameID]) {
             const remainingPlayer = games[gameID].players.find(p => p.socketId !== socket.id);
             if (remainingPlayer) {
@@ -542,6 +582,7 @@ io.on('connection', (socket) => {
         }
     });
 });
+
 function getGameIDBySocket(socket) {
     for (const gameID in games) {
         if (games[gameID].players.some(p => p.socketId === socket.id)) {
