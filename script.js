@@ -15,20 +15,264 @@ const themes = {
     animals: ['🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼', '🐨', '🐯', '🦁', '🐮', '🐷', '🐸', '🐵', '🐔', '🐧', '🐦']
 };
 
-// ===== DEFINICJA OSIĄGNIĘĆ (ZAKTUALIZOWANA) =====
+// ===== DEFINICJA OSIĄGNIĘĆ (TYLKO IKONY) =====
 const allAchievements = {
-    'first_solo_game': { icon: '🌱', title: 'Pierwsze Kroki', description: 'Ukończ swoją pierwszą grę solo.' },
-    'fast_win_easy':   { icon: '⚡', title: 'Szybki jak Błyskawica', description: 'Ukończ grę 4x4 w mniej niż 30 sekund.' },
-    'perfect_game':    { icon: '🎯', title: 'Perfekcjonista', description: 'Ukończ grę solo bez ani jednej pomyłki.' },
-    'master_mind':     { icon: '🧠', title: 'Geniusz Pamięci', description: 'Ukończ grę na poziomie 6x6.' },
-    'first_multi_win': { icon: '⚔️', title: 'Pierwsze Zwycięstwo', description: 'Wygraj swój pierwszy pojedynek multiplayer.' },
-    
-    // NOWE OSIĄGNIĘCIA
-    'no_powerups_hard': { icon: '🧘', title: 'Czysty Umysł', description: 'Ukończ grę 6x6 bez użycia power-upów.' },
-    'win_streak_3':     { icon: '🔥', title: 'W Gazie!', description: 'Wygraj 3 gry multiplayer z rzędu.' },
-    'connoisseur':      { icon: '🎨', title: 'Koneser', description: 'Zagraj grę każdym z 4 motywów.' }
+    'first_solo_game': { icon: '🌱' },
+    'fast_win_easy':   { icon: '⚡' },
+    'perfect_game':    { icon: '🎯' },
+    'master_mind':     { icon: '🧠' },
+    'first_multi_win': { icon: '⚔️' },
+    'no_powerups_hard': { icon: '🧘' },
+    'win_streak_3':     { icon: '🔥' },
+    'connoisseur':      { icon: '🎨' }
 };
 let unlockedAchievements = new Set();
+
+// ===== NOWY OBIEKT TŁUMACZEŃ =====
+const translations = {
+    "pl": {
+        "langBtn": "🇬🇧", // Przycisk pokazuje flagę UK
+        "langTitle": "Change language",
+        "htmlLang": "pl",
+        "title": "Memorr - Gra Pamięciowa Online (Solo & Multiplayer)",
+        "description": "Zagraj w Memorr, darmową grę pamięciową online. Trenuj pamięć w trybie solo lub rywalizuj ze znajomymi w pojedynkach multiplayer!",
+        "rankingTitle": "Ranking",
+        "achievementsTitle": "Osiągnięcia",
+        "authTitle": "Logowanie / Rejestracja",
+        "welcome": "Witaj",
+        "guest": "Gościu", // Poprawka
+        "playSolo": "GRA SOLO",
+        "playMultiplayer": "GRA WIELOOSOBOWA",
+        "gameDescription": "Witaj w Memorr! Sprawdź swoją pamięć grając solo lub zmierz się ze znajomymi w trybie multiplayer. Celem jest znalezienie wszystkich par. Powodzenia!",
+        "soloH3": "GRA SOLO - Wybierz Poziom",
+        "easy": "Łatwy (4x4)",
+        "medium": "Średni (6x4)",
+        "hard": "Trudny (6x6)",
+        "back": "POWRÓT",
+        "multiH3": "GRA WIELOOSOBOWA",
+        "createGame": "STWÓRZ GRĘ",
+        "joinGame": "DOŁĄCZ DO GRY",
+        "raceMode": "Wyścig",
+        "raceDesc": "(Kto pierwszy znajdzie pary na własnej planszy)",
+        "classicMode": "Klasyczny",
+        "classicDesc": "(Wspólna plansza, gra na punkty i tury)",
+        "selectLevel": "Wybierz Poziom",
+        "gameId": "ID Gry:",
+        "copyTitle": "Kopiuj do schowka",
+        "gameIdPlaceholder": "Wpisz ID Gry",
+        "join": "DOŁĄCZ",
+        "logout": "Wyloguj",
+        "selectTheme": "Wybierz motyw kart",
+        "themeDefault": "Klasyczny",
+        "themeNature": "Natura",
+        "themeFood": "Jedzenie",
+        "themeAnimals": "Zwierzęta",
+        "backToLobby": "POWRÓT DO LOBBY",
+        "peekTitle": "Podgląd (raz na grę)",
+        "autoPairTitle": "Automatyczna para (raz na grę)",
+        "player": "GRACZ",
+        "time": "Czas",
+        "moves": "Ruchy",
+        "points": "Punkty",
+        "record": "Rekord",
+        "games": "Gry",
+        "multiWins": "Wygrane",
+        "gamesPlayed": "Gry Ogółem",
+        "opponent": "PRZECIWNIK",
+        "newRecord": "NOWY REKORD!",
+        "rematch": "REWANŻ",
+        "congratulations": "Gratulacje!",
+        "soloWinMessage": "Ukończyłeś grę w {seconds}s i {moves} ruchach!",
+        "replay": "JESZCZE RAZ",
+        "nextLevel": "WYŻSZY POZIOM",
+        "yourAchievements": "Twoje Osiągnięcia",
+        "close": "ZAMKNIJ",
+        "login": "Logowanie",
+        "register": "Rejestracja",
+        "welcomeBack": "Witaj z powrotem!",
+        "usernamePlaceholder": "Nazwa użytkownika",
+        "passwordPlaceholder": "Hasło",
+        "forgotPassword": "Nie pamiętasz hasła?",
+        "joinMemorr": "Dołącz do Memorr",
+        "usernameRegisterPlaceholder": "Nazwa użytkownika (min. 3 znaki)",
+        "emailPlaceholder": "Twój e-mail",
+        "passwordRegisterPlaceholder": "Hasło (min. 6 znaków)",
+        "resetPassword": "Zresetuj hasło",
+        "resetSubtext": "Podaj swój e-mail, a wyślemy Ci link do resetu hasła.",
+        "sendLink": "Wyślij link",
+        "backToLogin": "Wróć do logowania",
+        "closeTitle": "Zamknij",
+        "leaderboard": "Ranking Graczy",
+        "bestTime6x6": "Najlepszy Czas (6x6)",
+        "multiWinsRank": "Wygrane Mecze",
+        "toastTitle": "Osiągnięcie odblokowane!",
+        "cookieText": "Używamy plików cookie (i `localStorage`), aby ulepszyć grę, zapisać Twój motyw i obsługiwać reklamy. Korzystając ze strony, zgadzasz się na naszą <a href=\"/privacy-policy.html\">Politykę Prywatności</a>.",
+        "cookieBtn": "Rozumiem",
+        "lobbyMsg_copied": "Skopiowano kod: {gameID}",
+        "lobbyMsg_copyError": "Nie udało się skopiować.",
+        "lobbyMsg_waitOpponent": "Czekam na przeciwnika...",
+        "lobbyMsg_loading": "Przetwarzanie...",
+        "lobbyMsg_noGame": "Gra o tym ID nie istnieje.",
+        "lobbyMsg_full": "Ten pokój jest już pełny.",
+        "winModal_Tie": "Remis!",
+        "winModal_TieMsg": "Niesamowita walka! Spróbujcie jeszcze raz.",
+        "winModal_WinRace": "Wygrałeś w {seconds}s i {moves} ruchach!",
+        "winModal_WinClassic": "Wygrałeś! Zebrałeś więcej par.",
+        "winModal_LostTitle": "Niestety!",
+        "winModal_LostRace": "Przeciwnik był szybszy. Spróbuj jeszcze raz!",
+        "winModal_LostClassic": "Przeciwnik zebrał więcej par. Spróbuj jeszcze raz!",
+        "leaderboard_loading": "Ładowanie...",
+        "leaderboard_error": "Nie udało się wczytać rankingu.",
+        "leaderboard_noTime": "Nikt jeszcze nie ukończył gry na poziomie Trudnym! Bądź pierwszy.",
+        "leaderboard_noWins": "Nikt jeszcze nie wygrał meczu multiplayer!",
+        "leaderboard_wins_one": "wygrana",
+        "leaderboard_wins_few": "wygrane",
+        "leaderboard_wins_many": "wygranych",
+        "turnInfo_your": "Twoja tura!",
+        "turnInfo_opponent": "Tura przeciwnika...",
+        "rematch_offer": "Przeciwnik chce zagrać rewanż!",
+        "rematch_wait": "Wysłano prośbę o rewanż... Czekam...",
+        "opponent_disconnected_title": "Koniec Gry",
+        "opponent_disconnected_msg": "Przeciwnik się rozłączył. Wygrałeś!",
+        "opponent_disconnected_lobby": "Przeciwnik się rozłączył.",
+        "footerHelp": "Pomoc",
+        "footerContact": "Kontakt",
+        "footerBlog": "Blog",
+        "footerPrivacy": "Polityka Prywatności",
+        "achievements": {
+            "first_solo_game": { "title": "Pierwsze Kroki", "description": "Ukończ swoją pierwszą grę solo." },
+            "fast_win_easy":   { "title": "Szybki jak Błyskawica", "description": "Ukończ grę 4x4 w mniej niż 30 sekund." },
+            "perfect_game":    { "title": "Perfekcjonista", "description": "Ukończ grę solo bez ani jednej pomyłki." },
+            "master_mind":     { "title": "Geniusz Pamięci", "description": "Ukończ grę na poziomie 6x6." },
+            "first_multi_win": { "title": "Pierwsze Zwycięstwo", "description": "Wygraj swój pierwszy pojedynek multiplayer." },
+            "no_powerups_hard": { "title": "Czysty Umysł", "description": "Ukończ grę 6x6 bez użycia power-upów." },
+            "win_streak_3":     { "title": "W Gazie!", "description": "Wygraj 3 gry multiplayer z rzędu." },
+            "connoisseur":      { "title": "Koneser", "description": "Zagraj grę każdym z 4 motywów." }
+        }
+    },
+    "en": {
+        "langBtn": "🇵🇱", // Przycisk pokazuje flagę Polski
+        "langTitle": "Zmień język",
+        "htmlLang": "en",
+        "title": "Memorr - Online Memory Game (Solo & Multiplayer)",
+        "description": "Play Memorr, a free online memory game. Train your memory in solo mode or compete with friends in multiplayer matches!",
+        "rankingTitle": "Leaderboard",
+        "achievementsTitle": "Achievements",
+        "authTitle": "Login / Register",
+        "welcome": "Welcome",
+        "guest": "Guest", // POPRAWKA
+        "playSolo": "PLAY SOLO",
+        "playMultiplayer": "MULTIPLAYER",
+        "gameDescription": "Welcome to Memorr! Test your memory by playing solo or challenge your friends in multiplayer. The goal is to find all the pairs. Good luck!",
+        "soloH3": "SOLO GAME - Select Difficulty",
+        "easy": "Easy (4x4)",
+        "medium": "Medium (6x4)",
+        "hard": "Hard (6x6)",
+        "back": "BACK",
+        "multiH3": "MULTIPLAYER",
+        "createGame": "CREATE GAME",
+        "joinGame": "JOIN GAME",
+        "raceMode": "Race",
+        "raceDesc": "(First to find all pairs on their own board)",
+        "classicMode": "Classic",
+        "classicDesc": "(Shared board, turn-based with points)",
+        "selectLevel": "Select Level",
+        "gameId": "Game ID:",
+        "copyTitle": "Copy to clipboard",
+        "gameIdPlaceholder": "Enter Game ID",
+        "join": "JOIN",
+        "logout": "Logout",
+        "selectTheme": "Select card theme",
+        "themeDefault": "Classic",
+        "themeNature": "Nature",
+        "themeFood": "Food",
+        "themeAnimals": "Animals",
+        "backToLobby": "BACK TO LOBBY",
+        "peekTitle": "Peek (once per game)",
+        "autoPairTitle": "Auto-Pair (once per game)",
+        "player": "PLAYER",
+        "time": "Time",
+        "moves": "Moves",
+        "points": "Points",
+        "record": "Record",
+        "games": "Games",
+        "multiWins": "Wins",
+        "gamesPlayed": "Total Games",
+        "opponent": "OPPONENT",
+        "newRecord": "NEW RECORD!",
+        "rematch": "REMATCH",
+        "congratulations": "Congratulations!",
+        "soloWinMessage": "You finished the game in {seconds}s and {moves} moves!",
+        "replay": "REPLAY",
+        "nextLevel": "NEXT LEVEL",
+        "yourAchievements": "Your Achievements",
+        "close": "CLOSE",
+        "login": "Login",
+        "register": "Register",
+        "welcomeBack": "Welcome back!",
+        "usernamePlaceholder": "Username",
+        "passwordPlaceholder": "Password",
+        "forgotPassword": "Forgot your password?",
+        "joinMemorr": "Join Memorr",
+        "usernameRegisterPlaceholder": "Username (min. 3 chars)",
+        "emailPlaceholder": "Your e-mail",
+        "passwordRegisterPlaceholder": "Password (min. 6 chars)",
+        "resetPassword": "Reset Password",
+        "resetSubtext": "Enter your e-mail and we will send you a password reset link.",
+        "sendLink": "Send Link",
+        "backToLogin": "Back to Login",
+        "closeTitle": "Close",
+        "leaderboard": "Leaderboard",
+        "bestTime6x6": "Best Time (6x6)",
+        "multiWinsRank": "Multiplayer Wins",
+        "toastTitle": "Achievement Unlocked!",
+        "cookieText": "We use cookies (and `localStorage`) to improve the game, save your theme, and serve ads. By using the site, you agree to our <a href=\"/privacy-policy.html\">Privacy Policy</a>.",
+        "cookieBtn": "Got it",
+        "lobbyMsg_copied": "Copied code: {gameID}",
+        "lobbyMsg_copyError": "Could not copy.",
+        "lobbyMsg_waitOpponent": "Waiting for opponent...",
+        "lobbyMsg_loading": "Processing...",
+        "lobbyMsg_noGame": "A game with this ID does not exist.",
+        "lobbyMsg_full": "This room is already full.",
+        "winModal_Tie": "It's a Tie!",
+        "winModal_TieMsg": "An amazing fight! Try again.",
+        "winModal_WinRace": "You won in {seconds}s and {moves} moves!",
+        "winModal_WinClassic": "You won! You collected more pairs.",
+        "winModal_LostTitle": "Unfortunately!",
+        "winModal_LostRace": "Your opponent was faster. Try again!",
+        "winModal_LostClassic": "Your opponent collected more pairs. Try again!",
+        "leaderboard_loading": "Loading...",
+        "leaderboard_error": "Failed to load leaderboard.",
+        "leaderboard_noTime": "No one has completed the Hard level yet! Be the first.",
+        "leaderboard_noWins": "No one has won a multiplayer match yet!",
+        "leaderboard_wins_one": "win",
+        "leaderboard_wins_few": "wins", // W ang. "wins" jest uniwersalne
+        "leaderboard_wins_many": "wins",
+        "turnInfo_your": "Your turn!",
+        "turnInfo_opponent": "Opponent's turn...",
+        "rematch_offer": "Opponent wants a rematch!",
+        "rematch_wait": "Rematch request sent... Waiting...",
+        "opponent_disconnected_title": "Game Over",
+        "opponent_disconnected_msg": "Your opponent disconnected. You win!",
+        "opponent_disconnected_lobby": "Opponent disconnected.",
+        "footerHelp": "Help",
+        "footerContact": "Contact",
+        "footerBlog": "Blog",
+        "footerPrivacy": "Privacy Policy",
+        "achievements": {
+            "first_solo_game": { "title": "First Steps", "description": "Complete your first solo game." },
+            "fast_win_easy":   { "title": "Quick as Lightning", "description": "Finish a 4x4 game in under 30 seconds." },
+            "perfect_game":    { "title": "Perfectionist", "description": "Finish a solo game without a single mistake." },
+            "master_mind":     { "title": "Memory Genius", "description": "Complete a 6x6 game." },
+            "first_multi_win": { "title": "First Victory", "description": "Win your first multiplayer match." },
+            "no_powerups_hard": { "title": "Pure Mind", "description": "Complete a 6x6 game without using power-ups." },
+            "win_streak_3":     { "title": "On Fire!", "description": "Win 3 multiplayer games in a row." },
+            "connoisseur":      { "title": "Connoisseur", "description": "Play a game with all 4 themes." }
+        }
+    }
+};
+
+let currentLang = 'pl';
 // ===================================
 
 // Funkcja tasująca
@@ -59,8 +303,8 @@ document.addEventListener('DOMContentLoaded', () => {
     let myTurn = false; 
     let isGuest = true;
     let authToken = null;
-    let powerUpUsedThisGame = false; // NOWA FLAGA
-    let themesPlayedGuest = new Set(); // NOWA FLAGA DLA GOŚCI
+    let powerUpUsedThisGame = false; 
+    let themesPlayedGuest = new Set();
     
     let currentUser = {
         username: "Gość",
@@ -170,6 +414,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const achievementsCloseBtn = document.getElementById('achievements-close-btn');
     const toastNotification = document.getElementById('toast-notification');
     const themeToggleBtn = document.getElementById('theme-toggle-btn'); 
+    const langToggleBtn = document.getElementById('lang-toggle-btn'); // NOWY PRZYCISK
     const leaderboardBtn = document.getElementById('leaderboard-btn');
     const leaderboardModal = document.getElementById('leaderboard-modal');
     const leaderboardCloseBtn = document.getElementById('leaderboard-close-btn');
@@ -178,6 +423,66 @@ document.addEventListener('DOMContentLoaded', () => {
     const leaderboardListTime = document.getElementById('leaderboard-list-time');
     const leaderboardListWins = document.getElementById('leaderboard-list-wins');
     // ==================================
+
+    // ================================================================
+    // ===== LOGIKA TŁUMACZEŃ =====
+    // ================================================================
+    
+    function setLanguage(lang) {
+        currentLang = lang;
+        const t = translations[lang];
+
+        document.documentElement.lang = t.htmlLang;
+        document.title = t.title;
+        document.querySelector('meta[name="description"]').setAttribute('content', t.description);
+        
+        themeToggleBtn.title = (lang === 'pl') ? 'Zmień motyw' : 'Change theme';
+        langToggleBtn.textContent = t.langBtn;
+        langToggleBtn.title = t.langTitle;
+
+        document.querySelectorAll('[data-lang]').forEach(el => {
+            const key = el.dataset.lang;
+            if (t[key]) {
+                el.textContent = t[key];
+            }
+        });
+        
+        document.querySelectorAll('[data-lang-title]').forEach(el => {
+            const key = el.dataset.langTitle;
+            if (t[key]) {
+                el.title = t[key];
+            }
+        });
+        
+        document.querySelectorAll('[data-lang-placeholder]').forEach(el => {
+            const key = el.dataset.langPlaceholder;
+            if (t[key]) {
+                el.placeholder = t[key];
+            }
+        });
+        
+        // POPRAWKA: Użyj "guest" z obiektu tłumaczeń
+        welcomeMessage.textContent = `${t.welcome}, ${isGuest ? t.guest : currentUser.username}!`;
+        
+        if (!achievementsModal.classList.contains('hidden')) {
+            showAchievementsModal();
+        }
+        if (!leaderboardModal.classList.contains('hidden')) {
+            if (!leaderboardListTime.classList.contains('hidden')) loadLeaderboardTime();
+            if (!leaderboardListWins.classList.contains('hidden')) loadLeaderboardWins();
+        }
+        // POPRAWKA: Przetłumacz stopkę
+        document.querySelector('.footer-content a[href="/help.html"]').textContent = t.footerHelp;
+        document.querySelector('.footer-content a[href="/contact.html"]').textContent = t.footerContact;
+        document.querySelector('.footer-content a[href="/blog"]').textContent = t.footerBlog;
+        document.querySelector('.footer-content a[href="/privacy-policy.html"]').textContent = t.footerPrivacy;
+    }
+
+    langToggleBtn.addEventListener('click', () => {
+        const newLang = (currentLang === 'pl') ? 'en' : 'pl';
+        localStorage.setItem('memorr_lang', newLang);
+        setLanguage(newLang);
+    });
 
     // ================================================================
     // ===== LOGIKA TRYBU CIEMNEGO =====
@@ -258,7 +563,7 @@ document.addEventListener('DOMContentLoaded', () => {
     forgotPasswordForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const email = document.getElementById('forgot-email').value;
-        authMessage.textContent = 'Przetwarzanie...';
+        authMessage.textContent = translations[currentLang].lobbyMsg_loading;
         authMessage.style.color = "var(--text-secondary)";
 
         try {
@@ -295,7 +600,7 @@ document.addEventListener('DOMContentLoaded', () => {
             authMessage.textContent = 'Nazwa użytkownika musi mieć co najmniej 3 znaki.';
             return;
         }
-        authMessage.textContent = 'Przetwarzanie...';
+        authMessage.textContent = translations[currentLang].lobbyMsg_loading;
         authMessage.style.color = "var(--text-secondary)";
 
         try {
@@ -322,7 +627,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     loginForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-        authMessage.textContent = 'Logowanie...';
+        authMessage.textContent = translations[currentLang].lobbyMsg_loading;
         authMessage.style.color = "var(--text-secondary)";
 
         const username = document.getElementById('login-username').value;
@@ -446,26 +751,26 @@ document.addEventListener('DOMContentLoaded', () => {
                 gameID,
                 token: localStorage.getItem('memorr_token')
             });
-            lobbyMessage.textContent = 'Próbuję dołączyć do gry...';
+            lobbyMessage.textContent = translations[currentLang].lobbyMsg_loading;
         } else {
-            lobbyMessage.textContent = 'Proszę wpisać ID gry.';
+            lobbyMessage.textContent = translations[currentLang].gameIdPlaceholder;
         }
     });
     
     copyGameIdBtn.addEventListener('click', () => {
         const gameID = gameIdDisplay.textContent;
         navigator.clipboard.writeText(gameID).then(() => {
-            lobbyMessage.textContent = `Skopiowano kod: ${gameID}`;
+            lobbyMessage.textContent = translations[currentLang].lobbyMsg_copied.replace('{gameID}', gameID);
             copyGameIdBtn.classList.add('copied');
             const currentMessage = lobbyMessage.textContent;
             setTimeout(() => {
                 copyGameIdBtn.classList.remove('copied');
                 if (lobbyMessage.textContent === currentMessage) {
-                    lobbyMessage.textContent = 'Czekam na przeciwnika...';
+                    lobbyMessage.textContent = translations[currentLang].lobbyMsg_waitOpponent;
                 }
             }, 2000);
         }).catch(err => {
-            lobbyMessage.textContent = 'Nie udało się skopiować.';
+            lobbyMessage.textContent = translations[currentLang].lobbyMsg_copyError;
         });
     });
     btnRestart.addEventListener('click', () => showLobbyUI(currentUser.username, isGuest));
@@ -488,12 +793,12 @@ document.addEventListener('DOMContentLoaded', () => {
     
     modalRematchBtn.addEventListener('click', () => {
         socket.emit('requestRematch');
-        modalRematchStatus.textContent = 'Wysłano prośbę o rewanż... Czekam...';
+        modalRematchStatus.textContent = translations[currentLang].rematch_wait;
         modalRematchBtn.classList.add('hidden');
     });
 
     function createMultiGame(rows, cols) {
-        lobbyMessage.textContent = 'Tworzenie gry...';
+        lobbyMessage.textContent = translations[currentLang].lobbyMsg_loading;
         const selectedMode = document.querySelector('input[name="gameMode"]:checked').value;
         currentGameMode = selectedMode;
         socket.emit('createGame', { 
@@ -509,7 +814,7 @@ document.addEventListener('DOMContentLoaded', () => {
         authPanel.classList.add('hidden');
         lobbyScreen.classList.remove('hidden');
         
-        welcomeMessage.textContent = `Witaj, ${username}!`;
+        // welcomeMessage jest teraz ustawiane w setLanguage
         
         leaderboardBtn.classList.remove('hidden');
         
@@ -525,6 +830,8 @@ document.addEventListener('DOMContentLoaded', () => {
         winModal.classList.add('hidden');
         soloWinModal.classList.add('hidden');
         showModeSelection();
+        
+        setLanguage(currentLang); // Zastosuj tłumaczenia
     }
 
     function showGameUI() {
@@ -540,7 +847,7 @@ document.addEventListener('DOMContentLoaded', () => {
     socket.on('gameCreated', (data) => {
         gameIdDisplay.textContent = data.gameID;
         gameIdContainer.classList.remove('hidden');
-        lobbyMessage.textContent = 'Stworzono grę. Czekam na przeciwnika...';
+        lobbyMessage.textContent = translations[currentLang].lobbyMsg_waitOpponent;
     });
     socket.on('gameStarted', (data) => {
         winModal.classList.add('hidden');
@@ -602,14 +909,14 @@ document.addEventListener('DOMContentLoaded', () => {
         if (winModal.classList.contains('hidden')) {
             showWinModal(false, false);
         }
-        modalRematchStatus.textContent = 'Przeciwnik chce zagrać rewanż!';
+        modalRematchStatus.textContent = translations[currentLang].rematch_offer;
         modalRematchBtn.classList.remove('hidden');
     });
     socket.on('opponentDisconnected', () => {
         stopTimer();
         if (gameScreen.classList.contains('hidden') === false) {
-            modalTitle.textContent = 'Koniec Gry';
-            modalMessage.textContent = 'Przeciwnik się rozłączył. Wygrałeś!';
+            modalTitle.textContent = translations[currentLang].opponent_disconnected_title;
+            modalMessage.textContent = translations[currentLang].opponent_disconnected_msg;
             modalRecordMessage.classList.add('hidden');
             modalPlayAgainBtn.classList.remove('hidden');
             modalRematchBtn.classList.add('hidden');
@@ -617,11 +924,11 @@ document.addEventListener('DOMContentLoaded', () => {
             winModal.classList.remove('hidden');
         } else {
             showLobbyUI(currentUser.username, isGuest);
-            lobbyMessage.textContent = "Przeciwnik się rozłączył.";
+            lobbyMessage.textContent = translations[currentLang].opponent_disconnected_lobby;
         }
     });
     socket.on('error', (message) => {
-        lobbyMessage.textContent = message;
+        lobbyMessage.textContent = message; // Błędy serwera (np. 404) nie są tłumaczone
         if (multiCreateDetails.classList.contains('hidden') === false) {
              setTimeout(showMultiOptions, 2000);
         }
@@ -645,6 +952,7 @@ document.addEventListener('DOMContentLoaded', () => {
             themesPlayedGuest = new Set(JSON.parse(localStorage.getItem('memorr_themes_guest') || '[]'));
         } else {
             unlockedAchievements = new Set(achievementsFromServer || []);
+            // themesPlayed jest już w currentUser.themesPlayed
         }
     }
 
@@ -673,8 +981,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function showAchievementToast(achievement) {
         toastNotification.querySelector('.toast-icon').textContent = achievement.icon;
-        toastNotification.querySelector('.toast-title').textContent = achievement.title;
-        toastNotification.querySelector('.toast-message').textContent = achievement.description;
+        toastNotification.querySelector('.toast-title').textContent = translations[currentLang].toastTitle;
+        toastNotification.querySelector('.toast-message').textContent = translations[currentLang].achievements[achievement.id].title;
         toastNotification.classList.add('show');
         setTimeout(() => {
             toastNotification.classList.remove('show');
@@ -684,7 +992,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function unlockAchievement(id) {
         if (!unlockedAchievements.has(id)) {
             unlockedAchievements.add(id);
-            showAchievementToast(allAchievements[id]);
+            showAchievementToast({ id: id, icon: allAchievements[id].icon });
             
             if (isGuest) {
                 saveAchievementsToLocal();
@@ -696,8 +1004,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function showAchievementsModal() {
         achievementsList.innerHTML = ''; 
+        const langAchievements = translations[currentLang].achievements;
+        
         for (const id in allAchievements) {
             const achievement = allAchievements[id];
+            const langData = langAchievements[id];
             const isUnlocked = unlockedAchievements.has(id);
             
             const li = document.createElement('li');
@@ -709,8 +1020,8 @@ document.addEventListener('DOMContentLoaded', () => {
             li.innerHTML = `
                 <span class="achievement-icon">${achievement.icon}</span>
                 <div class="achievement-details">
-                    <h5>${achievement.title}</h5>
-                    <p>${achievement.description}</p>
+                    <h5>${langData.title}</h5>
+                    <p>${langData.description}</p>
                 </div>
             `;
             achievementsList.appendChild(li);
@@ -737,18 +1048,18 @@ document.addEventListener('DOMContentLoaded', () => {
     // ================================================================
 
     async function loadLeaderboardTime() {
-        leaderboardListTime.innerHTML = '<li>Ładowanie...</li>';
+        leaderboardListTime.innerHTML = `<li>${translations[currentLang].leaderboard_loading}</li>`;
         leaderboardListWins.innerHTML = '';
         try {
             const response = await fetch('/api/leaderboard-time');
             if (!response.ok) {
-                leaderboardListTime.innerHTML = '<li>Nie udało się wczytać rankingu.</li>';
+                leaderboardListTime.innerHTML = `<li>${translations[currentLang].leaderboard_error}</li>`;
                 return;
             }
             const data = await response.json();
             
             if (data.length === 0) {
-                leaderboardListTime.innerHTML = '<li>Nikt jeszcze nie ukończył gry na poziomie Trudnym! Bądź pierwszy.</li>';
+                leaderboardListTime.innerHTML = `<li>${translations[currentLang].leaderboard_noTime}</li>`;
                 return;
             }
 
@@ -763,38 +1074,43 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         } catch (error) {
             console.error('Błąd wczytywania rankingu (czas):', error);
-            leaderboardListTime.innerHTML = '<li>Błąd połączenia z serwerem.</li>';
+            leaderboardListTime.innerHTML = `<li>${translations[currentLang].leaderboard_error}</li>`;
         }
     }
     
     async function loadLeaderboardWins() {
-        leaderboardListWins.innerHTML = '<li>Ładowanie...</li>';
+        leaderboardListWins.innerHTML = `<li>${translations[currentLang].leaderboard_loading}</li>`;
         leaderboardListTime.innerHTML = '';
         try {
             const response = await fetch('/api/leaderboard-wins');
             if (!response.ok) {
-                leaderboardListWins.innerHTML = '<li>Nie udało się wczytać rankingu.</li>';
+                leaderboardListWins.innerHTML = `<li>${translations[currentLang].leaderboard_error}</li>`;
                 return;
             }
             const data = await response.json();
             
             if (data.length === 0) {
-                leaderboardListWins.innerHTML = '<li>Nikt jeszcze nie wygrał meczu multiplayer!</li>';
+                leaderboardListWins.innerHTML = `<li>${translations[currentLang].leaderboard_noWins}</li>`;
                 return;
             }
 
             leaderboardListWins.innerHTML = '';
             data.forEach((player, index) => {
                 const li = document.createElement('li');
+                
+                let winsText = translations[currentLang].leaderboard_wins_many;
+                if (player.totalWins === 1) winsText = translations[currentLang].leaderboard_wins_one;
+                else if (player.totalWins > 1 && player.totalWins < 5 && currentLang === 'pl') winsText = translations[currentLang].leaderboard_wins_few;
+
                 li.innerHTML = `
                     <span>${index + 1}. <span class="rank-name">${player.username}</span></span>
-                    <span class="rank-score">${player.totalWins} ${player.totalWins === 1 ? 'wygrana' : (player.totalWins > 1 && player.totalWins < 5 ? 'wygrane' : 'wygranych')}</span>
+                    <span class="rank-score">${player.totalWins} ${winsText}</span>
                 `;
                 leaderboardListWins.appendChild(li);
             });
         } catch (error) {
             console.error('Błąd wczytywania rankingu (wygrane):', error);
-            leaderboardListWins.innerHTML = '<li>Błąd połączenia z serwerem.</li>';
+            leaderboardListWins.innerHTML = `<li>${translations[currentLang].leaderboard_error}</li>`;
         }
     }
 
@@ -835,7 +1151,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         powerUps.peek--;
         powerUpPeekBtn.disabled = true;
-        powerUpUsedThisGame = true; // Zaznacz użycie
+        powerUpUsedThisGame = true; 
         socket.emit('usePowerUp', 'peek');
 
         if (isSoloMode || currentGameMode === 'race') {
@@ -849,7 +1165,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         powerUps.autoPair--;
         powerUpAutopairBtn.disabled = true;
-        powerUpUsedThisGame = true; // Zaznacz użycie
+        powerUpUsedThisGame = true; 
         socket.emit('usePowerUp', 'autoPair');
 
         if (isSoloMode || currentGameMode === 'race') {
@@ -934,9 +1250,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         stat1Container.classList.remove('hidden');
         stat2Container.classList.remove('hidden');
-        stat1Label.textContent = "Rekord:";
+        stat1Label.textContent = translations[currentLang].record;
         stat1Unit.textContent = "s";
-        stat2Label.textContent = "Gry:";
+        stat2Label.textContent = translations[currentLang].games;
         loadSoloStats();
 
         if (rows === 6 && cols === 6) {
@@ -968,9 +1284,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         stat1Container.classList.remove('hidden');
         stat2Container.classList.remove('hidden');
-        stat1Label.textContent = "Wygrane:";
+        stat1Label.textContent = translations[currentLang].multiWins;
         stat1Unit.textContent = "";
-        stat2Label.textContent = "Gry Ogółem:";
+        stat2Label.textContent = translations[currentLang].gamesPlayed;
         loadMultiStats();
 
         if (data.rows === 6 && data.cols === 6) {
@@ -1030,7 +1346,7 @@ document.addEventListener('DOMContentLoaded', () => {
         gameBoard.innerHTML = '';
         
         powerUps = { peek: 1, autoPair: 1 };
-        powerUpUsedThisGame = false; // ZRESETUJ FLAGĘ
+        powerUpUsedThisGame = false; 
         powerUpPeekBtn.disabled = false;
         powerUpAutopairBtn.disabled = false;
         powerUpContainer.classList.add('hidden'); 
@@ -1154,12 +1470,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function updateTurnUI(isMyTurn) {
         if (isMyTurn) {
-            turnInfo.textContent = "Twoja tura!";
+            turnInfo.textContent = translations[currentLang].turnInfo_your;
             turnInfo.classList.add('my-turn');
             playerInfoPanel.classList.add('active-turn');
             opponentInfoPanel.classList.remove('active-turn');
         } else {
-            turnInfo.textContent = "Tura przeciwnika...";
+            turnInfo.textContent = translations[currentLang].turnInfo_opponent;
             turnInfo.classList.remove('my-turn');
             playerInfoPanel.classList.remove('active-turn');
             opponentInfoPanel.classList.add('active-turn');
@@ -1186,13 +1502,12 @@ document.addEventListener('DOMContentLoaded', () => {
         return null;
     }
 
-    // NOWA: Wczytuje statystyki MULTI (z chmury lub 0)
     function loadMultiStats() {
         stat1Container.classList.remove('hidden');
         stat2Container.classList.remove('hidden');
-        stat1Label.textContent = "Wygrane:";
+        stat1Label.textContent = translations[currentLang].multiWins;
         stat1Unit.textContent = "";
-        stat2Label.textContent = "Gry Ogółem:";
+        stat2Label.textContent = translations[currentLang].gamesPlayed;
         
         if (isGuest) {
             stat1Value.textContent = "0";
@@ -1203,13 +1518,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // ZAKTUALIZOWANE: Wczytuje staty SOLO (z chmury lub local)
     function loadSoloStats() {
         stat1Container.classList.remove('hidden');
         stat2Container.classList.remove('hidden');
-        stat1Label.textContent = "Rekord:";
+        stat1Label.textContent = translations[currentLang].record;
         stat1Unit.textContent = "s";
-        stat2Label.textContent = "Gry:";
+        stat2Label.textContent = translations[currentLang].games;
         
         let bestTime = 9999;
         let gamesPlayed = 0;
@@ -1237,10 +1551,9 @@ document.addEventListener('DOMContentLoaded', () => {
         let newRecord = false;
         let gamesPlayed = 0;
 
-        // Śledź użyte motywy
         if (isGuest) {
             themesPlayedGuest.add(currentTheme);
-            saveAchievementsToLocal(); // Zapisz motywy gościa
+            saveAchievementsToLocal();
         }
         
         if (isGuest) {
@@ -1260,7 +1573,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             return { newRecord, gamesPlayed };
         } else {
-            // ZALOGOWANY UŻYTKOWNIK -> Wyślij do API
             try {
                 const response = await fetch('/api/save-solo-stats', {
                     method: 'POST',
@@ -1271,7 +1583,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     body: JSON.stringify({ 
                         difficulty: difficulty, 
                         time: seconds,
-                        theme: currentTheme // Wyślij motyw
+                        theme: currentTheme 
                     })
                 });
                 const data = await response.json();
@@ -1306,12 +1618,10 @@ document.addEventListener('DOMContentLoaded', () => {
         if (currentRows === 6 && currentCols === 6) {
             unlockAchievement('master_mind');
         }
-        // NOWE OSIĄGNIĘCIE
         if (currentRows === 6 && currentCols === 6 && !powerUpUsedThisGame) {
             unlockAchievement('no_powerups_hard');
         }
         
-        // NOWE OSIĄGNIĘCIE (MOTYWY)
         let themesPlayed;
         if (isGuest) {
             themesPlayed = themesPlayedGuest;
@@ -1325,7 +1635,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     function showSoloWinModal(isNewRecord) {
-        soloModalMessage.textContent = `Ukończyłeś grę w ${seconds}s i ${moves} ruchach!`;
+        soloModalMessage.textContent = translations[currentLang].soloWinMessage
+            .replace('{seconds}', seconds)
+            .replace('{moves}', moves);
         
         if (currentRows === 4 || (currentRows === 6 && currentCols === 4)) {
             soloModalNextLevelBtn.classList.remove('hidden');
@@ -1344,10 +1656,9 @@ document.addEventListener('DOMContentLoaded', () => {
         soloWinModal.classList.remove('hidden');
     }
 
-    // ZAKTUALIZOWANE: Sprawdza serię wygranych
     function showWinModal(didPlayerWin, soloMode, isTie = false) {
         
-        modalPlayAgainBtn.classList.remove('hidden');
+        modalPlayAgainBtn.classList.remove('hidden'); 
         modalRematchBtn.classList.add('hidden');
         modalRematchStatus.textContent = '';
         modalRecordMessage.classList.add('hidden');
@@ -1355,36 +1666,33 @@ document.addEventListener('DOMContentLoaded', () => {
         if (soloMode) {
             showSoloWinModal(isTie); 
         } else {
-            modalRematchBtn.classList.remove('hidden');
+            const t = translations[currentLang];
+            modalRematchBtn.classList.remove('hidden'); 
             
             if (isTie) {
-                modalTitle.textContent = 'Remis!';
-                modalMessage.textContent = 'Niesamowita walka! Spróbujcie jeszcze raz.';
-                if (!isGuest) currentUser.winStreak = 0; // Resetuj serię przy remisie
+                modalTitle.textContent = t.winModal_Tie;
+                modalMessage.textContent = t.winModal_TieMsg;
+                if (!isGuest) currentUser.winStreak = 0;
             } else if (didPlayerWin) {
-                modalTitle.textContent = 'Gratulacje!';
+                modalTitle.textContent = t.congratulations;
                 modalMessage.textContent = (currentGameMode === 'race') 
-                    ? `Wygrałeś w ${seconds}s i ${moves} ruchach!`
-                    : 'Wygrałeś! Zebrałeś więcej par.';
+                    ? t.winModal_WinRace.replace('{seconds}', seconds).replace('{moves}', moves)
+                    : t.winModal_WinClassic;
                 try { winSound.play(); } catch(e) {}
                 unlockAchievement('first_multi_win'); 
 
-                // NOWE OSIĄGNIĘCIE (SERIA WYGRANYCH)
                 if (!isGuest) {
-                    // Serwer już zaktualizował winStreak, my tylko odczytujemy
-                    // Musimy poczekać, aż serwer zaktualizuje i odeśle nowe dane...
-                    // Prostsze rozwiązanie: śledźmy to też lokalnie.
                     currentUser.winStreak = (currentUser.winStreak || 0) + 1;
-                    if (currentUser.winStreak === 3) {
+                    if (currentUser.winStreak >= 3) {
                         unlockAchievement('win_streak_3');
                     }
                 }
             } else {
-                modalTitle.textContent = 'Niestety!';
+                modalTitle.textContent = t.winModal_LostTitle;
                 modalMessage.textContent = (currentGameMode === 'race')
-                    ? 'Przeciwnik był szybszy. Spróbuj jeszcze raz!'
-                    : 'Przeciwnik zebrał więcej par. Spróbuj jeszcze raz!';
-                if (!isGuest) currentUser.winStreak = 0; // Resetuj serię przy przegranej
+                    ? t.winModal_LostRace
+                    : t.winModal_LostClassic;
+                if (!isGuest) currentUser.winStreak = 0;
             }
             winModal.classList.remove('hidden');
         }
@@ -1395,7 +1703,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const token = localStorage.getItem('memorr_token');
         if (!token) {
             loadAchievements(); 
-            showLobbyUI("Gość", true);
+            showLobbyUI(translations[currentLang].guest, true);
             return;
         }
 
@@ -1412,7 +1720,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!response.ok) {
                 localStorage.removeItem('memorr_token');
                 loadAchievements();
-                showLobbyUI("Gość", true);
+                showLobbyUI(translations[currentLang].guest, true);
             } else {
                 currentUser = data.user;
                 isGuest = false;
@@ -1424,10 +1732,12 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error('Błąd weryfikacji tokenu:', error);
             localStorage.removeItem('memorr_token');
             loadAchievements();
-            showLobbyUI("Gość", true);
+            showLobbyUI(translations[currentLang].guest, true);
         }
     }
 
     // Domyślnie pokaż lobby na starcie
+    currentLang = localStorage.getItem('memorr_lang') || 'pl';
+    // setLanguage(currentLang); // Zostanie wywołane w checkTokenOnLoad -> showLobbyUI
     checkTokenOnLoad();
 });

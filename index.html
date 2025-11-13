@@ -1,6 +1,5 @@
 <!DOCTYPE html>
-<html lang="pl">
-<head>
+<html lang="pl"> <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Memorr - Gra Pamięciowa Online (Solo & Multiplayer)</title>
@@ -25,7 +24,6 @@
             // 2. Logika banera cookie
             const consent = localStorage.getItem('memorr_consent');
             if (!consent) {
-                // Pokaż baner dopiero po załadowaniu reszty strony
                 document.addEventListener('DOMContentLoaded', () => {
                     const banner = document.getElementById('cookie-consent-banner');
                     const consentBtn = document.getElementById('cookie-consent-btn');
@@ -58,121 +56,120 @@
 <body>
 
     <button id="theme-toggle-btn" title="Zmień motyw">🌙</button>
+    <button id="lang-toggle-btn" title="Change language">🇬🇧</button>
 
     <main>
         <h1><img src="/logo.png" alt="Memorr Logo" class="logo">Memo<span class="rr">rr</span> </h1>
 
         <div id="lobby-screen" class="panel">
-            <button id="leaderboard-btn" title="Ranking">🥇</button>
-            <button id="achievements-btn" title="Osiągnięcia">🏆</button>
-            <button id="auth-btn" title="Logowanie / Rejestracja">👤</button>
+            <button id="leaderboard-btn" title="Ranking" data-lang-title="rankingTitle">🥇</button>
+            <button id="achievements-btn" title="Osiągnięcia" data-lang-title="achievementsTitle">🏆</button>
+            <button id="auth-btn" title="Logowanie / Rejestracja" data-lang-title="authTitle">👤</button>
             
             <h2 id="welcome-message">Witaj, Gościu!</h2>
 
             <div id="mode-selection">
-                <button id="btn-select-solo" class="btn green">GRA SOLO</button>
-                <button id="btn-select-multi" class="btn blue">GRA WIELOOSOBOWA</button>
+                <button id="btn-select-solo" class="btn green" data-lang="playSolo"></button>
+                <button id="btn-select-multi" class="btn blue" data-lang="playMultiplayer"></button>
             </div>
 
-            <p class="game-description">
-                Witaj w Memorr! Sprawdź swoją pamięć grając solo lub zmierz się ze znajomymi w trybie multiplayer. Celem jest znalezienie wszystkich par. Powodzenia!
-            </p>
+            <p class="game-description" data-lang="gameDescription"></p>
             
             <div id="solo-options" class="hidden">
-                <h3>GRA SOLO - Wybierz Poziom</h3>
+                <h3 data-lang="soloH3"></h3>
                 <div class="difficulty-select">
-                    <button id="btn-solo-easy" class="btn green">Łatwy (4x4)</button>
-                    <button id="btn-solo-medium" class="btn green">Średni (6x4)</button>
-                    <button id="btn-solo-hard" class="btn green">Trudny (6x6)</button>
+                    <button id="btn-solo-easy" class="btn green" data-lang="easy"></button>
+                    <button id="btn-solo-medium" class="btn green" data-lang="medium"></button>
+                    <button id="btn-solo-hard" class="btn green" data-lang="hard"></button>
                 </div>
                 <div id="theme-selection-solo"></div>
-                <button id="btn-back-to-mode" class="btn purple">POWRÓT</button>
+                <button id="btn-back-to-mode" class="btn purple" data-lang="back"></button>
             </div>
 
             <div id="multi-options" class="hidden">
-                <h3>GRA WIELOOSOBOWA</h3>
+                <h3 data-lang="multiH3"></h3>
                 <div id="multi-create-join">
-                    <button id="btn-show-create-game" class="btn blue">STWÓRZ GRĘ</button>
-                    <button id="btn-show-join-game" class="btn blue">DOŁĄCZ DO GRY</button>
-                    <button id="btn-back-to-mode-multi" class="btn purple">POWRÓT</button>
+                    <button id="btn-show-create-game" class="btn blue" data-lang="createGame"></button>
+                    <button id="btn-show-join-game" class="btn blue" data-lang="joinGame"></button>
+                    <button id="btn-back-to-mode-multi" class="btn purple" data-lang="back"></button>
                 </div>
                 <div id="multi-create-details" class="hidden">
-                    <h4>STWÓRZ GRĘ</h4>
+                    <h4 data-lang="createGame"></h4>
                     <div id="game-mode-select">
                         <label>
-                            <input type="radio" name="gameMode" value="race" checked> Wyścig
-                            <span>(Kto pierwszy znajdzie pary na własnej planszy)</span>
+                            <input type="radio" name="gameMode" value="race" checked> <span data-lang="raceMode"></span>
+                            <span data-lang="raceDesc"></span>
                         </label>
                         <label>
-                            <input type="radio" name="gameMode" value="classic"> Klasyczny
-                            <span>(Wspólna plansza, gra na punkty i tury)</span>
+                            <input type="radio" name="gameMode" value="classic"> <span data-lang="classicMode"></span>
+                            <span data-lang="classicDesc"></span>
                         </label>
                     </div>
-                    <h5>Wybierz Poziom</h5>
+                    <h5 data-lang="selectLevel"></h5>
                     <div class="difficulty-select">
-                        <button id="btn-multi-easy" class="btn blue">Łatwy (4x4)</button>
-                        <button id="btn-multi-medium" class="btn blue">Średni (6x4)</button>
-                        <button id="btn-multi-hard" class="btn blue">Trudny (6x6)</button>
+                        <button id="btn-multi-easy" class="btn blue" data-lang="easy"></button>
+                        <button id="btn-multi-medium" class="btn blue" data-lang="medium"></button>
+                        <button id="btn-multi-hard" class="btn blue" data-lang="hard"></button>
                     </div>
                     <div id="theme-selection-multi"></div>
                     <div id="game-id-container" class="hidden">
-                        <span>ID Gry:</span>
+                        <span data-lang="gameId"></span>
                         <strong id="game-id-display"></strong>
-                        <button id="copy-game-id-btn" class="copy-btn" title="Kopiuj do schowka"></button>
+                        <button id="copy-game-id-btn" class="copy-btn" title="Kopiuj do schowka" data-lang-title="copyTitle"></button>
                     </div>
-                    <button id="btn-back-to-multi-options-from-create" class="btn purple">POWRÓT</button>
+                    <button id="btn-back-to-multi-options-from-create" class="btn purple" data-lang="back"></button>
                 </div>
                 <div id="multi-join-details" class="hidden">
-                    <h4>DOŁĄCZ DO GRY</h4>
-                    <input type="text" id="game-id-input" placeholder="Wpisz ID Gry" class="input-field">
-                    <button id="btn-join-game" class="btn blue">DOŁĄCZ</button>
-                    <button id="btn-back-to-multi-options-from-join" class="btn purple">POWRÓT</button>
+                    <h4 data-lang="joinGame"></h4>
+                    <input type="text" id="game-id-input" placeholder="Wpisz ID Gry" data-lang-placeholder="gameIdPlaceholder">
+                    <button id="btn-join-game" class="btn blue" data-lang="join"></button>
+                    <button id="btn-back-to-multi-options-from-join" class="btn purple" data-lang="back"></button>
                 </div>
             </div>
             
             <p id="lobby-message" class="error-text"></p>
             
-            <button id="logout-btn" class="btn red hidden">Wyloguj</button>
+            <button id="logout-btn" class="btn red hidden" data-lang="logout"></button>
         </div>
 
         <div id="theme-selection" class="hidden">
-            <h4>Wybierz motyw kart</h4>
+            <h4 data-lang="selectTheme"></h4>
             <div class="difficulty-select">
-                <button class="theme-btn selected" data-theme="default" title="Klasyczny">💎</button>
-                <button class="theme-btn" data-theme="nature" title="Natura">🌳</button>
-                <button class="theme-btn" data-theme="food" title="Jedzenie">🍕</button>
-                <button class="theme-btn" data-theme="animals" title="Zwierzęta">🐶</button>
+                <button class="theme-btn selected" data-theme="default" title="Klasyczny" data-lang-title="themeDefault">💎</button>
+                <button class="theme-btn" data-theme="nature" title="Natura" data-lang-title="themeNature">🌳</button>
+                <button class="theme-btn" data-theme="food" title="Jedzenie" data-lang-title="themeFood">🍕</button>
+                <button class="theme-btn" data-theme="animals" title="Zwierzęta" data-lang-title="themeAnimals">🐶</button>
             </div>
         </div>
 
         <div id="game-screen" class="hidden">
             <div class="controls">
                 <h3 id="turn-info" class="hidden"></h3>
-                <button id="btn-restart" class="btn purple">POWRÓT DO LOBBY</button> 
+                <button id="btn-restart" class="btn purple" data-lang="backToLobby"></button> 
             </div>
             
             <div id="powerup-container" class="hidden">
-                <button id="powerup-peek" class="powerup-btn" title="Podgląd (raz na grę)">👁️</button>
-                <button id="powerup-autopair" class="powerup-btn" title="Automatyczna para (raz na grę)">🎯</button>
+                <button id="powerup-peek" class="powerup-btn" title="Podgląd (raz na grę)" data-lang-title="peekTitle">👁️</button>
+                <button id="powerup-autopair" class="powerup-btn" title="Automatyczna para (raz na grę)" data-lang-title="autoPairTitle">🎯</button>
             </div>
             
             <div class="all-info-container">
                 <div id="player-info" class="info-container panel">
-                    <h3>GRACZ</h3>
-                    <div class="info-row">Czas: <span id="timer">0</span>s</div>
-                    <div class="info-row">Ruchy: <span id="move-counter">0</span></div>
-                    <div class="info-row">Punkty: <span id="pairs-found">0</span> / <span id="total-pairs">0</span></div>
+                    <h3 data-lang="player"></h3>
+                    <div class="info-row"><span data-lang="time"></span>: <span id="timer">0</span>s</div>
+                    <div class="info-row"><span data-lang="moves"></span>: <span id="move-counter">0</span></div>
+                    <div class="info-row"><span data-lang="points"></span>: <span id="pairs-found">0</span> / <span id="total-pairs">0</span></div>
                     
                     <div id="stat1-container" class="info-row">
-                        <span id="stat1-label">Rekord:</span> <span id="stat1-value">--</span><span id="stat1-unit">s</span>
+                        <span id="stat1-label" data-lang="record"></span>: <span id="stat1-value">--</span><span id="stat1-unit">s</span>
                     </div>
                     <div id="stat2-container" class="info-row">
-                        <span id="stat2-label">Gry:</span> <span id="stat2-value">0</span>
+                        <span id="stat2-label" data-lang="games"></span>: <span id="stat2-value">0</span>
                     </div>
                 </div>
                 <div id="opponent-info" class="info-container panel">
-                    <h3>PRZECIWNIK</h3>
-                    <div class="info-row">Punkty: <span id="opponent-pairs-found">0</span> / <span id="opponent-total-pairs">0</span></div>
+                    <h3 data-lang="opponent"></h3>
+                    <div class="info-row"><span data-lang="points"></span>: <span id="opponent-pairs-found">0</span> / <span id="opponent-total-pairs">0</span></div>
                 </div>
             </div>
             <div id="game-board"></div>
@@ -181,80 +178,80 @@
     
     <div id="win-modal" class="modal-overlay hidden">
         <div class="modal-content panel">
-            <h2 id="modal-title">Gratulacje!</h2>
+            <h2 id="modal-title"></h2>
             <p id="modal-message"></p>
-            <p id="modal-record-message" class="hidden">NOWY REKORD!</p>
+            <p id="modal-record-message" class="hidden" data-lang="newRecord"></p>
             <p id="modal-rematch-status"></p>
-            <button id="modal-play-again" class="btn green">POWRÓT DO LOBBY</button>
-            <button id="modal-rematch" class="btn blue hidden">REWANŻ</button>
+            <button id="modal-play-again" class="btn green" data-lang="backToLobby"></button>
+            <button id="modal-rematch" class="btn blue hidden" data-lang="rematch"></button>
         </div>
     </div>
 
     <div id="solo-win-modal" class="modal-overlay hidden">
         <div class="modal-content panel">
-            <h2 id="solo-modal-title">Gratulacje!</h2>
-            <p id="solo-modal-message">Ukończyłeś grę!</p>
-            <p id="solo-modal-record-message" class="hidden">NOWY REKORD!</p>
+            <h2 id="solo-modal-title" data-lang="congratulations"></h2>
+            <p id="solo-modal-message"></p>
+            <p id="solo-modal-record-message" class="hidden" data-lang="newRecord"></p>
             
             <div class="modal-button-container">
-                <button id="solo-modal-play-again" class="btn purple">POWRÓT DO LOBBY</button>
-                <button id="solo-modal-replay" class="btn green">JESZCZE RAZ</button>
-                <button id="solo-modal-next-level" class="btn blue hidden">WYŻSZY POZIOM</button>
+                <button id="solo-modal-play-again" class="btn purple" data-lang="backToLobby"></button>
+                <button id="solo-modal-replay" class="btn green" data-lang="replay"></button>
+                <button id="solo-modal-next-level" class="btn blue hidden" data-lang="nextLevel"></button>
             </div>
         </div>
     </div>
 
     <div id="achievements-modal" class="modal-overlay hidden">
         <div class="modal-content panel">
-            <h2>Twoje Osiągnięcia</h2>
+            <h2 data-lang="yourAchievements"></h2>
             <ul id="achievements-list"></ul>
-            <button id="achievements-close-btn" class="btn purple">ZAMKNIJ</button>
+            <button id="achievements-close-btn" class="btn purple" data-lang="close"></button>
         </div>
     </div>
     
     <div id="auth-panel" class="modal-overlay hidden">
         <div class="modal-content panel">
             <div class="auth-tabs">
-                <button id="login-tab-btn" class="auth-tab active" data-form="login-form">Logowanie</button>
-                <button id="register-tab-btn" class="auth-tab" data-form="register-form">Rejestracja</button>
+                <button id="login-tab-btn" class="auth-tab active" data-form="login-form" data-lang="login"></button>
+                <button id="register-tab-btn" class="auth-tab" data-form="register-form" data-lang="register"></button>
             </div>
 
             <form id="login-form" class="auth-form">
-                <h2>Witaj z powrotem!</h2>
-                <input type="text" id="login-username" class="input-field" placeholder="Nazwa użytkownika" required>
-                <input type="password" id="login-password" class="input-field" placeholder="Hasło" required>
-                <button type="submit" class="btn blue">Zaloguj się</button>
-                <a href="#" id="forgot-password-link" class="auth-link">Nie pamiętasz hasła?</a>
+                <h2 data-lang="welcomeBack"></h2>
+                <input type="text" id="login-username" class="input-field" placeholder="Nazwa użytkownika" data-lang-placeholder="usernamePlaceholder" required>
+                <input type="password" id="login-password" class="input-field" placeholder="Hasło" data-lang-placeholder="passwordPlaceholder" required>
+                <button type="submit" class="btn blue" data-lang="login"></button>
+                <a href="#" id="forgot-password-link" class="auth-link" data-lang="forgotPassword"></a>
             </form>
             
             <form id="register-form" class="auth-form hidden">
-                <h2>Dołącz do Memorr</h2>
-                <input type="text" id="register-username" class="input-field" placeholder="Nazwa użytkownika (min. 3 znaki)" required>
-                <input type="email" id="register-email" class="input-field" placeholder="Twój e-mail" required>
-                <input type="password" id="register-password" class="input-field" placeholder="Hasło (min. 6 znaków)" required>
-                <button type="submit" class="btn green">Zarejestruj się</button>
+                <h2 data-lang="joinMemorr"></h2>
+                <input type="text" id="register-username" class="input-field" placeholder="Nazwa użytkownika (min. 3 znaki)" data-lang-placeholder="usernameRegisterPlaceholder" required>
+                <input type="email" id="register-email" class="input-field" placeholder="Twój e-mail" data-lang-placeholder="emailPlaceholder" required>
+                <input type="password" id="register-password" class="input-field" placeholder="Hasło (min. 6 znaków)" data-lang-placeholder="passwordRegisterPlaceholder" required>
+                <button type="submit" class="btn green" data-lang="register"></button>
             </form>
 
             <form id="forgot-password-form" class="auth-form hidden">
-                <h2>Zresetuj hasło</h2>
-                <p class="auth-subtext">Podaj swój e-mail, a wyślemy Ci link do resetu hasła.</p>
-                <input type="email" id="forgot-email" class="input-field" placeholder="Twój e-mail" required>
-                <button type="submit" class="btn purple">Wyślij link</button>
-                <a href="#" id="back-to-login-link" class="auth-link">Wróć do logowania</a>
+                <h2 data-lang="resetPassword"></h2>
+                <p class="auth-subtext" data-lang="resetSubtext"></p>
+                <input type="email" id="forgot-email" class="input-field" placeholder="Twój e-mail" data-lang-placeholder="emailPlaceholder" required>
+                <button type="submit" class="btn purple" data-lang="sendLink"></button>
+                <a href="#" id="back-to-login-link" class="auth-link" data-lang="backToLogin"></a>
             </form>
 
             <p id="auth-message" class="error-text"></p>
-            <button id="auth-close-btn" class="auth-close-btn" title="Zamknij">✖</button>
+            <button id="auth-close-btn" class="auth-close-btn" title="Zamknij" data-lang-title="closeTitle">✖</button>
         </div>
     </div>
 
     <div id="leaderboard-modal" class="modal-overlay hidden">
         <div class="modal-content panel">
-            <h2>Ranking Graczy</h2>
+            <h2 data-lang="leaderboard"></h2>
             
             <div class="auth-tabs">
-                <button id="leaderboard-tab-time" class="auth-tab active" data-list="leaderboard-list-time">Najlepszy Czas (6x6)</button>
-                <button id="leaderboard-tab-wins" class="auth-tab" data-list="leaderboard-list-wins">Wygrane Mecze</button>
+                <button id="leaderboard-tab-time" class="auth-tab active" data-list="leaderboard-list-time" data-lang="bestTime6x6"></button>
+                <button id="leaderboard-tab-wins" class="auth-tab" data-list="leaderboard-list-wins" data-lang="multiWinsRank"></button>
             </div>
 
             <ol id="leaderboard-list-time" class="leaderboard-list">
@@ -264,25 +261,26 @@
                 <li>Ładowanie...</li>
             </ol>
 
-            <button id="leaderboard-close-btn" class="btn purple">ZAMKNIJ</button>
+            <button id="leaderboard-close-btn" class="btn purple" data-lang="close"></button>
         </div>
     </div>
 
     <div id="toast-notification" class="toast">
         <span class="toast-icon">🏆</span>
         <div class="toast-content">
-            <span class="toast-title">Osiągnięcie odblokowane!</span>
-            <span class="toast-message">Dobra robota!</span>
+            <span class="toast-title" data-lang="toastTitle"></span>
+            <span class="toast-message"></span>
         </div>
     </div>
-<div id="cookie-consent-banner" class="panel hidden">
-        <p>Używamy plików cookie (i `localStorage`), aby ulepszyć grę, zapisać Twój motyw i obsługiwać reklamy. Korzystając ze strony, zgadzasz się na naszą <a href="/privacy-policy.html">Politykę Prywatności</a>.</p>
-        <button id="cookie-consent-btn" class="btn small green">Rozumiem</button>
+    
+    <div id="cookie-consent-banner" class="panel hidden">
+        <p data-lang="cookieText"></p>
+        <button id="cookie-consent-btn" class="btn small green" data-lang="cookieBtn"></button>
     </div>
     
     <footer>
         <div class="footer-content">
-            &copy; memorr.top | <a href="/help.html">Pomoc</a> | <a href="/contact.html">Kontakt</a> | <a href="/blog">Blog</a> | <a href="/privacy-policy.html">Polityka Prywatności</a> | <a href="https://www.facebook.com/memorrtop" target="_blank" rel="noopener noreferrer">Facebook</a>
+            &copy; memorr.top | <a href="/help.html" data-lang="footerHelp">Pomoc</a> | <a href="/contact.html" data-lang="footerContact">Kontakt</a> | <a href="/blog" data-lang="footerBlog">Blog</a> | <a href="/privacy-policy.html" data-lang="footerPrivacy">Polityka Prywatności</a> | <a href="https://www.facebook.com/memorrtop" target="_blank" rel="noopener noreferrer">Facebook</a>
         </div>
     </footer>
     

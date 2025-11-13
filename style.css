@@ -73,6 +73,31 @@ body {
     transform: scale(1.1);
 }
 
+/* ===== NOWY PRZYCISK JĘZYKA ===== */
+#lang-toggle-btn {
+    position: fixed;
+    top: 20px;
+    right: 80px; /* Obok przycisku motywu */
+    z-index: 1001;
+    background: var(--bg-white);
+    border: none;
+    border-radius: 50%;
+    width: 45px;
+    height: 45px;
+    font-size: 1.5em;
+    cursor: pointer;
+    box-shadow: var(--shadow-medium);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.3s, transform 0.3s ease;
+}
+#lang-toggle-btn:hover {
+    transform: scale(1.1);
+}
+/* ================================== */
+
+
 main {
     flex-grow: 1;
     width: 100%;
@@ -82,32 +107,28 @@ main {
     justify-content: center;
 }
 
-h1, h2, h3, h4 {
-    color: var(--text-primary);
-    font-weight: 800;
-    margin-top: 0;
-    margin-bottom: 25px;
-}
-h1 { font-size: 3em; 
+/* POPRAWIONA SEKCJA H1 */
+h1 { 
+    font-size: 3em; 
     color: var(--text-primary); 
-    /* NOWE STYLE DLA H1, ABY ZAWIERAŁ LOGO */
     display: flex;
     align-items: center;
     justify-content: center;
-    flex-wrap: wrap; /* Na wypadek bardzo małych ekranów */
-     /* Odstęp między tekstem a logo */
+    flex-wrap: wrap; 
+    /*gap: 10px;  POPRAWNIE UMIESZCZONY */
  }
 h1 .rr {
     color: var(--accent-blue);
 }
-h1 img.logo {gap: 10px;
-    height: 1em; /* Dopasuj wysokość logo do wysokości czcionki */
+h1 img.logo {
+    /* USUNIĘTO BŁĘDNY 'gap: 10px;' STĄD */
+    height: 1em; 
     width: auto;
-    /* Poprawka dla trybu ciemnego, jeśli logo ma przezroczystość */
     html.dark-mode & {
         filter: brightness(1.2);
     }
 }
+/* KONIEC POPRAWKI */
 
 h2 { font-size: 2em; }
 h3 { font-size: 1.5em; }
@@ -559,18 +580,18 @@ html.dark-mode .copy-btn.copied {
     font-weight: 700;
 }
 
-#best-score-container {
+#stat1-container {
     color: var(--accent-green);
     font-weight: 700;
 }
-#best-score-container span {
+#stat1-container span {
     color: var(--accent-green);
 }
-#games-played-container {
+#stat2-container {
     color: var(--accent-green);
     font-weight: 700;
 }
-#games-played-container span {
+#stat2-container span {
     color: var(--accent-green);
 }
 
@@ -583,21 +604,6 @@ html.dark-mode .copy-btn.copied {
 
 #game-screen.solo-mode #opponent-info {
     display: none;
-}
-#game-screen.solo-mode #best-score-container {
-    display: block !important;
-}
-#game-screen.solo-mode #games-played-container {
-    display: block !important;
-}
-#game-screen:not(.solo-mode) #best-score-container {
-    display: none !important;
-}
-#game-screen:not(.solo-mode) #games-played-container {
-    display: none !important;
-}
-#game-screen:not(.solo-mode) #opponent-info {
-    display: block !important;
 }
 
 /* ===== STYLE POWER-UPÓW ===== */
@@ -737,7 +743,6 @@ html.dark-mode .copy-btn.copied {
     margin-bottom: 20px;
     font-weight: 800;
 }
-/* Poprawka dla modala rankingu */
 #leaderboard-modal .modal-content h4 {
     margin-top: -15px;
 }
@@ -784,10 +789,9 @@ html.dark-mode .copy-btn.copied {
     padding: 12px 20px;
     font-size: 1.1em;
 }
-/* ===== DODAJ TEN NOWY BLOK PONIŻEJ ===== */
 .modal-button-container {
     display: flex;
-    flex-wrap: wrap; /* Na wypadek małych ekranów */
+    flex-wrap: wrap;
     justify-content: center;
     gap: 15px;
     margin-top: 25px;
@@ -796,7 +800,7 @@ html.dark-mode .copy-btn.copied {
     font-size: 1em;
     padding: 10px 20px;
 }
-/* ================================== */
+
 /* ===== STOPKA ===== */
 footer {
     width: 100%;
@@ -857,11 +861,9 @@ footer {
     transform: scale(1.1);
 }
 
-/* NOWA IKONA RANKINGU */
 #leaderboard-btn {
     position: absolute;
     bottom: 20px;
-    /* Przesunięcie, aby zrobić miejsce dla ikony 👤 */
     right: 80px; 
     background: none;
     border: none;
@@ -886,8 +888,7 @@ footer {
     text-align: left;
 }
 
-/* NOWA LISTA RANKINGU */
-.leaderboard-list { /* Użyj klasy zamiast ID */
+.leaderboard-list {
     list-style: none;
     padding: 0;
     margin: 20px 0;
@@ -905,15 +906,15 @@ footer {
     background: var(--bg-light);
 }
 .leaderboard-list li:nth-child(1) {
-    background: #fffbe6; /* Złoty */
+    background: #fffbe6;
     border: 2px solid #ffe58f;
     font-weight: 800;
 }
 .leaderboard-list li:nth-child(2) {
-    background: #f0f0f0; /* Srebrny */
+    background: #f0f0f0;
 }
 .leaderboard-list li:nth-child(3) {
-    background: #fff0e6; /* Brązowy */
+    background: #fff0e6;
 }
 html.dark-mode .leaderboard-list li {
     background: var(--input-bg);
@@ -1026,33 +1027,28 @@ html.dark-mode .achievement-item.unlocked {
     font-weight: 400;
     color: var(--text-secondary);
 }
-/* ===== NOWE STYLE DLA STRON TEKSTOWYCH (POMOC, BLOG) ===== */
-.page-content {
-    text-align: left; /* Wyrównaj tekst do lewej */
-    max-width: 700px; /* Szerszy panel dla tekstu */
-}
 
+/* ===== STYLE DLA STRON TEKSTOWYCH (POMOC, BLOG) ===== */
+.page-content {
+    text-align: left;
+    max-width: 700px;
+}
 .page-content h3 {
     margin-top: 30px;
     color: var(--accent-blue);
 }
-
 .page-content p, .page-content li {
     font-size: 1.1em;
-    line-height: 1.7; /* Lepsza czytelność */
+    line-height: 1.7;
     color: var(--text-primary);
 }
-
 .page-content ul, .page-content ol {
     margin-left: 20px;
 }
-
 .page-content .btn {
     margin-top: 20px;
-    display: inline-block; /* Aby przycisk nie był na całą szerokość */
+    display: inline-block;
 }
-
-/* Styl dla listy artykułów na /blog/index.html */
 .article-link {
     border-bottom: 2px solid var(--input-bg);
     padding-bottom: 15px;
