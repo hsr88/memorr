@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Polityka Prywatności - Memorr</title>
-    <meta name="description" content="Polityka Prywatności serwisu memorr.top">
+    <title data-lang="page_privacy_title">Polityka Prywatności - Memorr</title>
+    <meta name="description" content="Polityka Prywatności serwisu memorr.top" data-lang-desc="page_privacy_desc">
     
     <link rel="icon" type="image/png" href="favicon.png"> 
     
@@ -19,7 +19,6 @@
             // 2. Logika banera cookie
             const consent = localStorage.getItem('memorr_consent');
             if (!consent) {
-                // Pokaż baner dopiero po załadowaniu reszty strony
                 document.addEventListener('DOMContentLoaded', () => {
                     const banner = document.getElementById('cookie-consent-banner');
                     const consentBtn = document.getElementById('cookie-consent-btn');
@@ -37,58 +36,68 @@
     </script>
     
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css"> </head>
-<body>
+    <link rel="stylesheet" href="style.css"> 
+</head>
+<body data-page-title="page_privacy_title" data-page-desc="page_privacy_desc">
+
+    <button id="theme-toggle-btn" title="Zmień motyw">🌙</button>
+    <button id="lang-toggle-btn" title="Change language">🇬🇧</button>
+
     <main>
         <h1><img src="/logo.png" alt="Memorr Logo" class="logo">Memo<span class="rr">rr</span> </h1>
 
         <div class="panel page-content">
-            <h2>Polityka Prywatności</h2>
-            <p class="article-meta">Ostatnia aktualizacja: 8 listopada 2025</p>
+            <h2 data-lang="page_privacy_h2">Polityka Prywatności</h2>
+            <p class="article-meta" data-lang="page_privacy_meta">Ostatnia aktualizacja: 8 listopada 2025</p>
             
-            <p>Niniejsza Polityka Prywatności opisuje, jakie dane zbieramy w serwisie memorr.top i w jaki sposób je wykorzystujemy.</p>
+            <p data-lang="page_privacy_p1">Niniejsza Polityka Prywatności opisuje, jakie dane zbieramy w serwisie memorr.top i w jaki sposób je wykorzystujemy.</p>
 
-            <h3>1. Jakie dane gromadzimy?</h3>
-            <p>Zbieramy dane, które nam podajesz oraz te, które zbieramy automatycznie.</p>
+            <h3 data-lang="page_privacy_h3_data">1. Jakie dane gromadzimy?</h3>
+            <p data-lang="page_privacy_p_data">Zbieramy dane, które nam podajesz oraz te, które zbieramy automatycznie.</p>
             <ul>
-                <li><strong>Dane podawane przez użytkownika:</strong> Podczas rejestracji konta prosimy o podanie nazwy użytkownika, adresu e-mail oraz hasła (Twoje hasło jest przechowywane w formie zaszyfrowanej - "hash" - i nikt nie ma do niego dostępu).</li>
-                <li><strong>Dane zbierane automatycznie:</strong> Kiedy grasz w naszą grę, zapisujemy Twoje postępy (osiągnięcia, najlepsze czasy solo, liczbę wygranych), aby powiązać je z Twoim kontem i umożliwić Ci udział w rankingach.</li>
-                <li><strong>Dane techniczne (localStorage):</strong> Używamy pamięci lokalnej Twojej przeglądarki (`localStorage`) do przechowywania Twojego tokena sesji (abyś pozostał zalogowany), Twojego wyboru motywu (jasny/ciemny) oraz postępów w grze, jeśli grasz jako "Gość".</li>
+                <li data-lang="page_privacy_li_data1"><strong>Dane podawane przez użytkownika:</strong> Podczas rejestracji konta prosimy o podanie nazwy użytkownika, adresu e-mail oraz hasła (Twoje hasło jest przechowywane w formie zaszyfrowanej - "hash" - i nikt nie ma do niego dostępu).</li>
+                <li data-lang="page_privacy_li_data2"><strong>Dane zbierane automatycznie:</strong> Kiedy grasz w naszą grę, zapisujemy Twoje postępy (osiągnięcia, najlepsze czasy solo, liczbę wygranych), aby powiązać je z Twoim kontem i umożliwić Ci udział w rankingach.</li>
+                <li data-lang="page_privacy_li_data3"><strong>Dane techniczne (localStorage):</strong> Używamy pamięci lokalnej Twojej przeglądarki (`localStorage`) do przechowywania Twojego tokena sesji (abyś pozostał zalogowany), Twojego wyboru motywu (jasny/ciemny) oraz postępów w grze, jeśli grasz jako "Gość".</li>
             </ul>
 
-            <h3>2. Jak wykorzystujemy Twoje dane?</h3>
-            <p>Twoje dane wykorzystujemy wyłącznie w celu świadczenia usług w ramach gry Memorr:</p>
+            <h3 data-lang="page_privacy_h3_use">2. Jak wykorzystujemy Twoje dane?</h3>
+            <p data-lang="page_privacy_p_use">Twoje dane wykorzystujemy wyłącznie w celu świadczenia usług w ramach gry Memorr:</p>
             <ul>
-                <li>Do logowania Cię na Twoje konto.</li>
-                <li>Do zapisywania Twoich postępów w grze (osiągnięcia, statystyki) i synchronizowania ich między urządzeniami.</li>
-                <li>Do umożliwienia Ci udziału w globalnych rankingach.</li>
-                <li>Do obsługi procesu resetowania hasła (wysyłania e-maila z linkiem).</li>
+                <li data-lang="page_privacy_li_use1">Do logowania Cię na Twoje konto.</li>
+                <li data-lang="page_privacy_li_use2">Do zapisywania Twoich postępów w grze (osiągnięcia, statystyki) i synchronizowania ich między urządzeniami.</li>
+                <li data-lang="page_privacy_li_use3">Do umożliwienia Ci udziału w globalnych rankingach.</li>
+                <li data-lang="page_privacy_li_use4">Do obsługi procesu resetowania hasła (wysyłania e-maila z linkiem).</li>
             </ul>
-            <p>Nigdy nie udostępniamy Twojego adresu e-mail ani innych danych osobowych stronom trzecim w celach marketingowych.</p>
+            <p data-lang="page_privacy_p_use_share">Nigdy nie udostępniamy Twojego adresu e-mail ani innych danych osobowych stronom trzecim w celach marketingowych.</p>
 
-            <h3>3. Pliki Cookie i Reklamy (Google AdSense)</h3>
-            <p>Planujemy wyświetlać reklamy za pośrednictwem programu Google AdSense. W związku z tym:</p>
+            <h3 data-lang="page_privacy_h3_cookies">3. Pliki Cookie i Reklamy (Google AdSense)</h3>
+            <p data-lang="page_privacy_p_cookies">Planujemy wyświetlać reklamy za pośrednictwem programu Google AdSense. W związku z tym:</p>
             <ul>
-                <li>Google, jako dostawca zewnętrzny, używa plików cookie do wyświetlania reklam w naszym serwisie.</li>
-                <li>Google używa plików cookie DART, co umożliwia wyświetlanie użytkownikom reklam na podstawie ich wizyt w naszej witrynie oraz innych witrynach w Internecie.</li>
-                <li>Użytkownicy mogą zrezygnować z używania plików cookie DART, odwiedzając stronę <a href="https://policies.google.com/technologies/ads" target="_blank" rel="noopener noreferrer">polityki prywatności reklam Google</a>.</li>
+                <li data-lang="page_privacy_li_cookies1">Google, jako dostawca zewnętrzny, używa plików cookie do wyświetlania reklam w naszym serwisie.</li>
+                <li data-lang="page_privacy_li_cookies2">Google używa plików cookie DART, co umożliwia wyświetlanie użytkownikom reklam na podstawie ich wizyt w naszej witrynie oraz innych witrynach w Internecie.</li>
+                <li data-lang="page_privacy_li_cookies3">Użytkownicy mogą zrezygnować z używania plików cookie DART, odwiedzając stronę <a href="https://policies.google.com/technologies/ads" target="_blank" rel="noopener noreferrer">polityki prywatności reklam Google</a>.</li>
             </ul>
-            <p>Nie mamy dostępu ani kontroli nad plikami cookie używanymi przez zewnętrznych reklamodawców (Google).</p>
+            <p data-lang="page_privacy_p_cookies_access">Nie mamy dostępu ani kontroli nad plikami cookie używanymi przez zewnętrznych reklamodawców (Google).</p>
 
-            <h3>4. Kontakt</h3>
-            <p>Jeśli masz jakiekolwiek pytania dotyczące tej polityki prywatności, skontaktuj się z nami za pośrednictwem strony <a href="/contact.html">Kontakt</a>.</p>
+            <h3 data-lang="page_privacy_h3_contact">4. Kontakt</h3>
+            <p data-lang="page_privacy_p_contact">Jeśli masz jakiekolwiek pytania dotyczące tej polityki prywatności, skontaktuj się z nami za pośrednictwem strony <a href="/contact.html">Kontakt</a>.</p>
             
-            <button onclick="window.location.href='/'" class="btn purple">POWRÓT DO GRY</button>
+            <button onclick="window.location.href='/'" class="btn purple" data-lang="backToLobby">POWRÓT DO GRY</button>
         </div>
     </main>
-<div id="cookie-consent-banner" class="panel hidden">
-        <p>Używamy plików cookie (i `localStorage`), aby ulepszyć grę, zapisać Twój motyw i obsługiwać reklamy. Korzystając ze strony, zgadzasz się na naszą <a href="/privacy-policy.html">Politykę Prywatności</a>.</p>
-        <button id="cookie-consent-btn" class="btn small green">Rozumiem</button>
+
+    <div id="cookie-consent-banner" class="panel hidden">
+        <p data-lang="cookieText">Używamy plików cookie (i `localStorage`), aby ulepszyć grę, zapisać Twój motyw i obsługiwać reklamy. Korzystając ze strony, zgadzasz się na naszą <a href="/privacy-policy.html">Politykę Prywatności</a>.</p>
+        <button id="cookie-consent-btn" class="btn small green" data-lang="cookieBtn">Rozumiem</button>
     </div>
+
     <footer>
         <div class="footer-content">
-            &copy; memorr.top | <a href="/help.html">Pomoc</a> | <a href="/contact.html">Kontakt</a> | <a href="/blog">Blog</a> | <a href="/privacy-policy.html">Polityka Prywatności</a> | <a href="https://www.facebook.com/memorrtop" target="_blank" rel="noopener noreferrer">Facebook</a>
+            &copy; memorr.top | <a href="/help.html" data-lang="footerHelp">Pomoc</a> | <a href="/contact.html" data-lang="footerContact">Kontakt</a> | <a href="/blog">Blog</a> | <a href="/privacy-policy.html" data-lang="footerPrivacy">Polityka Prywatności</a> | <a href="https://www.facebook.com/memorrtop" target="_blank" rel="noopener noreferrer">Facebook</a>
         </div>
     </footer>
+    
+    <script src="translations.js"></script>
+    <script src="static-lang.js"></script>
 </body>
 </html>

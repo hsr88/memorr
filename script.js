@@ -28,250 +28,7 @@ const allAchievements = {
 };
 let unlockedAchievements = new Set();
 
-// ===== NOWY OBIEKT TŁUMACZEŃ =====
-const translations = {
-    "pl": {
-        "langBtn": "🇬🇧", // Przycisk pokazuje flagę UK
-        "langTitle": "Change language",
-        "htmlLang": "pl",
-        "title": "Memorr - Gra Pamięciowa Online (Solo & Multiplayer)",
-        "description": "Zagraj w Memorr, darmową grę pamięciową online. Trenuj pamięć w trybie solo lub rywalizuj ze znajomymi w pojedynkach multiplayer!",
-        "rankingTitle": "Ranking",
-        "achievementsTitle": "Osiągnięcia",
-        "authTitle": "Logowanie / Rejestracja",
-        "welcome": "Witaj",
-        "guest": "Gościu", // Poprawka
-        "playSolo": "GRA SOLO",
-        "playMultiplayer": "GRA WIELOOSOBOWA",
-        "gameDescription": "Witaj w Memorr! Sprawdź swoją pamięć grając solo lub zmierz się ze znajomymi w trybie multiplayer. Celem jest znalezienie wszystkich par. Powodzenia!",
-        "soloH3": "GRA SOLO - Wybierz Poziom",
-        "easy": "Łatwy (4x4)",
-        "medium": "Średni (6x4)",
-        "hard": "Trudny (6x6)",
-        "back": "POWRÓT",
-        "multiH3": "GRA WIELOOSOBOWA",
-        "createGame": "STWÓRZ GRĘ",
-        "joinGame": "DOŁĄCZ DO GRY",
-        "raceMode": "Wyścig",
-        "raceDesc": "(Kto pierwszy znajdzie pary na własnej planszy)",
-        "classicMode": "Klasyczny",
-        "classicDesc": "(Wspólna plansza, gra na punkty i tury)",
-        "selectLevel": "Wybierz Poziom",
-        "gameId": "ID Gry:",
-        "copyTitle": "Kopiuj do schowka",
-        "gameIdPlaceholder": "Wpisz ID Gry",
-        "join": "DOŁĄCZ",
-        "logout": "Wyloguj",
-        "selectTheme": "Wybierz motyw kart",
-        "themeDefault": "Klasyczny",
-        "themeNature": "Natura",
-        "themeFood": "Jedzenie",
-        "themeAnimals": "Zwierzęta",
-        "backToLobby": "POWRÓT DO LOBBY",
-        "peekTitle": "Podgląd (raz na grę)",
-        "autoPairTitle": "Automatyczna para (raz na grę)",
-        "player": "GRACZ",
-        "time": "Czas",
-        "moves": "Ruchy",
-        "points": "Punkty",
-        "record": "Rekord",
-        "games": "Gry",
-        "multiWins": "Wygrane",
-        "gamesPlayed": "Gry Ogółem",
-        "opponent": "PRZECIWNIK",
-        "newRecord": "NOWY REKORD!",
-        "rematch": "REWANŻ",
-        "congratulations": "Gratulacje!",
-        "soloWinMessage": "Ukończyłeś grę w {seconds}s i {moves} ruchach!",
-        "replay": "JESZCZE RAZ",
-        "nextLevel": "WYŻSZY POZIOM",
-        "yourAchievements": "Twoje Osiągnięcia",
-        "close": "ZAMKNIJ",
-        "login": "Logowanie",
-        "register": "Rejestracja",
-        "welcomeBack": "Witaj z powrotem!",
-        "usernamePlaceholder": "Nazwa użytkownika",
-        "passwordPlaceholder": "Hasło",
-        "forgotPassword": "Nie pamiętasz hasła?",
-        "joinMemorr": "Dołącz do Memorr",
-        "usernameRegisterPlaceholder": "Nazwa użytkownika (min. 3 znaki)",
-        "emailPlaceholder": "Twój e-mail",
-        "passwordRegisterPlaceholder": "Hasło (min. 6 znaków)",
-        "resetPassword": "Zresetuj hasło",
-        "resetSubtext": "Podaj swój e-mail, a wyślemy Ci link do resetu hasła.",
-        "sendLink": "Wyślij link",
-        "backToLogin": "Wróć do logowania",
-        "closeTitle": "Zamknij",
-        "leaderboard": "Ranking Graczy",
-        "bestTime6x6": "Najlepszy Czas (6x6)",
-        "multiWinsRank": "Wygrane Mecze",
-        "toastTitle": "Osiągnięcie odblokowane!",
-        "cookieText": "Używamy plików cookie (i `localStorage`), aby ulepszyć grę, zapisać Twój motyw i obsługiwać reklamy. Korzystając ze strony, zgadzasz się na naszą <a href=\"/privacy-policy.html\">Politykę Prywatności</a>.",
-        "cookieBtn": "Rozumiem",
-        "lobbyMsg_copied": "Skopiowano kod: {gameID}",
-        "lobbyMsg_copyError": "Nie udało się skopiować.",
-        "lobbyMsg_waitOpponent": "Czekam na przeciwnika...",
-        "lobbyMsg_loading": "Przetwarzanie...",
-        "lobbyMsg_noGame": "Gra o tym ID nie istnieje.",
-        "lobbyMsg_full": "Ten pokój jest już pełny.",
-        "winModal_Tie": "Remis!",
-        "winModal_TieMsg": "Niesamowita walka! Spróbujcie jeszcze raz.",
-        "winModal_WinRace": "Wygrałeś w {seconds}s i {moves} ruchach!",
-        "winModal_WinClassic": "Wygrałeś! Zebrałeś więcej par.",
-        "winModal_LostTitle": "Niestety!",
-        "winModal_LostRace": "Przeciwnik był szybszy. Spróbuj jeszcze raz!",
-        "winModal_LostClassic": "Przeciwnik zebrał więcej par. Spróbuj jeszcze raz!",
-        "leaderboard_loading": "Ładowanie...",
-        "leaderboard_error": "Nie udało się wczytać rankingu.",
-        "leaderboard_noTime": "Nikt jeszcze nie ukończył gry na poziomie Trudnym! Bądź pierwszy.",
-        "leaderboard_noWins": "Nikt jeszcze nie wygrał meczu multiplayer!",
-        "leaderboard_wins_one": "wygrana",
-        "leaderboard_wins_few": "wygrane",
-        "leaderboard_wins_many": "wygranych",
-        "turnInfo_your": "Twoja tura!",
-        "turnInfo_opponent": "Tura przeciwnika...",
-        "rematch_offer": "Przeciwnik chce zagrać rewanż!",
-        "rematch_wait": "Wysłano prośbę o rewanż... Czekam...",
-        "opponent_disconnected_title": "Koniec Gry",
-        "opponent_disconnected_msg": "Przeciwnik się rozłączył. Wygrałeś!",
-        "opponent_disconnected_lobby": "Przeciwnik się rozłączył.",
-        "footerHelp": "Pomoc",
-        "footerContact": "Kontakt",
-        "footerBlog": "Blog",
-        "footerPrivacy": "Polityka Prywatności",
-        "achievements": {
-            "first_solo_game": { "title": "Pierwsze Kroki", "description": "Ukończ swoją pierwszą grę solo." },
-            "fast_win_easy":   { "title": "Szybki jak Błyskawica", "description": "Ukończ grę 4x4 w mniej niż 30 sekund." },
-            "perfect_game":    { "title": "Perfekcjonista", "description": "Ukończ grę solo bez ani jednej pomyłki." },
-            "master_mind":     { "title": "Geniusz Pamięci", "description": "Ukończ grę na poziomie 6x6." },
-            "first_multi_win": { "title": "Pierwsze Zwycięstwo", "description": "Wygraj swój pierwszy pojedynek multiplayer." },
-            "no_powerups_hard": { "title": "Czysty Umysł", "description": "Ukończ grę 6x6 bez użycia power-upów." },
-            "win_streak_3":     { "title": "W Gazie!", "description": "Wygraj 3 gry multiplayer z rzędu." },
-            "connoisseur":      { "title": "Koneser", "description": "Zagraj grę każdym z 4 motywów." }
-        }
-    },
-    "en": {
-        "langBtn": "🇵🇱", // Przycisk pokazuje flagę Polski
-        "langTitle": "Zmień język",
-        "htmlLang": "en",
-        "title": "Memorr - Online Memory Game (Solo & Multiplayer)",
-        "description": "Play Memorr, a free online memory game. Train your memory in solo mode or compete with friends in multiplayer matches!",
-        "rankingTitle": "Leaderboard",
-        "achievementsTitle": "Achievements",
-        "authTitle": "Login / Register",
-        "welcome": "Welcome",
-        "guest": "Guest", // POPRAWKA
-        "playSolo": "PLAY SOLO",
-        "playMultiplayer": "MULTIPLAYER",
-        "gameDescription": "Welcome to Memorr! Test your memory by playing solo or challenge your friends in multiplayer. The goal is to find all the pairs. Good luck!",
-        "soloH3": "SOLO GAME - Select Difficulty",
-        "easy": "Easy (4x4)",
-        "medium": "Medium (6x4)",
-        "hard": "Hard (6x6)",
-        "back": "BACK",
-        "multiH3": "MULTIPLAYER",
-        "createGame": "CREATE GAME",
-        "joinGame": "JOIN GAME",
-        "raceMode": "Race",
-        "raceDesc": "(First to find all pairs on their own board)",
-        "classicMode": "Classic",
-        "classicDesc": "(Shared board, turn-based with points)",
-        "selectLevel": "Select Level",
-        "gameId": "Game ID:",
-        "copyTitle": "Copy to clipboard",
-        "gameIdPlaceholder": "Enter Game ID",
-        "join": "JOIN",
-        "logout": "Logout",
-        "selectTheme": "Select card theme",
-        "themeDefault": "Classic",
-        "themeNature": "Nature",
-        "themeFood": "Food",
-        "themeAnimals": "Animals",
-        "backToLobby": "BACK TO LOBBY",
-        "peekTitle": "Peek (once per game)",
-        "autoPairTitle": "Auto-Pair (once per game)",
-        "player": "PLAYER",
-        "time": "Time",
-        "moves": "Moves",
-        "points": "Points",
-        "record": "Record",
-        "games": "Games",
-        "multiWins": "Wins",
-        "gamesPlayed": "Total Games",
-        "opponent": "OPPONENT",
-        "newRecord": "NEW RECORD!",
-        "rematch": "REMATCH",
-        "congratulations": "Congratulations!",
-        "soloWinMessage": "You finished the game in {seconds}s and {moves} moves!",
-        "replay": "REPLAY",
-        "nextLevel": "NEXT LEVEL",
-        "yourAchievements": "Your Achievements",
-        "close": "CLOSE",
-        "login": "Login",
-        "register": "Register",
-        "welcomeBack": "Welcome back!",
-        "usernamePlaceholder": "Username",
-        "passwordPlaceholder": "Password",
-        "forgotPassword": "Forgot your password?",
-        "joinMemorr": "Join Memorr",
-        "usernameRegisterPlaceholder": "Username (min. 3 chars)",
-        "emailPlaceholder": "Your e-mail",
-        "passwordRegisterPlaceholder": "Password (min. 6 chars)",
-        "resetPassword": "Reset Password",
-        "resetSubtext": "Enter your e-mail and we will send you a password reset link.",
-        "sendLink": "Send Link",
-        "backToLogin": "Back to Login",
-        "closeTitle": "Close",
-        "leaderboard": "Leaderboard",
-        "bestTime6x6": "Best Time (6x6)",
-        "multiWinsRank": "Multiplayer Wins",
-        "toastTitle": "Achievement Unlocked!",
-        "cookieText": "We use cookies (and `localStorage`) to improve the game, save your theme, and serve ads. By using the site, you agree to our <a href=\"/privacy-policy.html\">Privacy Policy</a>.",
-        "cookieBtn": "Got it",
-        "lobbyMsg_copied": "Copied code: {gameID}",
-        "lobbyMsg_copyError": "Could not copy.",
-        "lobbyMsg_waitOpponent": "Waiting for opponent...",
-        "lobbyMsg_loading": "Processing...",
-        "lobbyMsg_noGame": "A game with this ID does not exist.",
-        "lobbyMsg_full": "This room is already full.",
-        "winModal_Tie": "It's a Tie!",
-        "winModal_TieMsg": "An amazing fight! Try again.",
-        "winModal_WinRace": "You won in {seconds}s and {moves} moves!",
-        "winModal_WinClassic": "You won! You collected more pairs.",
-        "winModal_LostTitle": "Unfortunately!",
-        "winModal_LostRace": "Your opponent was faster. Try again!",
-        "winModal_LostClassic": "Your opponent collected more pairs. Try again!",
-        "leaderboard_loading": "Loading...",
-        "leaderboard_error": "Failed to load leaderboard.",
-        "leaderboard_noTime": "No one has completed the Hard level yet! Be the first.",
-        "leaderboard_noWins": "No one has won a multiplayer match yet!",
-        "leaderboard_wins_one": "win",
-        "leaderboard_wins_few": "wins", // W ang. "wins" jest uniwersalne
-        "leaderboard_wins_many": "wins",
-        "turnInfo_your": "Your turn!",
-        "turnInfo_opponent": "Opponent's turn...",
-        "rematch_offer": "Opponent wants a rematch!",
-        "rematch_wait": "Rematch request sent... Waiting...",
-        "opponent_disconnected_title": "Game Over",
-        "opponent_disconnected_msg": "Your opponent disconnected. You win!",
-        "opponent_disconnected_lobby": "Opponent disconnected.",
-        "footerHelp": "Help",
-        "footerContact": "Contact",
-        "footerBlog": "Blog",
-        "footerPrivacy": "Privacy Policy",
-        "achievements": {
-            "first_solo_game": { "title": "First Steps", "description": "Complete your first solo game." },
-            "fast_win_easy":   { "title": "Quick as Lightning", "description": "Finish a 4x4 game in under 30 seconds." },
-            "perfect_game":    { "title": "Perfectionist", "description": "Finish a solo game without a single mistake." },
-            "master_mind":     { "title": "Memory Genius", "description": "Complete a 6x6 game." },
-            "first_multi_win": { "title": "First Victory", "description": "Win your first multiplayer match." },
-            "no_powerups_hard": { "title": "Pure Mind", "description": "Complete a 6x6 game without using power-ups." },
-            "win_streak_3":     { "title": "On Fire!", "description": "Win 3 multiplayer games in a row." },
-            "connoisseur":      { "title": "Connoisseur", "description": "Play a game with all 4 themes." }
-        }
-    }
-};
-
+// ===== TŁUMACZENIA SĄ TERAZ W translations.js =====
 let currentLang = 'pl';
 // ===================================
 
@@ -414,7 +171,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const achievementsCloseBtn = document.getElementById('achievements-close-btn');
     const toastNotification = document.getElementById('toast-notification');
     const themeToggleBtn = document.getElementById('theme-toggle-btn'); 
-    const langToggleBtn = document.getElementById('lang-toggle-btn'); // NOWY PRZYCISK
+    const langToggleBtn = document.getElementById('lang-toggle-btn');
     const leaderboardBtn = document.getElementById('leaderboard-btn');
     const leaderboardModal = document.getElementById('leaderboard-modal');
     const leaderboardCloseBtn = document.getElementById('leaderboard-close-btn');
@@ -425,10 +182,16 @@ document.addEventListener('DOMContentLoaded', () => {
     // ==================================
 
     // ================================================================
-    // ===== LOGIKA TŁUMACZEŃ =====
+    // ===== LOGIKA TŁUMACZEŃ (dla script.js) =====
     // ================================================================
     
     function setLanguage(lang) {
+        // Upewnij się, że obiekt translations istnieje (powinien być z translations.js)
+        if (typeof translations === 'undefined') {
+            console.error('translations.js not loaded!');
+            return;
+        }
+        
         currentLang = lang;
         const t = translations[lang];
 
@@ -461,7 +224,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
         
-        // POPRAWKA: Użyj "guest" z obiektu tłumaczeń
         welcomeMessage.textContent = `${t.welcome}, ${isGuest ? t.guest : currentUser.username}!`;
         
         if (!achievementsModal.classList.contains('hidden')) {
@@ -471,7 +233,6 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!leaderboardListTime.classList.contains('hidden')) loadLeaderboardTime();
             if (!leaderboardListWins.classList.contains('hidden')) loadLeaderboardWins();
         }
-        // POPRAWKA: Przetłumacz stopkę
         document.querySelector('.footer-content a[href="/help.html"]').textContent = t.footerHelp;
         document.querySelector('.footer-content a[href="/contact.html"]').textContent = t.footerContact;
         document.querySelector('.footer-content a[href="/blog"]').textContent = t.footerBlog;

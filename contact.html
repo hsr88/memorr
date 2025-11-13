@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kontakt - Memorr</title>
-    <meta name="description" content="Skontaktuj się z twórcami gry Memorr. Zgłoś błąd lub prześlij sugestię.">
+    <title data-lang="page_contact_title">Kontakt - Memorr</title>
+    <meta name="description" content="Skontaktuj się z twórcami gry Memorr. Zgłoś błąd lub prześlij sugestię." data-lang-desc="page_contact_desc">
 
     <link rel="icon" type="image/png" href="favicon.png"> 
-<script>
+    <script>
         (function() {
             // 1. Logika trybu ciemnego
             const theme = localStorage.getItem('memorr_theme');
@@ -18,7 +18,6 @@
             // 2. Logika banera cookie
             const consent = localStorage.getItem('memorr_consent');
             if (!consent) {
-                // Pokaż baner dopiero po załadowaniu reszty strony
                 document.addEventListener('DOMContentLoaded', () => {
                     const banner = document.getElementById('cookie-consent-banner');
                     const consentBtn = document.getElementById('cookie-consent-btn');
@@ -45,29 +44,38 @@
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body data-page-title="page_contact_title" data-page-desc="page_contact_desc">
+
+    <button id="theme-toggle-btn" title="Zmień motyw">🌙</button>
+    <button id="lang-toggle-btn" title="Change language">🇬🇧</button>
+
     <main>
        <h1><img src="/logo.png" alt="Memorr Logo" class="logo">Memo<span class="rr">rr</span> </h1>
 
         <div class="panel page-content">
-            <h2>Skontaktuj się z nami</h2>
-            <p>Masz pytania, sugestie lub chciałbyś zgłosić błąd?</p>
-            <p>Napisz do nas na adres: <a href="mailto:admin@memorr.top">admin@memorr.top</a></p>
-            <p>Postaramy się odpowiedzieć najszybciej, jak to możliwe!</p>
+            <h2 data-lang="page_contact_h2">Skontaktuj się z nami</h2>
+            <p data-lang="page_contact_p1">Masz pytania, sugestie lub chciałbyś zgłosić błąd?</p>
+            <p data-lang="page_contact_p2">Napisz do nas na adres: <a href="mailto:admin@memorr.top">admin@memorr.top</a></p>
+            <p data-lang="page_contact_p3">Postaramy się odpowiedzieć najszybciej, jak to możliwe!</p>
 
             <p><a href="https://buycoffee.to/bankrut" target="_blank"><img src="https://buycoffee.to/static/img/share/share-button-dark.png" style="width: 185px; height: 48px" alt="Postaw mi kawę na buycoffee.to"></a></p>
             
-            <button onclick="window.location.href='/'" class="btn purple">POWRÓT DO GRY</button>
+            <button onclick="window.location.href='/'" class="btn purple" data-lang="backToLobby">POWRÓT DO GRY</button>
         </div>
     </main>
-<div id="cookie-consent-banner" class="panel hidden">
-        <p>Używamy plików cookie (i `localStorage`), aby ulepszyć grę, zapisać Twój motyw i obsługiwać reklamy. Korzystając ze strony, zgadzasz się na naszą <a href="/privacy-policy.html">Politykę Prywatności</a>.</p>
-        <button id="cookie-consent-btn" class="btn small green">Rozumiem</button>
+
+    <div id="cookie-consent-banner" class="panel hidden">
+        <p data-lang="cookieText">Używamy plików cookie (i `localStorage`), aby ulepszyć grę, zapisać Twój motyw i obsługiwać reklamy. Korzystając ze strony, zgadzasz się na naszą <a href="/privacy-policy.html">Politykę Prywatności</a>.</p>
+        <button id="cookie-consent-btn" class="btn small green" data-lang="cookieBtn">Rozumiem</button>
     </div>
-   <footer>
+
+    <footer>
         <div class="footer-content">
-            &copy; memorr.top | <a href="/help.html">Pomoc</a> | <a href="/contact.html">Kontakt</a> | <a href="/blog">Blog</a> | <a href="/privacy-policy.html">Polityka Prywatności</a> | <a href="https://www.facebook.com/memorrtop" target="_blank" rel="noopener noreferrer">Facebook</a>
+            &copy; memorr.top | <a href="/help.html" data-lang="footerHelp">Pomoc</a> | <a href="/contact.html" data-lang="footerContact">Kontakt</a> | <a href="/blog">Blog</a> | <a href="/privacy-policy.html" data-lang="footerPrivacy">Polityka Prywatności</a> | <a href="https://www.facebook.com/memorrtop" target="_blank" rel="noopener noreferrer">Facebook</a>
         </div>
     </footer>
+    
+    <script src="translations.js"></script>
+    <script src="static-lang.js"></script>
 </body>
 </html>

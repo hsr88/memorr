@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pomoc - Memorr</title>
-    <meta name="description" content="Zasady gry Memorr. Dowiedz się, jak grać w trybie solo, klasycznym pojedynku multiplayer i trybie wyścigu.">
+    <title data-lang="page_help_title">Pomoc - Memorr</title>
+    <meta name="description" content="Zasady gry Memorr. Dowiedz się, jak grać w trybie solo, klasycznym pojedynku multiplayer i trybie wyścigu." data-lang-desc="page_help_desc">
     
     <link rel="icon" type="image/png" href="favicon.png"> 
     
-   <script>
+    <script>
         (function() {
             // 1. Logika trybu ciemnego
             const theme = localStorage.getItem('memorr_theme');
@@ -19,7 +19,6 @@
             // 2. Logika banera cookie
             const consent = localStorage.getItem('memorr_consent');
             if (!consent) {
-                // Pokaż baner dopiero po załadowaniu reszty strony
                 document.addEventListener('DOMContentLoaded', () => {
                     const banner = document.getElementById('cookie-consent-banner');
                     const consentBtn = document.getElementById('cookie-consent-btn');
@@ -48,70 +47,79 @@
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body data-page-title="page_help_title" data-page-desc="page_help_desc">
+    
+    <button id="theme-toggle-btn" title="Zmień motyw">🌙</button>
+    <button id="lang-toggle-btn" title="Change language">🇬🇧</button>
+
     <main>
         <h1><img src="/logo.png" alt="Memorr Logo" class="logo">Memo<span class="rr">rr</span> </h1>
 
         <div class="panel page-content">
-            <h2>Pomoc i Zasady Gry</h2>
+            <h2 data-lang="page_help_h2">Pomoc i Zasady Gry</h2>
 
-            <h3>O co chodzi w Memorr?</h3>
-            <p>Memorr to klasyczna gra pamięciowa "Memory", w której Twoim zadaniem jest odkrywanie par identycznych kart. Rozgrywka jest prosta: w każdej turze odkrywasz dwie karty. Jeśli są takie same, zdobywasz punkt i karty pozostają odkryte. Jeśli są różne, karty zostają zakryte, a Ty starasz się zapamiętać ich położenie.</p>
+            <h3 data-lang="page_help_h3_about">O co chodzi w Memorr?</h3>
+            <p data-lang="page_help_p_about">Memorr to klasyczna gra pamięciowa "Memory", w której Twoim zadaniem jest odkrywanie par identycznych kart. Rozgrywka jest prosta: w każdej turze odkrywasz dwie karty. Jeśli są takie same, zdobywasz punkt i karty pozostają odkryte. Jeśli są różne, karty zostają zakryte, a Ty starasz się zapamiętać ich położenie.</p>
 
-            <h3>Tryby Gry</h3>
+            <h3 data-lang="page_help_h3_modes">Tryby Gry</h3>
             
-            <h4>Tryb Solo</h4>
-            <p>Zagraj sam i trenuj swoją pamięć! Wybierz jeden z trzech poziomów trudności (Łatwy 4x4, Średni 6x4, Trudny 6x6) i motyw kart. Twoim celem jest ukończenie gry w jak najkrótszym czasie. Twoje najlepsze czasy są zapisywane w chmurze (jeśli jesteś zalogowany) i liczą się do globalnego rankingu!</p>
+            <h4 data-lang="page_help_h4_solo">Tryb Solo</h4>
+            <p data-lang="page_help_p_solo">Zagraj sam i trenuj swoją pamięć! Wybierz jeden z trzech poziomów trudności (Łatwy 4x4, Średni 6x4, Trudny 6x6) i motyw kart. Twoim celem jest ukończenie gry w jak najkrótszym czasie. Twoje najlepsze czasy są zapisywane w chmurze (jeśli jesteś zalogowany) i liczą się do globalnego rankingu!</p>
             
-            <h4>Tryb Wieloosobowy</h4>
-            <p>Zmierz się ze znajomymi w ekscytującym pojedynku pamięci! Po dołączeniu do pokoju, twórca gry wybiera jeden z dwóch trybów:</p>
+            <h4 data-lang="page_help_h4_multi">Tryb Wieloosobowy</h4>
+            <p data-lang="page_help_p_multi">Zmierz się ze znajomymi w ekscytującym pojedynku pamięci! Po dołączeniu do pokoju, twórca gry wybiera jeden z dwóch trybów:</p>
             
-            <h5>Tryb Klasyczny (Turowy)</h5>
-            <p>To klasyczne zasady Memory. Obaj gracze grają na **jednej, wspólnej planszy** i grają na zmianę.
+            <h5 data-lang="page_help_h5_classic">Tryb Klasyczny (Turowy)</h5>
+            <p data-lang="page_help_p_classic">To klasyczne zasady Memory. Obaj gracze grają na **jednej, wspólnej planszy** i grają na zmianę.</p>
             <ul>
-                <li>Jeśli znajdziesz parę, zdobywasz punkt i **masz kolejny ruch**.</li>
-                <li>Jeśli spudłujesz, karty są zakrywane, a tura przechodzi na Twojego przeciwnika.</li>
+                <li data-lang="page_help_li_classic1">Jeśli znajdziesz parę, zdobywasz punkt i **masz kolejny ruch**.</li>
+                <li data-lang="page_help_li_classic2">Jeśli spudłujesz, karty są zakrywane, a tura przechodzi na Twojego przeciwnika.</li>
             </ul>
-            Wygrywa gracz, który na koniec gry zbierze **więcej par**. Każda wygrana (jeśli jesteś zalogowany) liczy się do Twoich statystyk i globalnego rankingu wygranych.</p>
+            <p data-lang="page_help_p_classic_win">Wygrywa gracz, który na koniec gry zbierze **więcej par**. Każda wygrana (jeśli jesteś zalogowany) liczy się do Twoich statystyk i globalnego rankingu wygranych.</p>
 
-            <h5>Tryb Wyścigu</h5>
-            <p>W tym trybie liczy się tylko **szybkość**. Obaj gracze otrzymują swoje **osobne, ale identycznie potasowane plansze**. Nie ma tur – obaj gracie w tym samym czasie.
+            <h5 data-lang="page_help_h5_race">Tryb Wyścigu</h5>
+            <p data-lang="page_help_p_race">W tym trybie liczy się tylko **szybkość**. Obaj gracze otrzymują swoje **osobne, ale identycznie potasowane plansze**. Nie ma tur – obaj gracie w tym samym czasie.</p>
             <ul>
-                <li>Widzisz postępy swojego przeciwnika (liczbę znalezionych par), ale nie widzisz jego planszy.</li>
-                <li>Twoim celem jest znalezienie wszystkich par szybciej niż on.</li>
+                <li data-lang="page_help_li_race1">Widzisz postępy swojego przeciwnika (liczbę znalezionych par), ale nie widzisz jego planszy.</li>
+                <li data-lang="page_help_li_race2">Twoim celem jest znalezienie wszystkich par szybciej niż on.</li>
             </ul>
-            Wygrywa gracz, który jako pierwszy **odkryje wszystkie pary**. Ta wygrana również jest zapisywana w Twoim profilu.</p>
+            <p data-lang="page_help_p_race_win">Wygrywa gracz, który jako pierwszy **odkryje wszystkie pary**. Ta wygrana również jest zapisywana w Twoim profilu.</p>
 
-            <h3>Power-upy (Ułatwienia)</h3>
-            <p>Na największych i najtrudniejszych planszach (**tylko 6x6**) masz do dyspozycji dwa potężne ułatwienia. Każde z nich możesz użyć tylko **jeden raz** na grę!</p>
+            <h3 data-lang="page_help_h3_powerups">Power-upy (Ułatwienia)</h3>
+            <p data-lang="page_help_p_powerups">Na największych i najtrudniejszych planszach (**tylko 6x6**) masz do dyspozycji dwa potężne ułatwienia. Każde z nich możesz użyć tylko **jeden raz** na grę!</p>
             <ul>
-                <li><strong>Podgląd Planszy (👁️):</strong> Odkrywa wszystkie zakryte karty na planszy na 2 sekundy. Użyj go mądrze, aby zapamiętać kluczowe pozycje!</li>
-                <li><strong>Automatyczna Para (🎯):</strong> Natychmiast znajduje i odkrywa jedną, losową parę na planszy za Ciebie. Idealne, gdy utkniesz.</li>
+                <li data-lang="page_help_li_powerup1"><strong>Podgląd Planszy (👁️):</strong> Odkrywa wszystkie zakryte karty na planszy na 2 sekundy. Użyj go mądrze, aby zapamiętać kluczowe pozycje!</li>
+                <li data-lang="page_help_li_powerup2"><strong>Automatyczna Para (🎯):</strong> Natychmiast znajduje i odkrywa jedną, losową parę na planszy za Ciebie. Idealne, gdy utkniesz.</li>
             </ul>
 
-            <h3>Rankingi (🥇)</h3>
-            <p>W lobby znajdziesz ikonę 🥇, która otwiera globalny ranking graczy. Jest on dostępny dla wszystkich (również dla gości!). Ranking jest podzielony na dwie kategorie:</p>
+            <h3 data-lang="page_help_h3_ranking">Rankingi (🥇)</h3>
+            <p data-lang="page_help_p_ranking">W lobby znajdziesz ikonę 🥇, która otwiera globalny ranking graczy. Jest on dostępny dla wszystkich (również dla gości!). Ranking jest podzielony na dwie kategorie:</p>
             <ul>
-                <li><strong>Najlepszy Czas (6x6):</strong> Pokazuje 10 najszybszych graczy, którzy ukończyli grę solo na poziomie Trudnym.</li>
-                <li><strong>Wygrane Mecze:</strong> Pokazuje 10 graczy z największą liczbą wygranych gier multiplayer (zarówno w trybie Klasycznym, jak i Wyścigu).</li>
+                <li data-lang="page_help_li_ranking1"><strong>Najlepszy Czas (6x6):</strong> Pokazuje 10 najszybszych graczy, którzy ukończyli grę solo na poziomie Trudnym.</li>
+                <li data-lang="page_help_li_ranking2"><strong>Wygrane Mecze:</strong> Pokazuje 10 graczy z największą liczbą wygranych gier multiplayer (zarówno w trybie Klasycznym, jak i Wyścigu).</li>
             </ul>
-            <p>Tylko zalogowani gracze mogą zapisywać swoje wyniki w rankingu. Graj, aby wspinać się na szczyt!</p>
-            <h3>Osiągnięcia (🏆)</h3>
-            <p>W lobby znajdziesz ikonę 🏆, która otwiera panel Twoich Osiągnięć. Tam możesz sprawdzić, jakie wyzwania udało Ci się już odblokować i jakie jeszcze czekają! Osiągnięcia dla gości zapisywane są w przeglądarce, a dla zalogowanych użytkowników – w chmurze.</p>
+            <p data-lang="page_help_p_ranking_login">Tylko zalogowani gracze mogą zapisywać swoje wyniki w rankingu. Graj, aby wspinać się na szczyt!</p>
+            <h3 data-lang="page_help_h3_achievements">Osiągnięcia (🏆)</h3>
+            <p data-lang="page_help_p_achievements">W lobby znajdziesz ikonę 🏆, która otwiera panel Twoich Osiągnięć. Tam możesz sprawdzić, jakie wyzwania udało Ci się już odblokować i jakie jeszcze czekają! Osiągnięcia dla gości zapisywane są w przeglądarce, a dla zalogowanych użytkowników – w chmurze.</p>
     
-<p><a href="https://buycoffee.to/bankrut" target="_blank"><img src="https://buycoffee.to/static/img/share/share-button-dark.png" style="width: 185px; height: 48px" alt="Postaw mi kawę na buycoffee.to"></a></p>
+            <p><a href="https://buycoffee.to/bankrut" target="_blank"><img src="https://buycoffee.to/static/img/share/share-button-dark.png" style="width: 185px; height: 48px" alt="Postaw mi kawę na buycoffee.to"></a></p>
     
-            <button onclick="window.location.href='/'" class="btn purple">POWRÓT DO GRY</button>
+            <button onclick="window.location.href='/'" class="btn purple" data-lang="backToLobby">POWRÓT DO GRY</button>
         </div>
     </main>
-<div id="cookie-consent-banner" class="panel hidden">
-        <p>Używamy plików cookie (i `localStorage`), aby ulepszyć grę, zapisać Twój motyw i obsługiwać reklamy. Korzystając ze strony, zgadzasz się na naszą <a href="/privacy-policy.html">Politykę Prywatności</a>.</p>
-        <button id="cookie-consent-btn" class="btn small green">Rozumiem</button>
+
+    <div id="cookie-consent-banner" class="panel hidden">
+        <p data-lang="cookieText">Używamy plików cookie (i `localStorage`), aby ulepszyć grę, zapisać Twój motyw i obsługiwać reklamy. Korzystając ze strony, zgadzasz się na naszą <a href="/privacy-policy.html">Politykę Prywatności</a>.</p>
+        <button id="cookie-consent-btn" class="btn small green" data-lang="cookieBtn">Rozumiem</button>
     </div>
-   <footer>
+
+    <footer>
         <div class="footer-content">
-            &copy; memorr.top | <a href="/help.html">Pomoc</a> | <a href="/contact.html">Kontakt</a> | <a href="/blog">Blog</a> | <a href="/privacy-policy.html">Polityka Prywatności</a> | <a href="https://www.facebook.com/memorrtop" target="_blank" rel="noopener noreferrer">Facebook</a>
+            &copy; memorr.top | <a href="/help.html" data-lang="footerHelp">Pomoc</a> | <a href="/contact.html" data-lang="footerContact">Kontakt</a> | <a href="/blog">Blog</a> | <a href="/privacy-policy.html" data-lang="footerPrivacy">Polityka Prywatności</a> | <a href="https://www.facebook.com/memorrtop" target="_blank" rel="noopener noreferrer">Facebook</a>
         </div>
     </footer>
+    
+    <script src="translations.js"></script>
+    <script src="static-lang.js"></script>
 </body>
 </html>
