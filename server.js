@@ -607,8 +607,8 @@ app.use((req, res) => {
 });
 // ============================================
 
-// 5. Uruchom serwer
-server.listen(PORT, () => {
-    console.log(`Serwer nasłuchuje na porcie ${PORT}`);
-    console.log(`Otwórz http://localhost:${PORT} w przeglądarce`);
+// 5. Uruchom serwer – POPRAWIONA WERSJA DLA RENDER
+server.listen(PORT, '0.0.0.0', () => {
+    console.log(`Serwer działa na http://0.0.0.0:${PORT}`);
+    console.log(`Render nasłuchuje na process.env.PORT = ${process.env.PORT}`);
 });
