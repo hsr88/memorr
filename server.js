@@ -8,15 +8,17 @@ const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const nodemailer = require('nodemailer');
 const path = require('path');
-const cors = require('cors'); 
+const cors = require('cors'); // <-- 1. NOWY MODUŁ
 require('dotenv').config();
 
 // 2. Skonfiguruj serwer
 const app = express();
 const server = http.createServer(app);
+
+// 2b. ZAKTUALIZOWANA KONFIGURACJA SOCKET.IO DLA CORS
 const io = new Server(server, {
     cors: {
-      origin: "*", // Pozwól Socket.IO na połączenia zewn. (dla GamePix)
+      origin: "*", // Pozwól Socket.IO na połączenia z dowolnej domeny
       methods: ["GET", "POST"]
     }
 });
@@ -43,31 +45,31 @@ const UserSchema = new mongoose.Schema({
     soloBestTimeEasy: { type: Number, default: 9999 },
     soloBestTimeMedium: { type: Number, default: 9999 },
     soloBestTimeHard: { type: Number, default: 9999 },
-    winStreak: { type: Number, default: 0 },
-    themesPlayed: { type: [String], default: [] }
+    winStreak: { type: Number, default: 0 }, 
+    themesPlayed: { type: [String], default: [] } 
 });
 const User = mongoose.model('User', UserSchema);
 // ============================================
 
 // 3. Ustaw Expressa
 
-// ===== KONFIGURACJA CORS (WAŻNE!) =====
-// Lista domen, którym ufamy
+// ===== 3b. ZAKTUALIZOWANA KONFIGURACJA CORS DLA EXPRESS (API) =====
 const allowedOrigins = [
     'https://memorr.top', 
-    'http://localhost:3000', 
-    'https://gamepix.com',
-    'https://testing-toolkit.gamepix.com', // Zaufaj narzędziu testowemu
-    'https://games.gamepix.com' // Zaufaj ich domenie gier
+    'http://localhost:3000',
+    'null' // Dla testów lokalnych (otwieranie pliku bezpośrednio)
 ];
 
 app.use(cors({
     origin: function(origin, callback){
-        // Zezwól na żądania bez 'origin' (np. testy lokalne, aplikacje mobilne)
+        // Zezwól na żądania bez 'origin' (np. testy lokalne)
         if(!origin) return callback(null, true);
         
-        // Sprawdź, czy domena jest na naszej liście LUB jest subdomeną GamePix
-        if(allowedOrigins.indexOf(origin) !== -1 || origin.endsWith(".gamepix.com") || origin.endsWith(".gpx.services")) {
+        // Sprawdź, czy domena jest na liście LUB jest subdomeną GamePix
+        if(allowedOrigins.indexOf(origin) !== -1 || 
+           origin.endsWith(".gamepix.com") || 
+           origin.endsWith(".gpx.services")) 
+        {
             return callback(null, true);
         }
         
@@ -90,10 +92,7 @@ app.use((req, res, next) => {
     }
     next();
 });
-
-// Trasa dla artykułów bloga (SEO)
 app.get('/blog/:slug', (req, res, next) => {
-    // ... (reszta kodu bez zmian)
     const slug = req.params.slug;
     if (!slug || slug.includes('..') || slug.includes('/')) {
         return next(); 
@@ -106,12 +105,12 @@ app.get('/blog/:slug', (req, res, next) => {
         }
     });
 });
-
 app.use(express.json());
 app.use(express.static(__dirname));
 
 // ===== API (Rejestracja, Logowanie...) =====
-// ... (CAŁA RESZTA TWOJEGO KODU API POZOSTAJE BEZ ZMIAN) ...
+// ... (Cała reszta kodu API, Socket.IO, itp. pozostaje BEZ ZMIAN) ...
+// (Wklejam resztę, żebyś miał pewność, że plik jest kompletny)
 app.post('/api/register', async (req, res) => {
     try {
         const { username, email, password } = req.body;
@@ -366,7 +365,6 @@ app.get('/api/leaderboard-wins', async (req, res) => {
 
 
 // ===== LOGIKA GRY (Socket.IO) =====
-// ... (CAŁA LOGIKA SOCKET.IO POZOSTAJE BEZ ZMIAN) ...
 async function awardWin(userId) {
     if (!userId) return; 
     try {
