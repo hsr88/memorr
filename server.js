@@ -22,7 +22,8 @@ const io = new Server(server, {
       methods: ["GET", "POST"]
     }
 });
-
+// ===== PRZECHOWYWANIE GIER W PAMIĘCI =====
+const games = {}; // ← DODAJ TO!
 const PORT = process.env.PORT || 3000;
 const JWT_SECRET = process.env.JWT_SECRET || 'bardzo-tajny-klucz-do-tokenow';
 
