@@ -75,7 +75,7 @@ const translations = {
         "bestTime6x6": "Najlepszy Czas (6x6)",
         "multiWinsRank": "Wygrane Mecze",
         "toastTitle": "Osiągnięcie odblokowane!",
-        "cookieText": "Używamy plików cookie (i `localStorage`), aby ulepszyć grę, zapisać Twój motyw i obsługiwać reklamy. Korzystając ze strony, zgadzasz się na naszą <a href=\"/privacy-policy.html\">Politykę Prywatności</a>.",
+        "cookieText": "Używamy plików cookie (i `localStorage`), aby ulepszyć grę, zapisać Twój motyw i obsługiwać reklamy. Korzystając ze strony, zgadzasz się na naszą Politykę Prywatności.",
         "cookieBtn": "Rozumiem",
         "lobbyMsg_copied": "Skopiowano kod: {gameID}",
         "lobbyMsg_copyError": "Nie udało się skopiować.",
