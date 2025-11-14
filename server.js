@@ -8,7 +8,7 @@ const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const nodemailer = require('nodemailer');
 const path = require('path');
-const cors = require('cors'); // <-- 1. NOWd
+const cors = require('cors'); // <-- 1. no czedmu nei dziala
 require('dotenv').config();
 
 // 2. Skonfiguruj serwer
